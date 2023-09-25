@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="title">Chat</title>
+    <link rel="icon" href="https://em-content.zobj.net/source/apple/354/speech-balloon_1f4ac.png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/twemoji@latest/dist/twemoji.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+</head>
+
+<body>
+    <script src="index.js" type="module" defer></script>
+    <div class="sidebar">
+        <div class="server-sidebar">
+            <a class="server-sidebar-icon" href="/">
+                <img src="https://static-00.iconduck.com/assets.00/discord-icon-512x512-xtx725no.png">
+            </a>
+            <a class="server-sidebar-icon">
+                <img src="https://yt3.googleusercontent.com/_DiGCcjGwJQAZ3zmlyB8TCYuA8O9tDJ9zGNysq5sR0rxwYb6SP5fW8cb3LbfcRwfui0m27oIhA=s176-c-k-c0x00ffffff-no-rj">
+            </a>
+            <a class="server-sidebar-icon">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png">
+            </a>
+            <a class="server-sidebar-icon">
+                <img src="https://play-lh.googleusercontent.com/WNWZaxi9RdJKe2GQM3vqXIAkk69mnIl4Cc8EyZcir2SKlVOxeUv9tZGfNTmNaLC717Ht">
+            </a>
+        </div>
+        <div class="channel-sidebar">
+            <div>
+                <h1 id="server-name"></h1>
+                <div id="channels">
+                </div>
+            </div>
+            <h3 id="server-info"></h3>
+        </div>
+        
+        <form class="settings" target="dummyframe">
+            <input type="text" name="Name" id="name" onchange="changeSettings('name')" max="25" maxlength="25">
+            <input type="color" name="Name Colour" id="colour" onchange="changeSettings('colour')">
+        </form>
+    </div>
+    <div class="main">
+        <div class="messages" id="messages"></div>
+        <form class="create" id="create" autocomplete="off">
+            <input class="message-create" id="created-message" placeholder="" max="175" maxlength="175" autofocus>
+            <div class="message-create-button" id="file-upload">
+                <label for="fileUpload">
+                    <img id="file-upload-icon" draggable="false"
+                        src="https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f4c1.svg">
+                </label>
+                <input type="file" id="fileUpload" style="display: none;" accept="image/*" />
+            </div>
+            <div class=" message-create-button" id="emoji-picker">
+                <div class="emoji-picker-div" id="emoji-picker-div"></div>
+                <img id="emoji-picker-icon" draggable="false"
+                    src="https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f642.svg">
+            </div>
+        </form>
+    </div>
+    <script defer>
+        String.prototype.truncate = String.prototype.truncate ||
+            function (n, useWordBoundary) {
+                if (this.length <= n) { return this; }
+                const subString = this.slice(0, n - 1); // the original check
+                return (useWordBoundary
+                    ? subString.slice(0, subString.lastIndexOf(" "))
+                    : subString);
+            };
+
+        document.getElementById("name").value = localStorage.getItem("name");
+        document.getElementById("colour").value = localStorage.getItem("colour");
+
+        function changeSettings(type) {
+            localStorage.setItem("name", document.getElementById("name").value.replace(new RegExp(" ", "g"), '_').truncate(20));
+            localStorage.setItem("colour", document.getElementById("colour").value);
+
+            if (type == "name" && localStorage.getItem("verified") == "true") { localStorage.setItem("verified", false) }
+
+
+            document.getElementById("name").value = localStorage.getItem("name");
+            document.getElementById("colour").value = localStorage.getItem("colour");
+        }
+        /*
+
+        for (let index = 0; index < 50; index++) {
+            setTimeout(() => {
+                console.log("%cStop!", "color:red;font-family:system-ui;font-size:3rem;-webkit-text-stroke: 1px black;font-weight:bold");
+                console.log("%cThis is a browser feature intended for developers. If someone told you to copy-paste something here it is a scam and will allow them to run code on your computer.", "color:white;font-family:system-ui;font-size:1rem;font-weight:bold");
+            }, 1000);
+        }*/
+    </script>
+    <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+</body>
+
+</html>
