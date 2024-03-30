@@ -76,6 +76,10 @@ em-emoji-picker {
     border-bottom: 5px solid var(--brand-2);
 }
 
+.server-sidebar-icon:nth-of-type(1) img {
+    border-radius: 0;
+}
+
 .server-sidebar-icon img {
     width: 64px;
     aspect-ratio: 1/1;
