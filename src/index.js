@@ -27,6 +27,10 @@ import {
     uploadBytes,
     getDownloadURL,
 } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
 const app = initializeApp(database);
 
@@ -52,23 +56,41 @@ function checkMessage(string) {
     }
     if (string.startsWith("font:")) {
         if (string.startsWith("font:comic:")) {
-            return `<span style="font-family: 'Comic Sans MS', 'Comic Sans', cursive;">${string.replace('font:comic:','')}</span>`;
+            return `<span style="font-family: 'Comic Sans MS', 'Comic Sans', cursive;">${string.replace(
+                "font:comic:",
+                ""
+            )}</span>`;
         }
         if (string.startsWith("font:consolas:")) {
-            return `<span style="font-family: Consolas, monospace;">${string.replace('font:consolas:','')}</span>`;
+            return `<span style="font-family: Consolas, monospace;">${string.replace(
+                "font:consolas:",
+                ""
+            )}</span>`;
         }
         if (string.startsWith("font:impact:")) {
-            return `<span style="font-family: Impact, serif;">${string.replace('font:impact:','')}</span>`;
+            return `<span style="font-family: Impact, serif;">${string.replace(
+                "font:impact:",
+                ""
+            )}</span>`;
         }
         if (string.startsWith("font:faded:")) {
-            return `<span style="opacity: 20%;">${string.replace('font:faded:','')}</span>`;
+            return `<span style="opacity: 20%;">${string.replace(
+                "font:faded:",
+                ""
+            )}</span>`;
         }
         if (string.startsWith("font:tiny:")) {
-            return `<span style="font-size: 10px">${string.replace('font:tiny:','')}</span>`;
+            return `<span style="font-size: 10px">${string.replace(
+                "font:tiny:",
+                ""
+            )}</span>`;
         }
-    } 
+    }
     if (string.startsWith("spoiler:")) {
-        return `<div class="message-spoiler"><span class="message-spoiler-text">${string.replace('spoiler:','')}</span></div>`
+        return `<div class="message-spoiler"><span class="message-spoiler-text">${string.replace(
+            "spoiler:",
+            ""
+        )}</span></div>`;
     } else {
         var replaced = string
             .replace(/\\n/g, "<br>")
@@ -173,6 +195,7 @@ const slots = ["💯", "💀", "🧑‍🦼", "🍪", "😂"];
 
 const db = getFirestore(app);
 const storage = getStorage();
+const auth = getAuth();
 
 const serverRef = await getDoc(doc(db, "server", "info"));
 const server = serverRef.data();
@@ -239,8 +262,6 @@ title.innerHTML = `Chat - #${channel}`;
 serverName.innerHTML = server.name;
 serverInfo.innerHTML = `
 Owned by: ${server.owner}
-<br>
-Managed by: ${server.manager}
 <br>
 Version: ${clientVersion}
 <br>
@@ -614,10 +635,27 @@ function loadData() {
 }
 
 if (server.version == clientVersion) {
-    if (urlParams.get("voice-channel")) {
-        loadVoice();
+    if (auth.currentUser) {
+        if (urlParams.get("voice-channel")) {
+            loadVoice();
+        } else {
+            loadData();
+        }
     } else {
-        loadData();
+        const messageElement = document.createElement("div");
+        messageElement.className = "message";
+        messageElement.innerHTML = `
+          <div class="message-sender">
+              <span style="color: #ffff00">Bot <svg xmlns="http://www.w3.org/2000/svg" style="fill: #ffff00;" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
+              <span class="message-time">00:00</span></span>
+          </div>
+          <span class="message-content">You are not signed in. You will not be able to view, send, or interact with messages until you update.<br><button id="sign-in" class="sign-in">Click here to sign in</button><br>Don't have an account? Contact a developer!</span>
+        `;
+        messagesDiv.appendChild(messageElement);
+        const signIn = document.querySelector("#sign-in");
+        signIn.addEventListener("click", async (e) => {
+            signin();
+        });
     }
 } else {
     const messageElement = document.createElement("div");
@@ -674,6 +712,30 @@ folderIcon.addEventListener("mouseout", async (e) => {
         "https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f4c1.svg";
 });
 
+function signin() {
+    let email = prompt("Please enter your email:");
+    if (email == null || email == "" || !email.includes("@")) {
+        alert("Please enter a valid email next time");
+        return;
+    }
+    let password = prompt("Please enter your password:");
+    if (email == null || email == "") {
+        alert("Please enter a valid password next time");
+        return;
+    }
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            console.log(userCredential);
+        })
+        .catch((error) => {
+            alert(
+                `An error occured, please send this to a developer:\n${error}`
+            );
+        });
+    window.location.reload();
+}
+
+
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -692,193 +754,103 @@ form.addEventListener("submit", async (e) => {
 
     messageInput.value = "";
     if (server.version == clientVersion) {
-        if (name === "") {
-            name = "Unnamed User";
-        }
+        if (auth.currentUser) {
+            if (name === "") {
+                name = "Unnamed User";
+            }
 
-        // File Uploading
+            // File Uploading
 
-        if (fileUpload.files[0]) {
-            const file = fileUpload.files[0];
-            const fileName = `file_${Math.random()
-                .toString(36)
-                .replace("0.", "")}.jpg`;
-            const storageRef = ref(storage, fileName);
+            if (fileUpload.files[0]) {
+                const file = fileUpload.files[0];
+                const fileName = `file_${Math.random()
+                    .toString(36)
+                    .replace("0.", "")}.jpg`;
+                const storageRef = ref(storage, fileName);
 
-            uploadBytes(storageRef, file).then((snapshot) => {
-                getDownloadURL(storageRef)
-                    .then(async (url) => {
-                        await addDoc(messageRef, {
-                            name: name,
-                            verified:
-                                localStorage.getItem("verified") == "true"
-                                    ? true
-                                    : false,
-                            bot: false,
-                            owner:
-                                localStorage.getItem("owner") == "true"
-                                    ? true
-                                    : false,
-                            content: `image:${url}`,
-                            colour: color,
-                            timestamp: new Date(),
-                            ip: ip,
-                            useragent: navigator.userAgent,
-                        });
-                    })
-                    .catch((error) => {
-                        console.log("Error getting image URL:", error);
-                    });
-            });
-
-            fileUpload.value = null;
-            return;
-        }
-
-        // Check Message
-
-        if (message === "" || color === "") {
-            alert("Messages cannot be empty!");
-            return;
-        }
-        if (message.length > 175) {
-            alert("Messages cannot be longer than 175 characters!");
-            return;
-        }
-        if (message.includes("<") || message.includes(">")) {
-            alert("Messages cannot include '<' or '>'!");
-            return;
-        }
-
-        // Bot Commands
-
-        if (message.startsWith("/")) {
-            if (channel == "bot-spam") {
-                if (message.startsWith("/verify")) {
-                    if (
-                        server.codes.includes(message.replace("/verify ", ""))
-                    ) {
-                        localStorage.setItem("verified", true);
-                        alert("You are now Verified");
-                    } else {
-                        alert("Invalid Verification Code");
-                    }
-                    return;
-                }
-                if (message.startsWith("/random")) {
-                    await addDoc(messageRef, {
-                        name: name,
-                        verified:
-                            localStorage.getItem("verified") == "true"
-                                ? true
-                                : false,
-                        bot: true,
-                        command: message,
-                        content: `${Math.floor(Math.random() * 100)}`,
-                        colour: color,
-                        timestamp: new Date(),
-                        ip: ip,
-                        useragent: navigator.userAgent,
-                    });
-                    return;
-                }
-                if (message.startsWith("/test")) {
-                    if (localStorage.getItem("verified") == "true") {
-                        await addDoc(messageRef, {
-                            name: name,
-                            verified:
-                                localStorage.getItem("verified") == "true"
-                                    ? true
-                                    : false,
-                            bot: true,
-                            command: message,
-                            content: `embed:${message}`,
-                            colour: color,
-                            timestamp: new Date(),
-                            ip: ip,
-                            useragent: navigator.userAgent,
-                        });
-                    } else {
-                        alert("No permission");
-                    }
-                    return;
-                }
-                if (message.startsWith("/slots")) {
-                    if (message.replace("/slots ", "") != "/slots") {
-                        let slots1 =
-                            slots[Math.floor(Math.random() * slots.length)];
-                        let slots2 =
-                            slots[Math.floor(Math.random() * slots.length)];
-                        let slots3 =
-                            slots[Math.floor(Math.random() * slots.length)];
-                        var status;
-                        if (
-                            slots1 == slots2 &&
-                            slots2 == slots3 &&
-                            slots3 == slots1
-                        ) {
-                            status =
-                                "omg u made like " +
-                                parseInt(message.replace("/slots ", "")) * 10 +
-                                " moneys wow gg bro";
-                        } else if (
-                            slots1 == slots2 ||
-                            slots2 == slots3 ||
-                            slots3 == slots1
-                        ) {
-                            status =
-                                "u made " +
-                                parseInt(message.replace("/slots ", "")) * 3 +
-                                " moneys gg";
-                        } else {
-                            status =
-                                "u lost " +
-                                message.replace("/slots ", "") +
-                                " moneys lol";
-                        }
-                        await addDoc(messageRef, {
-                            name: name,
-                            verified:
-                                localStorage.getItem("verified") == "true"
-                                    ? true
-                                    : false,
-                            bot: true,
-                            command: message,
-                            content: `embed:${status}\\${slots1} | ${slots2} | ${slots3}`,
-                            colour: color,
-                            timestamp: new Date(),
-                            ip: ip,
-                            useragent: navigator.userAgent,
-                        });
-                        return;
-                    } else {
-                        alert("Invalid Bet Amount");
-                    }
-                }
-                if (message.startsWith("/joke")) {
-                    await fetch("https://icanhazdadjoke.com/", {
-                        headers: {
-                            Accept: "application/json",
-                        },
-                    })
-                        .then((response) => response.json())
-                        .then(async (data) => {
+                uploadBytes(storageRef, file).then((snapshot) => {
+                    getDownloadURL(storageRef)
+                        .then(async (url) => {
                             await addDoc(messageRef, {
                                 name: name,
                                 verified:
                                     localStorage.getItem("verified") == "true"
                                         ? true
                                         : false,
-                                bot: true,
-                                command: message,
-                                content: `${data.joke}`,
+                                bot: false,
+                                owner:
+                                    localStorage.getItem("owner") == "true"
+                                        ? true
+                                        : false,
+                                content: `image:${url}`,
                                 colour: color,
                                 timestamp: new Date(),
                                 ip: ip,
                                 useragent: navigator.userAgent,
+                                auth: auth.currentUser.uid,
                             });
                         })
-                        .catch(async (error) => {
+                        .catch((error) => {
+                            console.log("Error getting image URL:", error);
+                        });
+                });
+
+                fileUpload.value = null;
+                return;
+            }
+
+            // Check Message
+
+            if (message === "" || color === "") {
+                alert("Messages cannot be empty!");
+                return;
+            }
+            if (message.length > 175) {
+                alert("Messages cannot be longer than 175 characters!");
+                return;
+            }
+            if (message.includes("<") || message.includes(">")) {
+                alert("Messages cannot include '<' or '>'!");
+                return;
+            }
+
+            // Bot Commands
+
+            if (message.startsWith("/")) {
+                if (channel == "bot-spam") {
+                    if (message.startsWith("/verify")) {
+                        if (
+                            server.codes.includes(
+                                message.replace("/verify ", "")
+                            )
+                        ) {
+                            localStorage.setItem("verified", true);
+                            alert("You are now Verified");
+                        } else {
+                            alert("Invalid Verification Code");
+                        }
+                        return;
+                    }
+                    if (message.startsWith("/random")) {
+                        await addDoc(messageRef, {
+                            name: name,
+                            verified:
+                                localStorage.getItem("verified") == "true"
+                                    ? true
+                                    : false,
+                            bot: true,
+                            command: message,
+                            content: `${Math.floor(Math.random() * 100)}`,
+                            colour: color,
+                            timestamp: new Date(),
+                            ip: ip,
+                            useragent: navigator.userAgent,
+                            auth: auth.currentUser.uid,
+                        });
+                        return;
+                    }
+                    if (message.startsWith("/test")) {
+                        if (localStorage.getItem("verified") == "true") {
                             await addDoc(messageRef, {
                                 name: name,
                                 verified:
@@ -887,121 +859,234 @@ form.addEventListener("submit", async (e) => {
                                         : false,
                                 bot: true,
                                 command: message,
-                                content: `Unable to fetch API: ${error}`,
+                                content: `embed:${message}`,
                                 colour: color,
                                 timestamp: new Date(),
                                 ip: ip,
                                 useragent: navigator.userAgent,
+                                auth: auth.currentUser.uid,
                             });
-                        });
-                    return;
-                }
-                if (message.startsWith("/rizz")) {
-                    await addDoc(messageRef, {
-                        name: name,
-                        verified:
-                            localStorage.getItem("verified") == "true"
-                                ? true
-                                : false,
-                        bot: true,
-                        command: message,
-                        content: rizz[Math.floor(Math.random() * rizz.length)],
-                        colour: color,
-                        timestamp: new Date(),
-                        ip: ip,
-                        useragent: navigator.userAgent,
-                    });
-                    return;
-                }
-                if (message.startsWith("/fact")) {
-                    await fetch(
-                        "https://uselessfacts.jsph.pl/api/v2/facts/random",
-                        {
+                        } else {
+                            alert("No permission");
+                        }
+                        return;
+                    }
+                    if (message.startsWith("/slots")) {
+                        if (message.replace("/slots ", "") != "/slots") {
+                            let slots1 =
+                                slots[Math.floor(Math.random() * slots.length)];
+                            let slots2 =
+                                slots[Math.floor(Math.random() * slots.length)];
+                            let slots3 =
+                                slots[Math.floor(Math.random() * slots.length)];
+                            var status;
+                            if (
+                                slots1 == slots2 &&
+                                slots2 == slots3 &&
+                                slots3 == slots1
+                            ) {
+                                status =
+                                    "omg u made like " +
+                                    parseInt(message.replace("/slots ", "")) *
+                                        10 +
+                                    " moneys wow gg bro";
+                            } else if (
+                                slots1 == slots2 ||
+                                slots2 == slots3 ||
+                                slots3 == slots1
+                            ) {
+                                status =
+                                    "u made " +
+                                    parseInt(message.replace("/slots ", "")) *
+                                        3 +
+                                    " moneys gg";
+                            } else {
+                                status =
+                                    "u lost " +
+                                    message.replace("/slots ", "") +
+                                    " moneys lol";
+                            }
+                            await addDoc(messageRef, {
+                                name: name,
+                                verified:
+                                    localStorage.getItem("verified") == "true"
+                                        ? true
+                                        : false,
+                                bot: true,
+                                command: message,
+                                content: `embed:${status}\\n${slots1} | ${slots2} | ${slots3}`,
+                                colour: color,
+                                timestamp: new Date(),
+                                ip: ip,
+                                useragent: navigator.userAgent,
+                                auth: auth.currentUser.uid,
+                            });
+                            return;
+                        } else {
+                            alert("Invalid Bet Amount");
+                        }
+                    }
+                    if (message.startsWith("/joke")) {
+                        await fetch("https://icanhazdadjoke.com/", {
                             headers: {
                                 Accept: "application/json",
                             },
-                        }
-                    )
-                        .then((response) => response.json())
-                        .then(async (data) => {
-                            await addDoc(messageRef, {
-                                name: name,
-                                verified:
-                                    localStorage.getItem("verified") == "true"
-                                        ? true
-                                        : false,
-                                bot: true,
-                                command: message,
-                                content: `${data.text.replace("`", "'")}`,
-                                colour: color,
-                                timestamp: new Date(),
-                                ip: ip,
-                                useragent: navigator.userAgent,
-                            });
                         })
-                        .catch(async (error) => {
-                            await addDoc(messageRef, {
-                                name: name,
-                                verified:
-                                    localStorage.getItem("verified") == "true"
-                                        ? true
-                                        : false,
-                                bot: true,
-                                command: message,
-                                content: `Unable to fetch API: ${error}`,
-                                colour: color,
-                                timestamp: new Date(),
-                                ip: ip,
-                                useragent: navigator.userAgent,
+                            .then((response) => response.json())
+                            .then(async (data) => {
+                                await addDoc(messageRef, {
+                                    name: name,
+                                    verified:
+                                        localStorage.getItem("verified") ==
+                                        "true"
+                                            ? true
+                                            : false,
+                                    bot: true,
+                                    command: message,
+                                    content: `${data.joke}`,
+                                    colour: color,
+                                    timestamp: new Date(),
+                                    ip: ip,
+                                    useragent: navigator.userAgent,
+                                    auth: auth.currentUser.uid,
+                                });
+                            })
+                            .catch(async (error) => {
+                                await addDoc(messageRef, {
+                                    name: name,
+                                    verified:
+                                        localStorage.getItem("verified") ==
+                                        "true"
+                                            ? true
+                                            : false,
+                                    bot: true,
+                                    command: message,
+                                    content: `Unable to fetch API: ${error}`,
+                                    colour: color,
+                                    timestamp: new Date(),
+                                    ip: ip,
+                                    useragent: navigator.userAgent,
+                                    auth: auth.currentUser.uid,
+                                });
                             });
+                        return;
+                    }
+                    if (message.startsWith("/rizz")) {
+                        await addDoc(messageRef, {
+                            name: name,
+                            verified:
+                                localStorage.getItem("verified") == "true"
+                                    ? true
+                                    : false,
+                            bot: true,
+                            command: message,
+                            content:
+                                rizz[Math.floor(Math.random() * rizz.length)],
+                            colour: color,
+                            timestamp: new Date(),
+                            ip: ip,
+                            useragent: navigator.userAgent,
+                            auth: auth.currentUser.uid,
                         });
-                    return;
+                        return;
+                    }
+                    if (message.startsWith("/fact")) {
+                        await fetch(
+                            "https://uselessfacts.jsph.pl/api/v2/facts/random",
+                            {
+                                headers: {
+                                    Accept: "application/json",
+                                },
+                            }
+                        )
+                            .then((response) => response.json())
+                            .then(async (data) => {
+                                await addDoc(messageRef, {
+                                    name: name,
+                                    verified:
+                                        localStorage.getItem("verified") ==
+                                        "true"
+                                            ? true
+                                            : false,
+                                    bot: true,
+                                    command: message,
+                                    content: `${data.text.replace("`", "'")}`,
+                                    colour: color,
+                                    timestamp: new Date(),
+                                    ip: ip,
+                                    useragent: navigator.userAgent,
+                                    auth: auth.currentUser.uid,
+                                });
+                            })
+                            .catch(async (error) => {
+                                await addDoc(messageRef, {
+                                    name: name,
+                                    verified:
+                                        localStorage.getItem("verified") ==
+                                        "true"
+                                            ? true
+                                            : false,
+                                    bot: true,
+                                    command: message,
+                                    content: `Unable to fetch API: ${error}`,
+                                    colour: color,
+                                    timestamp: new Date(),
+                                    ip: ip,
+                                    useragent: navigator.userAgent,
+                                    auth: auth.currentUser.uid,
+                                });
+                            });
+                        return;
+                    } else {
+                        return;
+                    }
                 } else {
-                    return;
+                    alert("Please use #bot-spam");
                 }
-            } else {
-                alert("Please use #bot-spam");
             }
-        }
 
-        // Anonymous Channel
+            // Anonymous Channel
 
-        if (channel == "anonymous") {
+            if (channel == "anonymous") {
+                try {
+                    await addDoc(messageRef, {
+                        name: "Anonymous",
+                        verified: false,
+                        bot: false,
+                        content: message,
+                        colour: `#${Math.floor(
+                            Math.random() * 16777215
+                        ).toString(16)}`,
+                        timestamp: new Date(),
+                        ip: null,
+                        useragent: null,
+                    });
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                }
+                return;
+            }
+
+            // Main
+
             try {
                 await addDoc(messageRef, {
-                    name: "Anonymous",
-                    verified: false,
+                    name: name,
+                    verified:
+                        localStorage.getItem("verified") == "true"
+                            ? true
+                            : false,
                     bot: false,
                     content: message,
-                    colour: `#${Math.floor(Math.random() * 16777215).toString(
-                        16
-                    )}`,
+                    colour: color,
                     timestamp: new Date(),
-                    ip: null,
-                    useragent: null,
+                    ip: ip,
+                    useragent: navigator.userAgent,
+                    auth: auth.currentUser.uid,
                 });
             } catch (error) {
                 console.error("Error adding document: ", error);
             }
-            return;
-        }
-
-        // Main
-
-        try {
-            await addDoc(messageRef, {
-                name: name,
-                verified:
-                    localStorage.getItem("verified") == "true" ? true : false,
-                bot: false,
-                content: message,
-                colour: color,
-                timestamp: new Date(),
-                ip: ip,
-                useragent: navigator.userAgent,
-            });
-        } catch (error) {
-            console.error("Error adding document: ", error);
         }
     }
 });
