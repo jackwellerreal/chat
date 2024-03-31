@@ -15,23 +15,15 @@
 <body>
     <script src="index.js" type="module" defer></script>
     <div class="sidebar">
-        <div class="server-sidebar">
+        <div class="server-sidebar" id="server-list">
             <a class="server-sidebar-icon" href="/">
                 <img src="https://em-content.zobj.net/source/apple/354/speech-balloon_1f4ac.png">
-            </a>
-            <a class="server-sidebar-icon">
-                <img src="https://yt3.googleusercontent.com/_DiGCcjGwJQAZ3zmlyB8TCYuA8O9tDJ9zGNysq5sR0rxwYb6SP5fW8cb3LbfcRwfui0m27oIhA=s176-c-k-c0x00ffffff-no-rj">
-            </a>
-            <a class="server-sidebar-icon">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png">
-            </a>
-            <a class="server-sidebar-icon">
-                <img src="https://play-lh.googleusercontent.com/WNWZaxi9RdJKe2GQM3vqXIAkk69mnIl4Cc8EyZcir2SKlVOxeUv9tZGfNTmNaLC717Ht">
             </a>
         </div>
         <div class="channel-sidebar">
             <div>
                 <h1 id="server-name"></h1>
+                <p id="server-description"></p>
                 <div id="channels">
                 </div>
             </div>
@@ -84,12 +76,14 @@
             document.getElementById("name").value = localStorage.getItem("name");
             document.getElementById("colour").value = localStorage.getItem("colour");
         }
+
+        /*
         for (let index = 0; index < 50; index++) {
             setTimeout(() => {
                 console.log("%cStop!", "color:red;font-family:system-ui;font-size:3rem;-webkit-text-stroke: 1px black;font-weight:bold");
                 console.log("%cThis is a browser feature intended for developers. If someone told you to copy-paste something here it is a scam and will allow them to run code on your computer.", "color:white;font-family:system-ui;font-size:1rem;font-weight:bold");
             }, 1000);
-        }
+        }*/
     </script>
     <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
 </body>

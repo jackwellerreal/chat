@@ -1,11 +1,11 @@
 const clientVersion = "TR 2.0 1";
-const database = {
-    apiKey: "AIzaSyDmMt7SpbIx65hb3cz7upv5FQ8S890SgxI",
-    authDomain: "chat-5ee01.firebaseapp.com",
-    projectId: "chat-5ee01",
-    storageBucket: "chat-5ee01.appspot.com",
-    messagingSenderId: "808021726904",
-    appId: "1:808021726904:web:4c49f3244b01c0d3fac64d",
+const firebaseConfig = {
+    apiKey: "AIzaSyCtX371vSQkQiUkbOznpq4qjN9GRQ4S4iY",
+    authDomain: "chat-test-1eb14.firebaseapp.com",
+    projectId: "chat-test-1eb14",
+    storageBucket: "chat-test-1eb14.appspot.com",
+    messagingSenderId: "1008517851206",
+    appId: "1:1008517851206:web:0ab44965f13291fe784247",
 };
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
@@ -32,7 +32,170 @@ import {
     signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
-const app = initializeApp(database);
+const app = initializeApp(firebaseConfig);
+
+const rizz = [
+    "Are you a parking ticket? ‘Cause you’ve got fine written all over you.",
+    "There must be something wrong with my eyes, I can’t take them off you.",
+    "Do you have a pencil? Cause I want to erase your past and write our future.",
+    "Do you know what my shirt is made of? Boyfriend/girlfriend material?",
+    "When I was walking by, I noticed you stalking so.. what’s up?",
+    "Your shirt has to go, but you can stay.",
+    "I was wondering if you had an extra heart. Mine was just stolen.",
+    "I seem to have lost my phone number. Can I have yours?",
+    "Did the sun come out or did you just smile at me?",
+    "I’m lost. Can you give me directions to your heart?",
+    "Hello. Cupid called. He wants to tell you that he needs my heart back.",
+    "Hi, how was heaven when you left it?",
+    "Was your dad a boxer? Because damn, you’re a knockout!",
+    "Are you sure you’re not tired? You’ve been running through my mind all day.",
+    "Hey, tie your shoes! I don’t want you falling for anyone else.",
+    "I may not be a genie, but I can make your dreams come true.",
+    "You know what material this is? [Grab your shirt] Boyfriend material.",
+    "I’d say God Bless you, but it looks like he already did.",
+    "Was you father an alien? Because there’s nothing else like you on Earth!",
+    "Is there an airport nearby or is it my heart taking off?",
+    "Do I know you? ‘Cause you look a lot like my next girlfriend/boyfriend.",
+    "You might be asked to leave soon. You are making the other women look bad.",
+    "I’m not a photographer, but I can picture me and you together.",
+    "Is your name Google? Because you have everything I’ve been searching for.",
+    "If nothing lasts forever, will you be my nothing?",
+    "Hey, you’re pretty and I’m cute. Together we’d be Pretty Cute.",
+    "Do you believe in love at first sight or should I pass by again?",
+    "Are you religious? Because you’re the answer to all my prayers.",
+    "Are you my phone charger? Because without you, I’d die.",
+    "Hello, I’m a thief, and I’m here to steal your heart.",
+    "Is it hot in here or is it just you?",
+    "They say Disneyland is the happiest place on earth. Well apparently, no one has ever been standing next to you.",
+    "Are you a dictionary? Cause you’re adding meaning to my life.",
+    "Can I follow you home? Cause my parents always told me to follow my dreams.",
+    "For some reason, I was feeling a little off today. But when you came along, you definitely turned me on.",
+    "You must be a broom, ‘cause you just swept me off my feet.",
+    "You don’t need keys to drive me crazy.",
+    "Are you from Tennessee? Because you’re the only ten I see!",
+    "I must be in a museum, because you truly are a work of art.",
+    "There’s only one thing I want to change about you, and that’s your last name.",
+    "You remind me of a magnet, because you sure are attracting me over here!",
+    "I’m sorry, were you talking to me? [No] Well then, please start.",
+    "Is your dad a terrorist? Cause you’re the bomb.",
+    "Are you from Russia? ‘Cause you’re russian my heart rate!",
+    "Didn’t I see you on the cover of Vogue?",
+    "My buddies bet me that I wouldn’t be able to start a conversation with the hottest person in the bar. Wanna buy some drinks with their money?",
+    "Kanye feel the love tonight?",
+    "Somebody call the cops, because it’s got to be illegal to look that good!",
+    "Are you a magician? Because whenever I look at you, everyone else disappears!",
+    "Aside from being sexy, what do you do for a living?",
+    "Can you take me to the doctor? Because I just broke my leg falling for you.",
+    "Would you grab my arm, so I can tell my friends I’ve been touched by an angel?",
+    "Sorry, but you owe me a drink. [Why?] Because when I looked at you, I dropped mine.",
+    "I’m no mathematician, but I’m pretty good with numbers. Tell you what, give me yours and watch what I can do with it.",
+    "Was your father a thief? ‘Cause someone stole the stars from the sky and put them in your eyes.",
+    "Did it hurt? When you fell from heaven?",
+];
+
+const slots = ["💯", "💀", "🧑‍🦼", "🍪", "😂"];
+
+const db = getFirestore(app);
+const storage = getStorage();
+const auth = getAuth();
+const urlParams = new URLSearchParams(window.location.search);
+
+// Define elements
+
+const pageTitle = document.querySelector("#title");
+const serverName = document.querySelector("#server-name");
+const serverDesc = document.querySelector("#server-description");
+const serverInfo = document.querySelector("#server-info");
+const messageInput = document.querySelector("#created-message");
+const messagesDiv = document.querySelector("#messages");
+const nameInput = document.querySelector("#name");
+const colorInput = document.querySelector("#colour");
+const emojiIcon = document.querySelector("#emoji-picker-icon");
+const folderIcon = document.querySelector("#file-upload-icon");
+const fileUpload = document.querySelector("#fileUpload");
+const emojiPicker = document.querySelector("#emoji-picker-div");
+const form = document.querySelector("#create");
+
+// Get info on chat
+
+const infoRef = await getDoc(doc(db, "info", "info"));
+const info = infoRef.data();
+
+// Get info on server
+
+const serversRef = await getDoc(doc(db, "info", "servers"));
+const servers = serversRef.data().servers;
+
+const server =
+    urlParams.get("server-id") == null
+        ? servers.find((obj) => obj.id === "home")
+        : servers.find((obj) => obj.id === urlParams.get("server-id"));
+
+// List all servers
+
+servers.forEach((serverList) => {
+    if (serverList.private == false) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("server-id", serverList.id);
+        const serverElement = document.createElement("a");
+        serverElement.className = "server-sidebar-icon";
+        serverElement.innerHTML = `<img src="${serverList.icon}">`;
+        serverElement.href = url;
+        document.getElementById("server-list").appendChild(serverElement);
+    }
+});
+
+// List channels for selected server
+
+const channels = server.channels;
+
+const channel =
+    urlParams.get("channel") == null
+        ? server.mainChannel
+        : urlParams.get("channel")
+        ? channels.find(
+              (obj) =>
+                  obj.name === urlParams.get("channel")
+          )
+        : server.mainChannel;
+console.log(channel) 
+
+channels.forEach((channelList) => {
+    const url = new URL(window.location.href);
+    const icon =
+        channelList.type === "text"
+            ? `<svg xmlns="http://www.w3.org/2000/svg" height="24px" fill="white" style="vertical-align: -0.125em; margin-right: 4px;" viewBox="0 0 448 512"><path d="M424 136l-74.01-.0254l13.63-75.76c2.344-13.03-6.312-25.53-19.38-27.88c-13-2.188-25.5 6.344-27.88 19.38l-15.16 84.26h-111.2l13.63-75.76c2.344-13.03-6.312-25.53-19.38-27.88C171.2 30.15 158.7 38.69 156.4 51.72l-15.16 84.26H56c-13.25 0-24 10.78-24 24.03c0 13.25 10.75 23.97 24 23.97h76.57l-25.92 144H24c-13.25 0-24 10.76-24 24.01C0 365.3 10.75 376 24 376l74.01-.0078l-13.63 75.76c-2.344 13.03 6.312 25.53 19.38 27.88C105.2 479.9 106.6 480 108 480c11.38 0 21.5-8.158 23.59-19.75l15.16-84.26h111.2l-13.63 75.76c-2.344 13.03 6.312 25.53 19.38 27.88C265.2 479.9 266.6 480 268 480c11.38 0 21.5-8.158 23.59-19.75l15.16-84.26L392 376c13.25 0 24-10.75 24-23.1c0-13.25-10.75-24.01-24-24.01h-76.57l25.92-144L424 184c13.25 0 24-10.75 24-23.1C448 146.8 437.3 136 424 136zM266.7 327.1h-111.2l25.92-144h111.2L266.7 327.1z"/></svg>`
+            : `<svg xmlns="http://www.w3.org/2000/svg" height="24px" fill="white" style="vertical-align: -0.125em; margin-right: 4px;" viewBox="0 0 576 512"><path d="M333.2 34.84c-4.201-1.896-8.729-2.841-13.16-2.841c-7.697 0-15.29 2.784-21.27 8.1L163.8 160H80c-26.51 0-48 21.49-48 47.1v95.1c0 26.51 21.49 47.1 48 47.1h83.84l134.9 119.9C304.7 477.2 312.3 480 320 480c4.438 0 8.959-.9312 13.16-2.837C344.7 472 352 460.6 352 448V64C352 51.41 344.7 39.1 333.2 34.84zM304 412.4L182.1 304H80v-95.1h102.1L304 99.64V412.4zM444.6 181.9c-4.471-3.629-9.857-5.401-15.2-5.401c-6.949 0-13.83 2.994-18.55 8.807c-8.406 10.25-6.906 25.37 3.375 33.78C425.5 228.4 432 241.8 432 256s-6.5 27.62-17.81 36.87c-10.28 8.406-11.78 23.53-3.375 33.78c4.719 5.812 11.62 8.812 18.56 8.812c5.344 0 10.75-1.781 15.19-5.406C467.1 311.6 480 284.7 480 256C480 227.3 467.1 200.4 444.6 181.9zM505.1 108c-4.455-3.637-9.842-5.417-15.2-5.417c-6.934 0-13.82 2.979-18.58 8.761c-8.406 10.25-6.906 25.37 3.344 33.78C508.6 172.9 528 213.3 528 256c0 42.69-19.44 83.09-53.31 110.9c-10.25 8.406-11.75 23.53-3.344 33.78c4.75 5.781 11.62 8.781 18.56 8.781c5.375 0 10.75-1.781 15.22-5.437C550.2 367.1 576 313.1 576 256C576 198.9 550.2 144.9 505.1 108z"/></svg>`;
+    const channelElement = document.createElement("a");
+
+    url.searchParams.set("channel", channelList.name);
+    channelElement.innerHTML = icon + channelList.name;
+    channelElement.href = url;
+    channelElement.classList = channelList == channel ? "channels-current" : "";
+    document.getElementById("channels").appendChild(channelElement);
+});
+
+// Provide information on server
+
+pageTitle.innerHTML = `${server.name} - #${channel.name}`;
+serverName.innerHTML = server.name;
+serverDesc.innerHTML = server.description;
+serverInfo.innerHTML = `Owned by: ${server.owner}<br>Managed by: ${
+    info.manager
+}<br>Version: ${clientVersion}<br>Showing ${info.messageCount} messages<br>${
+    localStorage.getItem("verified") ? "You are verified!<br>" : ""
+}<a href="https://jack-weller.gitbook.io/chat/" target="_blank" style="margin: 0; font-size: inherit;">Information</a>`;
+
+// Get the refrence to the messages
+
+const messageRef = collection(db, `${server.id}/channels/${channel}`);
+const q = query(
+    messageRef,
+    orderBy("timestamp", "desc"),
+    limit(server.messageCount)
+);
+
+// Format Messages
 
 function checkMessage(string) {
     if (string.startsWith("raw:")) {
@@ -200,152 +363,7 @@ function checkMessage(string) {
     }
 }
 
-const rizz = [
-    "Are you a parking ticket? ‘Cause you’ve got fine written all over you.",
-    "There must be something wrong with my eyes, I can’t take them off you.",
-    "Do you have a pencil? Cause I want to erase your past and write our future.",
-    "Do you know what my shirt is made of? Boyfriend/girlfriend material?",
-    "When I was walking by, I noticed you stalking so.. what’s up?",
-    "Your shirt has to go, but you can stay.",
-    "I was wondering if you had an extra heart. Mine was just stolen.",
-    "I seem to have lost my phone number. Can I have yours?",
-    "Did the sun come out or did you just smile at me?",
-    "I’m lost. Can you give me directions to your heart?",
-    "Hello. Cupid called. He wants to tell you that he needs my heart back.",
-    "Hi, how was heaven when you left it?",
-    "Was your dad a boxer? Because damn, you’re a knockout!",
-    "Are you sure you’re not tired? You’ve been running through my mind all day.",
-    "Hey, tie your shoes! I don’t want you falling for anyone else.",
-    "I may not be a genie, but I can make your dreams come true.",
-    "You know what material this is? [Grab your shirt] Boyfriend material.",
-    "I’d say God Bless you, but it looks like he already did.",
-    "Was you father an alien? Because there’s nothing else like you on Earth!",
-    "Is there an airport nearby or is it my heart taking off?",
-    "Do I know you? ‘Cause you look a lot like my next girlfriend/boyfriend.",
-    "You might be asked to leave soon. You are making the other women look bad.",
-    "I’m not a photographer, but I can picture me and you together.",
-    "Is your name Google? Because you have everything I’ve been searching for.",
-    "If nothing lasts forever, will you be my nothing?",
-    "Hey, you’re pretty and I’m cute. Together we’d be Pretty Cute.",
-    "Do you believe in love at first sight or should I pass by again?",
-    "Are you religious? Because you’re the answer to all my prayers.",
-    "Are you my phone charger? Because without you, I’d die.",
-    "Hello, I’m a thief, and I’m here to steal your heart.",
-    "Is it hot in here or is it just you?",
-    "They say Disneyland is the happiest place on earth. Well apparently, no one has ever been standing next to you.",
-    "Are you a dictionary? Cause you’re adding meaning to my life.",
-    "Can I follow you home? Cause my parents always told me to follow my dreams.",
-    "For some reason, I was feeling a little off today. But when you came along, you definitely turned me on.",
-    "You must be a broom, ‘cause you just swept me off my feet.",
-    "You don’t need keys to drive me crazy.",
-    "Are you from Tennessee? Because you’re the only ten I see!",
-    "I must be in a museum, because you truly are a work of art.",
-    "There’s only one thing I want to change about you, and that’s your last name.",
-    "You remind me of a magnet, because you sure are attracting me over here!",
-    "I’m sorry, were you talking to me? [No] Well then, please start.",
-    "Is your dad a terrorist? Cause you’re the bomb.",
-    "Are you from Russia? ‘Cause you’re russian my heart rate!",
-    "Didn’t I see you on the cover of Vogue?",
-    "My buddies bet me that I wouldn’t be able to start a conversation with the hottest person in the bar. Wanna buy some drinks with their money?",
-    "Kanye feel the love tonight?",
-    "Somebody call the cops, because it’s got to be illegal to look that good!",
-    "Are you a magician? Because whenever I look at you, everyone else disappears!",
-    "Aside from being sexy, what do you do for a living?",
-    "Can you take me to the doctor? Because I just broke my leg falling for you.",
-    "Would you grab my arm, so I can tell my friends I’ve been touched by an angel?",
-    "Sorry, but you owe me a drink. [Why?] Because when I looked at you, I dropped mine.",
-    "I’m no mathematician, but I’m pretty good with numbers. Tell you what, give me yours and watch what I can do with it.",
-    "Was your father a thief? ‘Cause someone stole the stars from the sky and put them in your eyes.",
-    "Did it hurt? When you fell from heaven?",
-];
-
-const slots = ["💯", "💀", "🧑‍🦼", "🍪", "😂"];
-
-const db = getFirestore(app);
-const storage = getStorage();
-const auth = getAuth();
-
-const serverRef = await getDoc(doc(db, "server", "info"));
-const server = serverRef.data();
-
-const channelsRef = await getDoc(doc(db, "server", "channels"));
-const channels = channelsRef.data().channels;
-const mainChannel = channelsRef.data().main;
-
-const urlParams = new URLSearchParams(window.location.search);
-const channel =
-    urlParams.get("text-channel") == null
-        ? mainChannel
-        : channels.find(
-              (obj) =>
-                  obj.name === urlParams.get("text-channel") &&
-                  obj.type === "text"
-          )
-        ? urlParams.get("text-channel")
-        : mainChannel;
-
-channels.forEach((channelList) => {
-    const url = new URL(window.location.href);
-    const icon =
-        channelList.type === "text"
-            ? `<svg xmlns="http://www.w3.org/2000/svg" height="24px" fill="white" style="vertical-align: -0.125em; margin-right: 4px;" viewBox="0 0 448 512"><path d="M424 136l-74.01-.0254l13.63-75.76c2.344-13.03-6.312-25.53-19.38-27.88c-13-2.188-25.5 6.344-27.88 19.38l-15.16 84.26h-111.2l13.63-75.76c2.344-13.03-6.312-25.53-19.38-27.88C171.2 30.15 158.7 38.69 156.4 51.72l-15.16 84.26H56c-13.25 0-24 10.78-24 24.03c0 13.25 10.75 23.97 24 23.97h76.57l-25.92 144H24c-13.25 0-24 10.76-24 24.01C0 365.3 10.75 376 24 376l74.01-.0078l-13.63 75.76c-2.344 13.03 6.312 25.53 19.38 27.88C105.2 479.9 106.6 480 108 480c11.38 0 21.5-8.158 23.59-19.75l15.16-84.26h111.2l-13.63 75.76c-2.344 13.03 6.312 25.53 19.38 27.88C265.2 479.9 266.6 480 268 480c11.38 0 21.5-8.158 23.59-19.75l15.16-84.26L392 376c13.25 0 24-10.75 24-23.1c0-13.25-10.75-24.01-24-24.01h-76.57l25.92-144L424 184c13.25 0 24-10.75 24-23.1C448 146.8 437.3 136 424 136zM266.7 327.1h-111.2l25.92-144h111.2L266.7 327.1z"/></svg>`
-            : `<svg xmlns="http://www.w3.org/2000/svg" height="24px" fill="white" style="vertical-align: -0.125em; margin-right: 4px;" viewBox="0 0 576 512"><path d="M333.2 34.84c-4.201-1.896-8.729-2.841-13.16-2.841c-7.697 0-15.29 2.784-21.27 8.1L163.8 160H80c-26.51 0-48 21.49-48 47.1v95.1c0 26.51 21.49 47.1 48 47.1h83.84l134.9 119.9C304.7 477.2 312.3 480 320 480c4.438 0 8.959-.9312 13.16-2.837C344.7 472 352 460.6 352 448V64C352 51.41 344.7 39.1 333.2 34.84zM304 412.4L182.1 304H80v-95.1h102.1L304 99.64V412.4zM444.6 181.9c-4.471-3.629-9.857-5.401-15.2-5.401c-6.949 0-13.83 2.994-18.55 8.807c-8.406 10.25-6.906 25.37 3.375 33.78C425.5 228.4 432 241.8 432 256s-6.5 27.62-17.81 36.87c-10.28 8.406-11.78 23.53-3.375 33.78c4.719 5.812 11.62 8.812 18.56 8.812c5.344 0 10.75-1.781 15.19-5.406C467.1 311.6 480 284.7 480 256C480 227.3 467.1 200.4 444.6 181.9zM505.1 108c-4.455-3.637-9.842-5.417-15.2-5.417c-6.934 0-13.82 2.979-18.58 8.761c-8.406 10.25-6.906 25.37 3.344 33.78C508.6 172.9 528 213.3 528 256c0 42.69-19.44 83.09-53.31 110.9c-10.25 8.406-11.75 23.53-3.344 33.78c4.75 5.781 11.62 8.781 18.56 8.781c5.375 0 10.75-1.781 15.22-5.437C550.2 367.1 576 313.1 576 256C576 198.9 550.2 144.9 505.1 108z"/></svg>`;
-    const channelElement = document.createElement("a");
-
-    if (channelList.type === "text") {
-        url.searchParams.set("text-channel", channelList.name);
-        url.searchParams.delete("voice-channel");
-    }
-    if (channelList.type === "voice") {
-        url.searchParams.set("voice-channel", channelList.name);
-        url.searchParams.delete("text-channel");
-    }
-    channelElement.innerHTML = icon + channelList.name;
-    channelElement.href = url;
-    channelElement.classList = channelList == channel ? "channels-current" : "";
-    document.getElementById("channels").appendChild(channelElement);
-});
-
-const messageRef = collection(db, channel);
-const q = query(
-    messageRef,
-    orderBy("timestamp", "desc"),
-    limit(server.messageCount)
-);
-
-const messagesDiv = document.querySelector("#messages");
-const nameInput = document.querySelector("#name");
-const messageInput = document.querySelector("#created-message");
-const colorInput = document.querySelector("#colour");
-const emojiIcon = document.querySelector("#emoji-picker-icon");
-const folderIcon = document.querySelector("#file-upload-icon");
-const fileUpload = document.querySelector("#fileUpload");
-const emojiPicker = document.querySelector("#emoji-picker-div");
-const form = document.querySelector("#create");
-const title = document.querySelector("#title");
-const serverName = document.querySelector("#server-name");
-const serverInfo = document.querySelector("#server-info");
-
-title.innerHTML = `Chat - #${channel}`;
-serverName.innerHTML = server.name;
-serverInfo.innerHTML = `
-Owned by: ${server.owner}
-<br>
-Version: ${clientVersion}
-<br>
-Showing ${server.messageCount} messages
-<br>
-${localStorage.getItem("verified") ? "You are verified!<br>" : ""}
-<a 
-  href="https://jack-weller.gitbook.io/chat/" 
-  target="_blank" 
-  style="
-    margin: 0;
-    font-size: inherit;
-  ">
-  Information
-</a>`;
-messageInput.placeholder = `Message #${channel}`;
+// Display Messages
 
 async function displayPosts(posts) {
     try {
@@ -458,16 +476,30 @@ async function displayPosts(posts) {
         });
         const messageElement = document.createElement("div");
         messageElement.className = "greating";
-        messageElement.innerHTML = `<h1>You are in #${channel}</h1><h2>${
-            channels.find((obj) => obj.name === channel).type === "text"
-                ? channels.find((obj) => obj.name === channel).description
-                : channels.find((obj) => obj.name === mainChannel).description
-        }</h2><h3>Showing ${server.messageCount} latest messages</h3>`;
+        messageElement.innerHTML = `<h1>You are in #${channel.name}</h1><h2>${channel.description}</h2><h3>Showing ${info.messageCount} latest messages</h3>`;
         messagesDiv.appendChild(messageElement);
     } catch (e) {
         console.error(e);
     }
 }
+
+// Get Messages & Display them
+
+function loadData() {
+    onSnapshot(q, (querySnapshot) => {
+        const posts = [];
+        querySnapshot.forEach((doc) => {
+            posts.push({ ...doc.data(), id: doc.id });
+        });
+        displayPosts(posts).then(() => {
+            messagesDiv.scroll({
+                top: messagesDiv.scrollHeight,
+            });
+        });
+    });
+}
+
+// Load Voice Channel & Manage Calls
 
 async function loadVoice() {
     const videoDiv = document.createElement("div");
@@ -689,26 +721,16 @@ async function loadVoice() {
     };
 }
 
-function loadData() {
-    onSnapshot(q, (querySnapshot) => {
-        const posts = [];
-        querySnapshot.forEach((doc) => {
-            posts.push({ ...doc.data(), id: doc.id });
-        });
-        displayPosts(posts).then(() => {
-            messagesDiv.scroll({
-                top: messagesDiv.scrollHeight,
-            });
-        });
-    });
-}
+// Check for version, auth then show messsages/voice
 
-if (server.version == clientVersion) {
+if (info.version == clientVersion) {
     if (auth.currentUser) {
-        if (urlParams.get("voice-channel")) {
-            loadVoice();
-        } else {
-            loadData();
+        if (urlParams.get("server-id")) {
+            if (urlParams.get("voice-channel")) {
+                loadVoice();
+            } else {
+                loadData();
+            }
         }
     } else {
         const messageElement = document.createElement("div");
@@ -724,7 +746,25 @@ if (server.version == clientVersion) {
         const signIn = document.querySelector("#sign-in");
         signIn.addEventListener("click", function (event) {
             event.preventDefault();
-            signin();
+            let email = prompt("Please enter your email:");
+            if (email == null || email == "" || !email.includes("@")) {
+                alert("Please enter a valid email next time");
+                return;
+            }
+            let password = prompt("Please enter your password:");
+            if (email == null || email == "") {
+                alert("Please enter a valid password next time");
+                return;
+            }
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    console.log(userCredential);
+                })
+                .catch((error) => {
+                    alert(
+                        `An error occured, please send this to a developer:\n${error}`
+                    );
+                });
             alert("Please refresh for actions to take effect.");
         });
     }
@@ -740,6 +780,12 @@ if (server.version == clientVersion) {
     `;
     messagesDiv.appendChild(messageElement);
 }
+
+// Change message input placeholder
+
+messageInput.placeholder = `Message #${channel.name}`;
+
+// Emoji Picker
 
 const pickerOptions = {
     onEmojiSelect: (value) => {
@@ -770,6 +816,8 @@ emojiIcon.addEventListener("mouseout", async (e) => {
         "https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f642.svg";
 });
 
+// File Upload
+
 fileUpload.onchange = () => {
     messageInput.value = messageInput.value + "&file&";
 };
@@ -783,27 +831,7 @@ folderIcon.addEventListener("mouseout", async (e) => {
         "https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f4c1.svg";
 });
 
-function signin() {
-    let email = prompt("Please enter your email:");
-    if (email == null || email == "" || !email.includes("@")) {
-        alert("Please enter a valid email next time");
-        return;
-    }
-    let password = prompt("Please enter your password:");
-    if (email == null || email == "") {
-        alert("Please enter a valid password next time");
-        return;
-    }
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            console.log(userCredential);
-        })
-        .catch((error) => {
-            alert(
-                `An error occured, please send this to a developer:\n${error}`
-            );
-        });
-}
+// Send Message
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -949,7 +977,11 @@ form.addEventListener("submit", async (e) => {
                                     : false,
                             bot: true,
                             command: message,
-                            content: `embed:${(Math.floor(Math.random() * 2) == 0) == true ? "🪙 Heads" : "🪙 Tails"}`,
+                            content: `embed:${
+                                (Math.floor(Math.random() * 2) == 0) == true
+                                    ? "🪙 Heads"
+                                    : "🪙 Tails"
+                            }`,
                             colour: color,
                             timestamp: new Date(),
                             ip: ip,
