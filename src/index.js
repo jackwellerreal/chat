@@ -158,7 +158,6 @@ const channel =
                   obj.name === urlParams.get("channel")
           )
         : server.mainChannel;
-console.log(channel) 
 
 channels.forEach((channelList) => {
     const url = new URL(window.location.href);
@@ -188,7 +187,7 @@ serverInfo.innerHTML = `Owned by: ${server.owner}<br>Managed by: ${
 
 // Get the refrence to the messages
 
-const messageRef = collection(db, `${server.id}/channels/${channel}`);
+const messageRef = collection(db, `${server.id}/channels/${channel.name}`);
 const q = query(
     messageRef,
     orderBy("timestamp", "desc"),
@@ -233,6 +232,30 @@ function checkMessage(string) {
         if (string.startsWith("font:impact:")) {
             return `<span style="font-family: Impact, serif;">${string.replace(
                 "font:impact:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("font:wingdings:")) {
+            return `<span style="font-family: 'Wingdings 3'";>${string.replace(
+                "font:wingdings:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("font:maths:")) {
+            return `<span style="font-family: Cambria, Georgia, serif;";>${string.replace(
+                "font:maths:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("font:newroman:")) {
+            return `<span style="font-family: 'Times New Roman', serif;";>${string.replace(
+                "font:newroman:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("font:algerian:")) {
+            return `<span style="font-family: Algerian, fantasy;";>${string.replace(
+                "font:algerian:",
                 ""
             )}</span>`;
         }
@@ -759,13 +782,13 @@ if (info.version == clientVersion) {
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     console.log(userCredential);
+                    window.location.reload()
                 })
                 .catch((error) => {
                     alert(
                         `An error occured, please send this to a developer:\n${error}`
                     );
                 });
-            alert("Please refresh for actions to take effect.");
         });
     }
 } else {
@@ -850,7 +873,7 @@ form.addEventListener("submit", async (e) => {
         });
 
     messageInput.value = "";
-    if (server.version == clientVersion) {
+    if (info.version == clientVersion) {
         if (auth.currentUser) {
             if (name === "") {
                 name = "Unnamed_User";
