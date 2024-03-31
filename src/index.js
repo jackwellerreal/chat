@@ -335,7 +335,7 @@ Version: ${clientVersion}
 <br>
 Showing ${server.messageCount} messages
 <br>
-${localStorage.getItem("verified") ? 'You are verified!<br>' : ''}
+${localStorage.getItem("verified") ? "You are verified!<br>" : ""}
 <a 
   href="https://jack-weller.gitbook.io/chat/" 
   target="_blank" 
@@ -722,10 +722,10 @@ if (server.version == clientVersion) {
         `;
         messagesDiv.appendChild(messageElement);
         const signIn = document.querySelector("#sign-in");
-        signIn.addEventListener("click", function(event){
-            event.preventDefault()
-            signin()
-            alert("Please refresh for actions to take effect.")
+        signIn.addEventListener("click", function (event) {
+            event.preventDefault();
+            signin();
+            alert("Please refresh for actions to take effect.");
         });
     }
 } else {
@@ -804,7 +804,6 @@ function signin() {
             );
         });
 }
-
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -940,6 +939,23 @@ form.addEventListener("submit", async (e) => {
                             alert("No permission");
                         }
                         return;
+                    }
+                    if (message.startsWith("/coinflip")) {
+                        await addDoc(messageRef, {
+                            name: name,
+                            verified:
+                                localStorage.getItem("verified") == "true"
+                                    ? true
+                                    : false,
+                            bot: true,
+                            command: message,
+                            content: `embed:${(Math.floor(Math.random() * 2) == 0) == true ? "🪙 Heads" : "🪙 Tails"}`,
+                            colour: color,
+                            timestamp: new Date(),
+                            ip: ip,
+                            useragent: navigator.userAgent,
+                            auth: auth.currentUser.uid,
+                        });
                     }
                     if (message.startsWith("/slots")) {
                         if (message.replace("/slots ", "") != "/slots") {
