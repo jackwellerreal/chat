@@ -86,6 +86,74 @@ function checkMessage(string) {
             )}</span>`;
         }
     }
+    if (string.startsWith("colour:")) {
+        if (string.startsWith("colour:red:")) {
+            return `<span style="color: red;">${string.replace(
+                "colour:red:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:orange:")) {
+            return `<span style="color: orange;">${string.replace(
+                "colour:orange:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:yellow:")) {
+            return `<span style="color: yellow;">${string.replace(
+                "colour:yellow:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:lime:")) {
+            return `<span style="color: lime;">${string.replace(
+                "colour:lime:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:green:")) {
+            return `<span style="color: green;">${string.replace(
+                "colour:green:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:cyan:")) {
+            return `<span style="color: cyan;">${string.replace(
+                "colour:cyan:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:blue:")) {
+            return `<span style="color: blue;">${string.replace(
+                "colour:blue:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:darkblue:")) {
+            return `<span style="color: darkblue;">${string.replace(
+                "colour:darkblue:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:purple:")) {
+            return `<span style="color: purple;">${string.replace(
+                "colour:purple:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:magenta:")) {
+            return `<span style="color: magenta;">${string.replace(
+                "colour:magenta:",
+                ""
+            )}</span>`;
+        }
+        if (string.startsWith("colour:pink:")) {
+            return `<span style="color: pink;">${string.replace(
+                "colour:pink:",
+                ""
+            )}</span>`;
+        }
+    }
     if (string.startsWith("spoiler:")) {
         return `<div class="message-spoiler"><span class="message-spoiler-text">${string.replace(
             "spoiler:",
@@ -757,7 +825,7 @@ form.addEventListener("submit", async (e) => {
     if (server.version == clientVersion) {
         if (auth.currentUser) {
             if (name === "") {
-                name = "Unnamed User";
+                name = "Unnamed_User";
             }
 
             // File Uploading

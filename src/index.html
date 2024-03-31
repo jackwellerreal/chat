@@ -70,16 +70,16 @@
                     ? subString.slice(0, subString.lastIndexOf(" "))
                     : subString);
             };
+        
 
-        document.getElementById("name").value = localStorage.getItem("name");
+        document.getElementById("name").value = localStorage.getItem("name") == null ? "Unnamed_User" : localStorage.getItem("name");
         document.getElementById("colour").value = localStorage.getItem("colour");
 
         function changeSettings(type) {
-            localStorage.setItem("name", document.getElementById("name").value.replace(new RegExp(" ", "g"), '_').truncate(20));
+            localStorage.setItem("name", document.getElementById("name").value.replace(new RegExp(" ", "g"), '_').truncate(20) == null ? "Unnamed_User" : document.getElementById("name").value.replace(new RegExp(" ", "g"), '_').truncate(20));
             localStorage.setItem("colour", document.getElementById("colour").value);
 
             if (type == "name" && localStorage.getItem("verified") == "true") { localStorage.setItem("verified", false) }
-
 
             document.getElementById("name").value = localStorage.getItem("name");
             document.getElementById("colour").value = localStorage.getItem("colour");
