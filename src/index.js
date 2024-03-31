@@ -335,6 +335,7 @@ Version: ${clientVersion}
 <br>
 Showing ${server.messageCount} messages
 <br>
+${localStorage.getItem("verified") ? 'You are verified!<br>' : ''}
 <a 
   href="https://jack-weller.gitbook.io/chat/" 
   target="_blank" 
