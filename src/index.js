@@ -1,4 +1,4 @@
-const clientVersion = "TR 2.0";
+const clientVersion = "TR 2.0 1";
 const database = {
     apiKey: "AIzaSyDmMt7SpbIx65hb3cz7upv5FQ8S890SgxI",
     authDomain: "chat-5ee01.firebaseapp.com",
@@ -653,8 +653,10 @@ if (server.version == clientVersion) {
         `;
         messagesDiv.appendChild(messageElement);
         const signIn = document.querySelector("#sign-in");
-        signIn.addEventListener("click", async (e) => {
-            signin();
+        signIn.addEventListener("click", function(event){
+            event.preventDefault()
+            signin()
+            alert("Please refresh for actions to take effect.")
         });
     }
 } else {
@@ -732,7 +734,6 @@ function signin() {
                 `An error occured, please send this to a developer:\n${error}`
             );
         });
-    window.location.reload();
 }
 
 
