@@ -134,7 +134,10 @@ const server =
 // List all servers
 
 servers.forEach((serverList) => {
-    if (serverList.private == false) {
+    if (
+        serverList.private == false ||
+        JSON.parse(localStorage.getItem("servers")).includes(serverList.private)
+    ) {
         const url = new URL(window.location.href);
         url.searchParams.set("server-id", serverList.id);
         const serverElement = document.createElement("a");
@@ -145,19 +148,21 @@ servers.forEach((serverList) => {
     }
 });
 
+document
+    .getElementById("server-list")
+    .insertAdjacentHTML(
+        "beforeend",
+        `<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 448 512" class="server-sidebar-plus"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32v144H48c-17.7 0-32 14.3-32 32s14.3 32 32 32h144v144c0 17.7 14.3 32 32 32s32-14.3 32-32V288h144c17.7 0 32-14.3 32-32s-14.3-32-32-32H256z" /></svg>`
+    );
+
 // List channels for selected server
 
 const channels = server.channels;
 
 const channel =
-    urlParams.get("channel") == null
-        ? server.mainChannel
-        : urlParams.get("channel")
-        ? channels.find(
-              (obj) =>
-                  obj.name === urlParams.get("channel")
-          )
-        : server.mainChannel;
+    urlParams.get("channel")
+        ? channels.find((obj) => obj.name === urlParams.get("channel"))
+        : channels.find((obj) => obj.name === server.mainChannel)
 
 channels.forEach((channelList) => {
     const url = new URL(window.location.href);
@@ -782,7 +787,7 @@ if (info.version == clientVersion) {
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     console.log(userCredential);
-                    window.location.reload()
+                    window.location.reload();
                 })
                 .catch((error) => {
                     alert(
