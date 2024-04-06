@@ -136,7 +136,7 @@ const server =
 servers.forEach((serverList) => {
     if (
         serverList.private == false ||
-        JSON.parse(localStorage.getItem("servers")).includes(serverList.private)
+        localStorage.getItem("servers").split(",").includes(serverList.id)
     ) {
         const url = new URL(window.location.href);
         url.searchParams.set("server-id", serverList.id);
@@ -152,17 +152,31 @@ document
     .getElementById("server-list")
     .insertAdjacentHTML(
         "beforeend",
-        `<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 448 512" class="server-sidebar-plus"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32v144H48c-17.7 0-32 14.3-32 32s14.3 32 32 32h144v144c0 17.7 14.3 32 32 32s32-14.3 32-32V288h144c17.7 0 32-14.3 32-32s-14.3-32-32-32H256z" /></svg>`
+        `<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 448 512" class="server-sidebar-plus" id="server-sidebar-plus"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32v144H48c-17.7 0-32 14.3-32 32s14.3 32 32 32h144v144c0 17.7 14.3 32 32 32s32-14.3 32-32V288h144c17.7 0 32-14.3 32-32s-14.3-32-32-32H256z" /></svg>`
     );
+
+document.querySelector("#server-sidebar-plus").addEventListener("click", () => {
+    let serverID = prompt("Please enter the server ID:");
+    if (serverID == null || serverID == "") {
+        alert("Please enter a valid server ID next time");
+        return;
+    }
+    if (localStorage.getItem("servers") == null) {
+        let servers = `${serverID}`
+        localStorage.setItem("servers", servers);
+    } else {
+        let servers = localStorage.getItem("servers") + `,${serverID}`
+        localStorage.setItem("servers", servers);
+    }
+});
 
 // List channels for selected server
 
 const channels = server.channels;
 
-const channel =
-    urlParams.get("channel")
-        ? channels.find((obj) => obj.name === urlParams.get("channel"))
-        : channels.find((obj) => obj.name === server.mainChannel)
+const channel = urlParams.get("channel")
+    ? channels.find((obj) => obj.name === urlParams.get("channel"))
+    : channels.find((obj) => obj.name === server.mainChannel);
 
 channels.forEach((channelList) => {
     const url = new URL(window.location.href);
