@@ -1,8 +1,1 @@
-{
-  "devDependencies": {
-    "javascript-obfuscator": "^4.1.0"
-  },
-  "scripts": {
-    "compile": "node compiler.js"
-  }
-}
+{"devDependencies":{"javascript-obfuscator":"^4.1.0"},"scripts":{"compile":"node compiler.js","create-user":"node createUser.js"},"dependencies":{"firebase":"^10.10.0","prompt-sync":"^4.2.0"}}
