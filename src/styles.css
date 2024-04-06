@@ -65,18 +65,30 @@ em-emoji-picker {
     aspect-ratio: 1/1;
 }
 
-.server-sidebar-icon svg {
+.server-sidebar-plus {
     width: 64px;
+    height: 64px;
+    padding: 8px;
     cursor: pointer;
     transition: 0.25s ease;
+    background-color: var(--brand-3);
+    fill: var(--brand-0);
+    margin-bottom: 16px;
+    aspect-ratio: 1/1;
+    border-radius: 100%;
 }
 
-.server-sidebar-icon:nth-of-type(1) {
+.server-sidebar-plus:hover {
+    border-radius: 10px;
+    fill: var(--green);
+}
+
+.server-sidebar-icon:nth-child(1) {
     padding-bottom: 16px;
     border-bottom: 5px solid var(--brand-2);
 }
 
-.server-sidebar-icon:nth-of-type(1) img {
+.server-sidebar-icon:nth-child(1) img {
     border-radius: 0;
 }
 
