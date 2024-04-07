@@ -1,11 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
-
 :root {
-    --brand-5: #1E1F22;
+    --brand-5: #1e1f22;
     --brand-4: #232428;
-    --brand-3: #2B2D31;
+    --brand-3: #2b2d31;
     --brand-2: #313338;
-    --brand-1: #383A40;
+    --brand-1: #383a40;
     --brand-0: #ffffff;
 
     --red: #f44336;
@@ -18,6 +16,7 @@
     margin: 0;
     padding: 0;
     font-family: "Poppins", sans-serif;
+    font-style: normal;
     box-sizing: border-box;
     color: var(--brand-0);
 }
@@ -44,6 +43,10 @@ em-emoji-picker {
     --rgb-input: 41, 43, 47;
 }
 
+h1, h2, h3 {
+    font-weight: 600;
+}
+
 .sidebar {
     display: grid;
     grid-template-columns: auto auto;
@@ -58,6 +61,22 @@ em-emoji-picker {
     padding: 1em;
     grid-row: span 2;
     background-color: var(--brand-4);
+}
+
+.server-banner {
+    position: absolute;
+    top: -1em;
+    left: -1em;
+    width: calc(100% + 2em);
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    filter: blur(1px), ;
+    mask-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    opacity: 65%;
 }
 
 .server-sidebar-icon {
@@ -195,7 +214,7 @@ em-emoji-picker {
 }
 
 .message-sender {
-    font-weight: 800;
+    font-weight: 600;
     font-size: 24px;
 }
 
@@ -375,4 +394,5 @@ em-emoji-picker {
     border-radius: 10px;
     align-self: center;
     width: 100%;
+    transform: scaleX(-1);
 }

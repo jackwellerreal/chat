@@ -105,6 +105,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const pageTitle = document.querySelector("#title");
 const serverName = document.querySelector("#server-name");
 const serverDesc = document.querySelector("#server-description");
+const serverBanner = document.querySelector("#server-banner");
 const serverInfo = document.querySelector("#server-info");
 const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
@@ -162,10 +163,10 @@ document.querySelector("#server-sidebar-plus").addEventListener("click", () => {
         return;
     }
     if (localStorage.getItem("servers") == null) {
-        let servers = `${serverID}`
+        let servers = `${serverID}`;
         localStorage.setItem("servers", servers);
     } else {
-        let servers = localStorage.getItem("servers") + `,${serverID}`
+        let servers = localStorage.getItem("servers") + `,${serverID}`;
         localStorage.setItem("servers", servers);
     }
 });
@@ -198,6 +199,8 @@ channels.forEach((channelList) => {
 pageTitle.innerHTML = `${server.name} - #${channel.name}`;
 serverName.innerHTML = server.name;
 serverDesc.innerHTML = server.description;
+serverBanner.style.background = `url(${server.banner})`;
+serverBanner.style.backgroundPosition = `center center`;
 serverInfo.innerHTML = `Owned by: ${server.owner}<br>Managed by: ${
     info.manager
 }<br>Version: ${clientVersion}<br>Showing ${info.messageCount} messages<br>${
@@ -544,6 +547,12 @@ function loadData() {
 // Load Voice Channel & Manage Calls
 
 async function loadVoice() {
+    const create = document.getElementById("create");
+    const newCreate = document.createElement("div");
+    newCreate.id = create.id;
+    newCreate.className = create.className
+    newCreate.innerHTML = create.innerHTML;
+    create.parentNode.replaceChild(newCreate, create);
     const videoDiv = document.createElement("div");
     const localVideo = document.createElement("video");
     const remoteVideo = document.createElement("video");
@@ -768,7 +777,7 @@ async function loadVoice() {
 if (info.version == clientVersion) {
     if (auth.currentUser) {
         if (urlParams.get("server-id")) {
-            if (urlParams.get("voice-channel")) {
+            if (urlParams.get("channel") == "voice") {
                 loadVoice();
             } else {
                 loadData();
