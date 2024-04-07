@@ -201,6 +201,7 @@ serverName.innerHTML = server.name;
 serverDesc.innerHTML = server.description;
 serverBanner.style.background = `url(${server.banner})`;
 serverBanner.style.backgroundPosition = `center center`;
+serverBanner.style.backgroundSize = `contain`;
 serverInfo.innerHTML = `Owned by: ${server.owner}<br>Managed by: ${
     info.manager
 }<br>Version: ${clientVersion}<br>Showing ${info.messageCount} messages<br>${
