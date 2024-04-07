@@ -8,7 +8,9 @@
         "create-server": "node createServer.js"
     },
     "dependencies": {
+        "@prettier/sync": "^0.5.1",
         "firebase": "^10.10.0",
+        "prettier": "^3.2.5",
         "prompt-sync": "^4.2.0"
     }
 }
