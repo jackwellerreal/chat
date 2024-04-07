@@ -70,7 +70,7 @@ h1, h2, h3 {
     width: calc(100% + 2em);
     aspect-ratio: 16/9;
     overflow: hidden;
-    filter: blur(1px), ;
+    filter: blur(1px);
     mask-image: linear-gradient(
         to bottom,
         rgba(255, 255, 255, 1) 50%,
