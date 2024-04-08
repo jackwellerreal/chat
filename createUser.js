@@ -8,25 +8,24 @@ const firebaseConfig = {
     appId: process.env.APPID,
 };
 
-const { initializeApp } = require("firebase/app.js");
-const { getAuth, createUserWithEmailAndPassword } = require("firebase/auth.js");
+const { initializeApp } = require("firebase/app");
+const { getAuth, createUserWithEmailAndPassword } = require("firebase/auth");
 const prompt = require("prompt-sync")({ sigint: true });
 const Colours = require("./colours");
-const colours = new Colours();
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth();
+const colours = new Colours();
 
 console.log(
     `${colours.FgYellow}Welcome to the ${colours.FgBlue}user creation${colours.FgYellow} wizard!${colours.Reset}`
 );
 
 const username = prompt(
-    `${colours.FgYellow}Please enter a username: ${colours.Reset}`
+    `${colours.FgYellow}Please enter a ${colours.FgBlue}username${colours.FgYellow}: ${colours.Reset}`
 );
 const password = prompt(
-    `${colours.FgYellow}Please enter a password: ${colours.Reset}`
+    `${colours.FgYellow}Please enter a ${colours.FgBlue}password${colours.FgYellow}: ${colours.Reset}`
 );
 
 createUserWithEmailAndPassword(auth, username, password)

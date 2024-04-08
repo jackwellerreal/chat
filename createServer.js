@@ -8,11 +8,25 @@ const firebaseConfig = {
     appId: process.env.APPID,
 };
 
+const { initializeApp } = require("firebase/app");
+const {
+    getFirestore,
+    collection,
+    query,
+    doc,
+    getDoc,
+    orderBy,
+    limit,
+    onSnapshot,
+    addDoc,
+    setDoc,
+} = require("firebase/firestore");
 const prompt = require("prompt-sync")({ sigint: true });
 const Colours = require("./colours");
-const colours = new Colours();
 
-// TODO: add firebase stuff 
+const app = initializeApp(firebaseConfig);
+const db = getFirestore();
+const colours = new Colours();
 
 try {
     console.log(
@@ -44,33 +58,33 @@ try {
         `${colours.FgYellow}Please enter all the ${colours.FgBlue}channels${colours.FgYellow} for the server (eg general;bot-spam;memes): ${colours.Reset}`
     ).split(";");
 
-    var channelDescs = []
+    var channelDescs = [];
 
     for (let index = 0; index < channelNames.length; index++) {
         let desc = prompt(
             `${colours.FgYellow}Please enter a description for the channel, ${colours.FgBlue}${channelNames[index]}${colours.FgYellow} for the server (eg A place to chat about anything): ${colours.Reset}`
         );
-        channelDescs.push(desc)
+        channelDescs.push(desc);
     }
 
-    var channelTypes = []
+    var channelTypes = [];
 
     for (let index = 0; index < channelNames.length; index++) {
         let desc = prompt(
             `${colours.FgYellow}Please enter what type the channel, ${colours.FgBlue}${channelNames[index]}${colours.FgYellow} is (text or voice): ${colours.Reset}`
         );
-        channelTypes.push(desc)
-    }   
+        channelTypes.push(desc);
+    }
 
-    var channels = []
+    var channels = [];
 
     for (let index = 0; index < channelNames.length; index++) {
         channels.push({
             name: channelNames[index],
             type: channelTypes[index],
             description: channelDescs[index],
-        })
-    }   
+        });
+    }
 
     const char = [
         "a",
@@ -130,7 +144,7 @@ try {
         description: description,
         mainChannel: mainchannel,
         name: name,
-        channels: channels
+        channels: channels,
     };
 
     // TODO: Make new server thing
