@@ -1,5 +1,6 @@
 // compiler v2 bc files got lost 😭
 
+require("dotenv").config();
 const JavaScriptObfuscator = require("javascript-obfuscator");
 const fs = require("fs");
 const prettier = require("@prettier/sync");
@@ -12,8 +13,40 @@ console.log(
 );
 
 try {
-    var obfuscationResult = JavaScriptObfuscator.obfuscate(
-        fs.readFileSync("./src/index.js", "utf8"),
+    let htmlContent = fs.readFileSync("./src/index.html", "utf8");
+    let jsContent = fs.readFileSync("./src/index.js", "utf8");
+
+    // Insert enviroment variables
+
+    let envTagIndex = jsContent.indexOf("// config here");
+    if (envTagIndex !== -1) {
+        let envContent = jsContent.substring(
+            envTagIndex + "// config here".length
+        );
+        jsContent =
+            jsContent.substring(0, envTagIndex) +
+            `
+            const firebaseConfig = {
+                apiKey: "${process.env.APIKEY}",
+                authDomain: "${process.env.AUTHDOMAIN}",
+                projectId: "${process.env.PROJECTID}",
+                storageBucket: "${process.env.STORAGEBUCKET}",
+                messagingSenderId: "${process.env.MESSAGESENDERID}",
+                appId: "${process.env.APPID}",
+            };
+            ` +
+            envContent;
+    } else {
+        console.log(
+            `${colours.FgRed}❌ Firebase config tag not found in the JS file${colours.Reset}`
+        );
+        return;
+    }
+
+    // Obfuscate code
+
+    var obfuscationResult = jsContent; /*JavaScriptObfuscator.obfuscate(
+        jsContent,
         {
             compact: true,
             controlFlowFlattening: true,
@@ -24,9 +57,7 @@ try {
             splitStrings: true,
             stringArrayThreshold: 1,
         }
-    ).getObfuscatedCode();
-
-    let htmlContent = fs.readFileSync("./src/index.html", "utf8");
+    ).getObfuscatedCode();*/
 
     // Insert obfuscated javascript
 
@@ -48,7 +79,7 @@ try {
         console.log(
             `${colours.FgRed}❌ Script tag not found in the HTML file${colours.Reset}`
         );
-        return
+        return;
     }
 
     // Insert css
@@ -70,7 +101,7 @@ try {
         console.log(
             `${colours.FgRed}❌ Style tag not found in the HTML file${colours.Reset}`
         );
-        return
+        return;
     }
 
     // Insert developer warning
@@ -95,11 +126,10 @@ try {
         console.log(
             `${colours.FgRed}❌ Developer tag not found in the HTML file${colours.Reset}`
         );
-        return
+        return;
     }
 
     // Format code using prettier
-
 
     try {
         htmlContent = prettier.format(htmlContent, {
@@ -113,7 +143,7 @@ try {
             `${colours.FgRed}❌ Unsuccessfully formatted code${colours.Reset}`
         );
         console.log(`${error}`);
-        return
+        return;
     }
     // Write to final file
 

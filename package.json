@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "@prettier/sync": "^0.5.1",
+        "dotenv": "^16.4.5",
         "firebase": "^10.10.0",
         "prettier": "^3.2.5",
         "prompt-sync": "^4.2.0"
