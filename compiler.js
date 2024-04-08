@@ -45,7 +45,7 @@ try {
 
     // Obfuscate code
 
-    var obfuscationResult = jsContent; /*JavaScriptObfuscator.obfuscate(
+    var obfuscationResult = JavaScriptObfuscator.obfuscate(
         jsContent,
         {
             compact: true,
@@ -57,7 +57,7 @@ try {
             splitStrings: true,
             stringArrayThreshold: 1,
         }
-    ).getObfuscatedCode();*/
+    ).getObfuscatedCode();
 
     // Insert obfuscated javascript
 

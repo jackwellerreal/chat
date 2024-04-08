@@ -8,7 +8,7 @@ Chat app version 2.0 rewrite
 > Most features that are in v1.9 are documented [here](https://jack-weller.gitbook.io/chat/)
 
 ## v2 Features
-* Accounts
-* Servers
-* Moderation
-* Sercure Verification
+[x] Accounts
+[x] Servers
+[ ] Moderation
+[ ] Sercure Verification

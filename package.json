@@ -1,4 +1,5 @@
 {
+    "name": "chat-v2",
     "devDependencies": {
         "javascript-obfuscator": "^4.1.0"
     },

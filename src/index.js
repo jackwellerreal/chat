@@ -1,14 +1,7 @@
 const clientVersion = "TR 2.0 1";
+
 // config here
-const firebaseConfig = {
-    apiKey: "AIzaSyC3bVHFPlQlqFRVNpgACjEZnGoFlB5Dbjs",
-    authDomain: "chat-v2-654bb.firebaseapp.com",
-    projectId: "chat-v2-654bb",
-    storageBucket: "chat-v2-654bb.appspot.com",
-    messagingSenderId: "996020677176",
-    appId: "1:996020677176:web:753898bbd6fb1acc7014cd",
-    measurementId: "G-4C84ZYBW9E",
-};
+
 // Make sure to remove the firebase config before compiling and pushing to github
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
