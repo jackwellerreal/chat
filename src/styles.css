@@ -43,7 +43,9 @@ em-emoji-picker {
     --rgb-input: 41, 43, 47;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     font-weight: 600;
 }
 
