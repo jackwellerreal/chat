@@ -60,19 +60,23 @@ const info = infoRef.data();
 // Get info on server
 
 const serversRef = await getDoc(doc(db, "info", "servers"));
-const servers = serversRef.data().servers;
+const servers = serversRef.data().list;
 
 const server =
     urlParams.get("server-id") == null
-        ? servers.find((obj) => obj.id === "home")
+        ? servers.find((obj) => obj.id === "40a2eee5") // you can change the id to any server id
         : servers.find((obj) => obj.id === urlParams.get("server-id"));
 
 // List all servers
 
 servers.forEach((serverList) => {
+    let localServerList =
+        localStorage.getItem("servers") == null
+            ? []
+            : localStorage.getItem("servers").split(",");
     if (
         serverList.private == false ||
-        localStorage.getItem("servers").split(",").includes(serverList.id)
+        localServerList.includes(serverList.id)
     ) {
         const url = new URL(window.location.href);
         url.searchParams.set("server-id", serverList.id);
@@ -486,7 +490,7 @@ async function loadVoice() {
     const create = document.getElementById("create");
     const newCreate = document.createElement("div");
     newCreate.id = create.id;
-    newCreate.className = create.className
+    newCreate.className = create.className;
     newCreate.innerHTML = create.innerHTML;
     create.parentNode.replaceChild(newCreate, create);
     const videoDiv = document.createElement("div");
@@ -712,12 +716,10 @@ async function loadVoice() {
 
 if (info.version == clientVersion) {
     if (auth.currentUser) {
-        if (urlParams.get("server-id")) {
-            if (urlParams.get("channel") == "voice") {
-                loadVoice();
-            } else {
-                loadData();
-            }
+        if (urlParams.get("channel") == "voice") {
+            loadVoice();
+        } else {
+            loadData();
         }
     } else {
         const messageElement = document.createElement("div");

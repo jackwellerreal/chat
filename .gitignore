@@ -23,5 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 
 .env
+test.js
 final.html
 src/ui
