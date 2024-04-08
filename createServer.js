@@ -86,45 +86,8 @@ try {
         });
     }
 
-    const char = [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f",
-        "g",
-        "h",
-        "i",
-        "j",
-        "k",
-        "l",
-        "m",
-        "n",
-        "o",
-        "p",
-        "q",
-        "r",
-        "s",
-        "t",
-        "u",
-        "v",
-        "w",
-        "x",
-        "y",
-        "z",
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-    ];
-    var id = "";
+    const char = "abcdefghijklmnopqrstuvwxyz0123456789";
+    let id = "";
 
     for (let index = 0; index < 8; index++) {
         id += char[Math.floor(Math.random() * char.length)];
@@ -149,6 +112,9 @@ try {
 
     // TODO: Make new server thing
     console.log(serverJSON);
+    console.log(
+        `${colours.FgGreen}✅ Successfully created a server${colours.Reset}`
+    );
 } catch (error) {
     console.log(
         `${colours.FgRed}❌ Unsuccessfully created a server${colours.Reset}`
