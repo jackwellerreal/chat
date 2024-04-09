@@ -51,7 +51,7 @@ h3 {
 
 .sidebar {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 96px 352px;
     grid-template-rows: 10fr 1fr;
     background-color: var(--brand-2);
     height: 100vh;
@@ -105,6 +105,10 @@ h3 {
 }
 
 .server-sidebar-icon:nth-child(1) img {
+    border-radius: 0;
+}
+
+.server-sidebar-icon:nth-child(1) img:hover {
     border-radius: 0;
 }
 

@@ -50,6 +50,7 @@ const serverName = document.querySelector("#server-name");
 const serverDesc = document.querySelector("#server-description");
 const serverBanner = document.querySelector("#server-banner");
 const serverInfo = document.querySelector("#server-info");
+const channelSidebar = document.querySelector(".channel-sidebar");
 const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
 const nameInput = document.querySelector("#name");
@@ -141,6 +142,21 @@ channels.forEach((channelList) => {
     channelElement.href = url;
     channelElement.classList = channelList == channel ? "channels-current" : "";
     document.getElementById("channels").appendChild(channelElement);
+});
+
+// When user scrolls add background to server title
+
+channelSidebar.addEventListener("scroll", function () {
+    var scrollPosition = this.scrollTop;
+    console.log(scrollPosition)
+    if (scrollPosition == 0) {
+        serverName.style.backgroundColor = "transparent";
+        serverName.style.borderBottom = "none";
+    }
+    if (scrollPosition != 0) {
+        serverName.style.backgroundColor = "var(--brand-2)";
+        serverName.style.borderBottom = "5px solid var(--brand-3)";
+    }
 });
 
 // Provide information on server
