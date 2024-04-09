@@ -738,17 +738,17 @@ if (info.version == clientVersion) {
         const signIn = document.querySelector("#sign-in");
         signIn.addEventListener("click", function (event) {
             event.preventDefault();
-            let email = prompt("Please enter your email:");
-            if (email == null || email == "" || !email.includes("@")) {
+            let username = prompt("Please enter your username:");
+            if (username == null || username == "") {
                 alert("Please enter a valid email next time");
                 return;
             }
             let password = prompt("Please enter your password:");
-            if (email == null || email == "") {
+            if (password == null || password == "") {
                 alert("Please enter a valid password next time");
                 return;
             }
-            signInWithEmailAndPassword(auth, email, password)
+            signInWithEmailAndPassword(auth, username+"@chat.com", password)
                 .then((userCredential) => {
                     console.log(userCredential);
                     window.location.reload();

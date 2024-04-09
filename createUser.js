@@ -28,7 +28,7 @@ const password = prompt(
     `${colours.FgYellow}Please enter a ${colours.FgBlue}password${colours.FgYellow}: ${colours.Reset}`
 );
 
-createUserWithEmailAndPassword(auth, username, password)
+createUserWithEmailAndPassword(auth, username+"@chat.com", password)
     .then((userCredential) => {
         console.log(
             `${colours.FgGreen}✅ Successfully created a user account${colours.Reset}`
