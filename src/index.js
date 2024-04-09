@@ -76,8 +76,6 @@ const server =
         ? servers.find((obj) => obj.id === "40a2eee5") // you can change the id to any server id
         : servers.find((obj) => obj.id === urlParams.get("server-id"));
 
-console.log(server);
-
 // List all servers
 
 servers.forEach((serverList) => {
@@ -148,7 +146,7 @@ channels.forEach((channelList) => {
 
 channelSidebar.addEventListener("scroll", function () {
     var scrollPosition = this.scrollTop;
-    console.log(scrollPosition)
+    console.log(scrollPosition);
     if (scrollPosition == 0) {
         serverName.style.backgroundColor = "transparent";
         serverName.style.borderBottom = "none";
@@ -380,7 +378,20 @@ async function displayPosts(posts) {
     try {
         messagesDiv.innerHTML = "";
         posts.forEach((post, i) => {
-            const time = moment.unix(post.timestamp.seconds).fromNow();
+
+            // time
+            var momentObj = moment.unix(post.timestamp.seconds);
+            var today = moment().startOf('day');
+            var yesterday = moment().subtract(1, 'days').startOf('day');
+            var time;
+            if (momentObj.isSame(today, 'day')) {
+                time = 'Today at ' + momentObj.format('HH:mm');
+            } else if (momentObj.isSame(yesterday, 'day')) {
+                time = 'Yesterday at ' + momentObj.format('HH:mm');
+            } else {
+                time = momentObj.format('DD/MM/YYYY HH:mm');
+            }
+            
             var name = post.name;
             const verified = post.verified;
             const bot = post.bot;
@@ -416,78 +427,69 @@ async function displayPosts(posts) {
                     : ""
             }`;
 
-            messageElement.className = `message ${mention} ${important}`;
+            messageElement.className = `message${" " + mention}${" " + important}`;
             messageElement.id = post.id;
+            
             messageElement.innerHTML = `
-          <div class="message-sender">
-              ${
-                  bot === true
-                      ? '<span style="color: ' +
-                        color +
-                        '; font-weight: 800;">' +
-                        name +
-                        '</span> <span style="font-weight: 400;">used</span> <span class="message-highlight" style="font-weight: 400;" onclick="document.getElementById(\'created-message\').value = \'' +
-                        command +
-                        "'.match(/\\/([^ ^!^@^#^$]+)/g) \">" +
-                        command +
-                        "</span>"
-                      : '<span id="message-name" style="color: ' +
-                        color +
-                        '">' +
-                        name +
-                        "</span>"
-              }
-              <span class="message-time">${time}</span>
-          </div>
-          <span class="message-content">${message}</span>
+            <div style="display: flex; align-items: center;">
+                <img src="https://source.boringavatars.com/beam/120/${post.name}?colors=f03333,f0b133,d0f033,33f052,33f0e0,33b1f0,a133f0" class="message-pfp">
+            </div>
+            <div>
+                <div class="message-sender">
+                    ${
+                        bot === true
+                            ? '<span style="color: ' +
+                                color +
+                                '; font-weight: 800;">' +
+                                name +
+                                '</span> <span style="font-weight: 400;">used</span> <span class="message-highlight" style="font-weight: 400;" onclick="document.getElementById(\'created-message\').value = \'' +
+                                command +
+                                "'.match(/\\/([^ ^!^@^#^$]+)/g) \">" +
+                                command +
+                                "</span>"
+                            : '<span id="message-name" style="color: ' +
+                                color +
+                                '">' +
+                                name +
+                                "</span>"
+                    }
+                    <span class="message-time">${time}</span>
+                </div>
+                <span class="message-content">${message}</span>
+            </div>
         `;
             messageElement.setAttribute("bot", bot ? "true" : "false");
             messagesDiv.appendChild(messageElement);
 
             const previousMessage = messagesDiv.children[i - 1];
-            const previousPreviousMessage = messagesDiv.children[i - 2];
             if (previousMessage) {
                 const previousMessageName =
-                    previousMessage.children[0].children[0].innerHTML.split(
+                    previousMessage.children[1].children[0].children[0].innerHTML.split(
                         " "
                     )[0];
-
                 if (
                     previousMessageName == post.name &&
                     !bot &&
                     previousMessage.getAttribute("bot") == "false"
                 ) {
+                    previousMessage.children[1].children[0].remove();
                     previousMessage.children[0].remove();
-                    previousMessage.classList.add("message-multi-end");
+
                     previousMessage.setAttribute(
                         "og-name",
                         previousMessageName
                     );
-                }
 
-                if (previousPreviousMessage) {
-                    if (
-                        previousPreviousMessage.classList.contains(
-                            "message-multi-end"
-                        )
-                    ) {
-                        const previousPreviousMessageName =
-                            previousPreviousMessage.getAttribute("og-name");
-
-                        if (
-                            previousMessageName == previousPreviousMessageName
-                        ) {
-                            previousMessage.classList.add(
-                                "message-multi-start"
-                            );
-                        }
-                    }
+                    const multiTime = document.createElement('span');
+                    multiTime.className = "message-time-multi"
+                    multiTime.innerHTML = `${moment.unix(post.timestamp.seconds).format("HH:mm")}`
+                    previousMessage.insertBefore(multiTime, previousMessage.children[0]);
                 }
             }
         });
         const messageElement = document.createElement("div");
         messageElement.className = "greating";
-        messageElement.innerHTML = `<h1>You are in #${channel.name}</h1><h2>${channel.description}</h2><h3>Showing ${info.messageCount} latest messages</h3>`;
+        messageElement.innerHTML = `<h1>You are in #${channel.name}</h1><h2>${channel.description}</h2><h3>Showing the latest ${info.messageCount} messages</h3>`;
         messagesDiv.appendChild(messageElement);
     } catch (e) {
         console.error(e);

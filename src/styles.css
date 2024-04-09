@@ -6,10 +6,21 @@
     --brand-1: #383a40;
     --brand-0: #ffffff;
 
-    --red: #f44336;
-    --yellow: #ffeb3b;
-    --green: #4caf50;
-    --blue: #2196f3;
+    --red: hsl(0 86% 57%);
+    --orange: hsl(40 86% 57%);
+    --yellow: hsl(70 86% 57%);
+    --green: hsl(130 86% 57%);
+    --cyan: hsl(175 86% 57%);
+    --blue: hsl(200 86% 57%);
+    --purple: hsl(275 86% 57%);
+
+    --red-translucent: hsl(0 86% 57% / 0.1);
+    --orange-translucent: hsl(40 86% 57% / 0.1);
+    --yellow-translucent: hsl(70 86% 57% / 0.1);
+    --green-translucent: hsl(130 86% 57% / 0.1);
+    --cyan-translucent: hsl(175 86% 57% / 0.1);
+    --blue-translucent: hsl(200 86% 57% / 0.1);
+    --purple-translucent: hsl(275 86% 57% / 0.1);
 }
 
 * {
@@ -41,6 +52,14 @@ em-emoji-picker {
     --rgb-background: 47, 49, 54;
     --rgb-color: 255, 255, 255;
     --rgb-input: 41, 43, 47;
+}
+
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
 }
 
 h1,
@@ -87,7 +106,7 @@ h3 {
     cursor: pointer;
     transition: 0.25s ease;
     background-color: var(--brand-3);
-    fill: var(--green);
+    fill: #4caf50;
     margin-bottom: 16px;
     aspect-ratio: 1/1;
     border-radius: 100%;
@@ -96,7 +115,7 @@ h3 {
 .server-sidebar-plus:hover {
     border-radius: 20px;
     fill: var(--brand-0);
-    background-color: var(--green);
+    background-color: #4caf50;
 }
 
 .server-sidebar-icon:nth-child(1) {
@@ -217,18 +236,24 @@ h3 {
 }
 
 .message {
+    display: flex;
+    align-items: center;
     max-width: 100%;
     overflow-wrap: break-word;
-    padding: 1em;
+    padding: 4px 12px;
+}
+
+.message-pfp { 
+    height: 50px; 
+    margin-right: 12px;
 }
 
 .message-sender {
     font-weight: 600;
-    font-size: 24px;
 }
 
 .message-sender * {
-    line-height: 24px;
+    font-size: 20px;
     vertical-align: middle;
 }
 
@@ -243,20 +268,30 @@ h3 {
 
 .message-time {
     font-weight: normal;
-    font-size: 20px;
+    font-size: 16px;
     color: gray;
 }
 
+.message-time-multi  {
+    width: 50px;
+    margin-right: 12px; 
+    font-weight: normal;
+    font-size: 16px;
+    color: gray;
+    text-align: right;
+    opacity: 0;
+}
+
+.message:hover .message-time-multi {
+    opacity: 1;
+}
+
+.message:not(.message-mention):not(.message-important):hover {
+    background-color: var(--brand-2);
+}
+
 .message-content {
-    font-size: 24px;
-}
-
-.message-multi-start {
-    padding-bottom: 0.25em;
-}
-
-.message-multi-end {
-    padding-top: 0.25em;
+    font-size: 20px;
 }
 
 .message-highlight {
@@ -274,13 +309,13 @@ h3 {
 }
 
 .message-mention {
-    background-color: hsl(40 calc(1 * 86.4%) 56.9% / 0.1);
-    border-left: 2px solid hsl(40 calc(1 * 86.4%) 56.9% / 1);
+    background-color: var(--orange-translucent);
+    border-left: 2px solid var(--orange);
 }
 
 .message-important {
-    background-color: hsl(00 calc(1 * 86.4%) 56.9% / 0.1);
-    border-left: 2px solid hsl(0 calc(1 * 86.4%) 56.9% / 1);
+    background-color: var(--red-translucent);
+    border-left: 2px solid var(--red);
 }
 
 .message-spoiler {
