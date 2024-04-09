@@ -60,25 +60,19 @@ h3 {
 .server-sidebar {
     display: flex;
     flex-direction: column;
+    width: 96px;
     padding: 1em;
     grid-row: span 2;
     background-color: var(--brand-4);
 }
 
 .server-banner {
-    position: absolute;
+    position: relative;
     top: -1em;
     left: -1em;
     width: calc(100% + 2em);
     aspect-ratio: 16/9;
     overflow: hidden;
-    filter: blur(1px);
-    mask-image: linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 1) 50%,
-        rgba(255, 255, 255, 0) 100%
-    );
-    opacity: 65%;
 }
 
 .server-sidebar-icon {
@@ -93,15 +87,16 @@ h3 {
     cursor: pointer;
     transition: 0.25s ease;
     background-color: var(--brand-3);
-    fill: var(--brand-0);
+    fill: var(--green);
     margin-bottom: 16px;
     aspect-ratio: 1/1;
     border-radius: 100%;
 }
 
 .server-sidebar-plus:hover {
-    border-radius: 10px;
-    fill: var(--green);
+    border-radius: 20px;
+    fill: var(--brand-0);
+    background-color: var(--green);
 }
 
 .server-sidebar-icon:nth-child(1) {
@@ -122,7 +117,7 @@ h3 {
 }
 
 .server-sidebar-icon img:hover {
-    border-radius: 10px;
+    border-radius: 20px;
 }
 
 .channel-sidebar {
@@ -130,13 +125,14 @@ h3 {
     flex-direction: column;
     justify-content: space-between;
     padding: 1em;
+    overflow-y: scroll;
 }
 
 .channel-sidebar a {
     display: block;
     width: fit-content;
     font-size: 24px;
-    margin-top: 0.5em;
+    margin-top: 12px;
     text-decoration: none;
 }
 
@@ -145,6 +141,7 @@ h3 {
 }
 
 #server-info {
+    margin-top: 12px;
     opacity: 50%;
 }
 

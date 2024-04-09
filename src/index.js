@@ -1,6 +1,13 @@
 const clientVersion = "TR 2.0 1";
 
-// config here
+const firebaseConfig = {
+    apiKey: "AIzaSyC3bVHFPlQlqFRVNpgACjEZnGoFlB5Dbjs",
+    authDomain: "chat-v2-654bb.firebaseapp.com",
+    projectId: "chat-v2-654bb",
+    storageBucket: "chat-v2-654bb.appspot.com",
+    messagingSenderId: "996020677176",
+    appId: "1:996020677176:web:753898bbd6fb1acc7014cd",
+};
 
 // Make sure to remove the firebase config before compiling and pushing to github
 
@@ -748,7 +755,7 @@ if (info.version == clientVersion) {
                 alert("Please enter a valid password next time");
                 return;
             }
-            signInWithEmailAndPassword(auth, username+"@chat.com", password)
+            signInWithEmailAndPassword(auth, username + "@chat.com", password)
                 .then((userCredential) => {
                     console.log(userCredential);
                     window.location.reload();

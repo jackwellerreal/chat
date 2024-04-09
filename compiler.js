@@ -16,8 +16,10 @@ try {
     let htmlContent = fs.readFileSync("./src/index.html", "utf8");
     let jsContent = fs.readFileSync("./src/index.js", "utf8");
 
-    // Insert enviroment variables
+    /*
 
+    // Insert enviroment variables
+    
     let envTagIndex = jsContent.indexOf("// config here");
     if (envTagIndex !== -1) {
         let envContent = jsContent.substring(
@@ -42,6 +44,7 @@ try {
         );
         return;
     }
+    */
 
     // Obfuscate code
 
