@@ -126,6 +126,12 @@ h3 {
     justify-content: space-between;
     padding: 1em;
     overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.channel-sidebar::-webkit-scrollbar {
+    display: none;
 }
 
 .channel-sidebar a {
