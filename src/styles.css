@@ -250,28 +250,27 @@ h3 {
 }
 
 .message-highlight {
-    background-color: rgba(89, 102, 243, 0.5);
-    border: 2px solid rgba(89, 102, 243, 0.7);
+    background-color: hsl( 235 calc( 1 * 85.6%) 64.7% / 0.3);
     padding: 2px;
     margin-top: 2px;
     border-radius: 10px;
     text-decoration: none;
     cursor: pointer;
+    transition: background-color 50ms ease-out,color 50ms ease-out;
 }
 
 .message-highlight:hover {
-    background-color: rgba(89, 102, 243, 0.7);
-    border: 2px solid rgba(89, 102, 243, 0.7);
+    background-color: hsl( 235 calc( 1 * 85.6%) 64.7% / 1);
 }
 
 .message-mention {
-    background-color: rgba(243, 218, 88, 0.2);
-    border: 2px solid rgba(243, 218, 88, 0.2);
+    background-color: hsl(40 calc(1 * 86.4%) 56.9% / 0.1);
+    border-left: 2px solid hsl(40 calc(1 * 86.4%) 56.9% / 1);
 }
 
 .message-important {
-    background-color: rgba(243, 88, 88, 0.2);
-    border: 2px solid rgba(243, 88, 88, 0.2);
+    background-color: hsl(00 calc(1 * 86.4%) 56.9% / 0.1);
+    border-left: 2px solid hsl(0 calc(1 * 86.4%) 56.9% / 1);
 }
 
 .message-spoiler {
