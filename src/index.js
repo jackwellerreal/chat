@@ -46,6 +46,7 @@ const urlParams = new URLSearchParams(window.location.search);
 // Define elements
 
 const pageTitle = document.querySelector("#title");
+const favicon = document.querySelector("#favicon");
 const serverName = document.querySelector("#server-name");
 const serverDesc = document.querySelector("#server-description");
 const serverBanner = document.querySelector("#server-banner");
@@ -109,7 +110,7 @@ document
     .insertAdjacentHTML(
         "beforeend",
         `<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512" id="findServer" class="server-sidebar-plus"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.9-15.1 18.4-18.4l144.3-55.5c19.4-7.5 38.5 11.6 31 31L325.1 306.7c-3.2 8.5-9.9 15.1-18.4 18.4zM288 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>`
-    ); 
+    );
 
 document.querySelector("#addServer").addEventListener("click", () => {
     let serverID = prompt("Please enter the server ID:");
@@ -153,7 +154,6 @@ channels.forEach((channelList) => {
 
 channelSidebar.addEventListener("scroll", function () {
     var scrollPosition = this.scrollTop;
-    console.log(scrollPosition);
     if (scrollPosition == 0) {
         serverName.style.backgroundColor = "transparent";
         serverName.style.borderBottom = "none";
@@ -167,6 +167,7 @@ channelSidebar.addEventListener("scroll", function () {
 // Provide information on server
 
 pageTitle.innerHTML = `${server.name} - #${channel.name}`;
+favicon.href = server.icon;
 serverName.innerHTML = server.name;
 serverDesc.innerHTML = server.description;
 serverBanner.style.background = `url(${server.banner})`;
@@ -382,61 +383,58 @@ function checkMessage(string) {
 // Display Messages
 
 async function displayPosts(posts) {
-    try {
-        messagesDiv.innerHTML = "";
-        posts.forEach((post, i) => {
-            // time
-            var momentObj = moment.unix(post.timestamp.seconds);
-            var today = moment().startOf("day");
-            var yesterday = moment().subtract(1, "days").startOf("day");
-            var time;
-            if (momentObj.isSame(today, "day")) {
-                time = "Today at " + momentObj.format("HH:mm");
-            } else if (momentObj.isSame(yesterday, "day")) {
-                time = "Yesterday at " + momentObj.format("HH:mm");
-            } else {
-                time = momentObj.format("DD/MM/YYYY HH:mm");
+    messagesDiv.innerHTML = "";
+    posts.forEach((post, i) => {
+        // time
+        var momentObj = moment.unix(post.timestamp.seconds);
+        var today = moment().startOf("day");
+        var yesterday = moment().subtract(1, "days").startOf("day");
+        var time;
+        if (momentObj.isSame(today, "day")) {
+            time = "Today at " + momentObj.format("HH:mm");
+        } else if (momentObj.isSame(yesterday, "day")) {
+            time = "Yesterday at " + momentObj.format("HH:mm");
+        } else {
+            time = momentObj.format("DD/MM/YYYY HH:mm");
+        }
+
+        var name = post.name;
+        const verified = post.verified;
+        const bot = post.bot;
+        const message = twemoji.parse(
+            checkMessage(bot === true ? "raw:" + post.content : post.content),
+            {
+                size: "svg",
+                ext: ".svg",
             }
-
-            var name = post.name;
-            const verified = post.verified;
-            const bot = post.bot;
-            const message = twemoji.parse(
-                checkMessage(
-                    bot === true ? "raw:" + post.content : post.content
-                ),
-                {
-                    size: "svg",
-                    ext: ".svg",
-                }
-            );
-            const color = post.colour;
-            const command = post.command;
-            const messageElement = document.createElement("div");
-            const mention =
-                message.match(/(?<!\\)@everyone/) ||
-                message.match(
-                    new RegExp(`(?<!\\\\)@${localStorage.getItem("name")}`)
-                )
-                    ? "message-mention"
-                    : "";
-
-            const important = message.toLowerCase().includes(`!important`)
-                ? "message-important"
+        );
+        const color = post.colour;
+        const command = post.command;
+        const messageElement = document.createElement("div");
+        const mention =
+            message.match(/(?<!\\)@everyone/) ||
+            message.match(
+                new RegExp(`(?<!\\\\)@${localStorage.getItem("name")}`)
+            )
+                ? "message-mention"
                 : "";
 
-            name += ` ${
-                verified === true
-                    ? '<svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
-                      color +
-                      ';" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
-                    : ""
-            }`;
+        const important = message.toLowerCase().includes(`!important`)
+            ? "message-important"
+            : "";
 
-            messageElement.className = `message${" " + mention}${" " + important}`;
-            messageElement.id = post.id;
+        name += ` ${
+            verified === true
+                ? '<svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
+                  color +
+                  ';" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
+                : ""
+        }`;
 
-            messageElement.innerHTML = `
+        messageElement.className = `message${" " + mention}${" " + important}`;
+        messageElement.id = post.id;
+
+        messageElement.innerHTML = `
             <div style="display: flex; align-items: center;">
                 <img src="https://source.boringavatars.com/beam/120/${post.name}?colors=f03333,f0b133,d0f033,33f052,33f0e0,33b1f0,a133f0" class="message-pfp">
             </div>
@@ -464,45 +462,39 @@ async function displayPosts(posts) {
                 <span class="message-content">${message}</span>
             </div>
         `;
-            messageElement.setAttribute("bot", bot ? "true" : "false");
-            messagesDiv.appendChild(messageElement);
-
-            const previousMessage = messagesDiv.children[i - 1];
-            if (previousMessage) {
-                const previousMessageName =
-                    previousMessage.children[1].children[0].children[0].innerHTML.split(
-                        " "
-                    )[0];
-                if (
-                    previousMessageName == post.name &&
-                    !bot &&
-                    previousMessage.getAttribute("bot") == "false"
-                ) {
-                    previousMessage.children[1].children[0].remove();
-                    previousMessage.children[0].remove();
-
-                    previousMessage.setAttribute(
-                        "og-name",
-                        previousMessageName
-                    );
-
-                    const multiTime = document.createElement("span");
-                    multiTime.className = "message-time-multi";
-                    multiTime.innerHTML = `${moment.unix(post.timestamp.seconds).format("HH:mm")}`;
-                    previousMessage.insertBefore(
-                        multiTime,
-                        previousMessage.children[0]
-                    );
-                }
-            }
-        });
-        const messageElement = document.createElement("div");
-        messageElement.className = "greating";
-        messageElement.innerHTML = `<h1>You are in #${channel.name}</h1><h2>${channel.description}</h2><h3>Showing the latest ${info.messageCount} messages</h3>`;
+        messageElement.setAttribute("bot", bot ? "true" : "false");
         messagesDiv.appendChild(messageElement);
-    } catch (e) {
-        console.error(e);
-    }
+
+        const previousMessage = messagesDiv.children[i - 1];
+        if (previousMessage) {
+            const previousMessageName =
+                previousMessage.children[1].children[0].children[0].innerHTML.split(
+                    " "
+                )[0];
+            if (
+                previousMessageName == post.name &&
+                !bot &&
+                previousMessage.getAttribute("bot") == "false"
+            ) {
+                previousMessage.children[1].children[0].remove();
+                previousMessage.children[0].remove();
+
+                previousMessage.setAttribute("og-name", previousMessageName);
+
+                const multiTime = document.createElement("span");
+                multiTime.className = "message-time-multi";
+                multiTime.innerHTML = `${moment.unix(post.timestamp.seconds).format("HH:mm")}`;
+                previousMessage.insertBefore(
+                    multiTime,
+                    previousMessage.children[0]
+                );
+            }
+        }
+    });
+    const messageElement = document.createElement("div");
+    messageElement.className = "greating";
+    messageElement.innerHTML = `<h1>You are in #${channel.name}</h1><h2>${channel.description}</h2><h3>Showing the latest ${info.messageCount} messages</h3>`;
+    messagesDiv.appendChild(messageElement);
 }
 
 // Get Messages & Display them
@@ -855,6 +847,82 @@ folderIcon.addEventListener("mouseover", async (e) => {
 folderIcon.addEventListener("mouseout", async (e) => {
     folderIcon.src =
         "https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f4c1.svg";
+});
+
+// Show whos typing
+
+const typingDocRef = doc(db, `${server.id}/channels/${channel.name}`, "typing");
+
+onSnapshot(typingDocRef, (doc) => {
+    if (doc.data().people.length !== 0) {
+        document.querySelector(".typing-indicator").innerHTML =
+            `
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path d="M256 116a52 52 0 1 1 0-104 52 52 0 1 1 0 104zm0 364a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM448 288a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM32 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm399.4-96.2A56 56 0 1 1 352.2 80.6a56 56 0 1 1 79.2 79.2zM97.6 414.4a32 32 0 1 1 45.3-45.3A32 32 0 1 1 97.6 414.4zm271.5 0a32 32 0 1 1 45.3-45.3 32 32 0 1 1 -45.3 45.3zM86.3 86.3a48 48 0 1 1 67.9 67.9A48 48 0 1 1 86.3 86.3z"/>
+                </svg>
+            </div>` +
+            `<div>
+                <span style="font-weight:bold">${doc.data().people}</span> is typing...
+            </div>`;
+    }
+    if (doc.data().people.length === 0) {
+        document.querySelector(".typing-indicator").innerHTML = ``;
+    }
+});
+
+// Typing indicator
+
+let typingTimeout;
+
+messageInput.addEventListener("input", async (e) => {
+    const typingDocSnapshot = await getDoc(typingDocRef);
+    const typingDocData = typingDocSnapshot.exists()
+        ? typingDocSnapshot.data()
+        : {};
+
+    if (messageInput.value) {
+        const peopleList = typingDocData.people ? typingDocData.people : [];
+        if (peopleList.includes(nameInput.value)) return;
+        peopleList.push(nameInput.value);
+
+        await setDoc(typingDocRef, { people: peopleList });
+    } else {
+        if (
+            !typingDocData.people ||
+            !typingDocData.people.includes(nameInput.value)
+        ) {
+            return;
+        }
+
+        const index = typingDocData.people.indexOf(nameInput.value);
+        if (index > -1) {
+            typingDocData.people.splice(index, 1);
+        }
+
+        await setDoc(typingDocRef, { people: typingDocData.people });
+    }
+
+    // Reset the timeout
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(async () => {
+        const currentDocSnapshot = await getDoc(typingDocRef);
+        const currentDocData = currentDocSnapshot.exists()
+            ? currentDocSnapshot.data()
+            : {};
+
+        if (
+            currentDocData.people &&
+            currentDocData.people.includes(nameInput.value)
+        ) {
+            const index = currentDocData.people.indexOf(nameInput.value);
+            if (index > -1) {
+                currentDocData.people.splice(index, 1);
+            }
+
+            await setDoc(typingDocRef, { people: currentDocData.people });
+        }
+    }, 15000);
 });
 
 // Send Message
