@@ -38,7 +38,7 @@ body {
     width: 100%;
     height: 100vh;
     color-scheme: dark;
-    background-color: var(--brand-1);
+    background-color: #313338;
 }
 
 em-emoji-picker {
@@ -71,8 +71,8 @@ h3 {
 .sidebar {
     display: grid;
     grid-template-columns: 96px 352px;
-    grid-template-rows: 10fr 1fr;
-    background-color: var(--brand-2);
+    grid-template-rows: auto 80px;
+    background-color: #2B2D31;
     height: 100vh;
 }
 
@@ -82,7 +82,21 @@ h3 {
     width: 96px;
     padding: 1em;
     grid-row: span 2;
-    background-color: var(--brand-4);
+    background-color: #1e1f22;
+}
+
+#server-name {
+    position: fixed;
+    width: 352px;
+    padding: 16px;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
+}
+
+#server-description {
+    width: 320px;
+    padding-bottom: 16px;
+    color: #949ba4 ;
+    border-bottom: 2.5px solid #3B3D44 ;
 }
 
 .server-banner {
@@ -92,7 +106,7 @@ h3 {
     width: calc(100% + 2em);
     aspect-ratio: 16/9;
     overflow: hidden;
-    box-shadow: inset 0px 0px 300px -150px rgba(0,0,0,1);
+    box-shadow: inset 0px 0px 300px -150px rgba(0, 0, 0, 1);
 }
 
 .server-sidebar-icon {
@@ -158,16 +172,43 @@ h3 {
     display: none;
 }
 
-.channel-sidebar a {
+.channel-sidebar-item {
     display: block;
-    width: fit-content;
-    font-size: 24px;
+    width: 100%;
+    padding: 4px 12px;
+    border-radius: 10px;
+    font-size: 20px;
     margin-top: 12px;
+}
+
+.channel-sidebar-item:hover {
+    background-color: #35373c;
+}
+
+.channel-sidebar-item a,
+.channel-sidebar-item svg {
     text-decoration: none;
+    color: #949ba4 !important;
+    fill: #949ba4 !important;
+}
+
+.channel-sidebar-item a {
+    display: block;
+    width: 100%;
 }
 
 .channels-current {
-    text-decoration: underline !important;
+    background-color: #383a40;
+}
+
+.channels-current a,
+.channels-current svg {
+    color: var(--brand-0) !important;
+    fill: var(--brand-0) !important;
+}
+
+.channels-current:hover {
+    background-color: #383a40;
 }
 
 #server-info {
@@ -175,43 +216,48 @@ h3 {
     opacity: 50%;
 }
 
+/* settings */
+
 .settings {
     display: flex;
-    gap: 10px;
-    width: 100%;
+    justify-content: space-between;
     padding: 1em;
-    background-color: var(--brand-3);
+    background-color: #232428;
 }
 
-.settings input[type="text"] {
-    width: 100%;
-    border-radius: 10px;
-    padding: 1em;
-    outline: none;
-    border: none;
-    color: var(--brand-0);
-    background-color: var(--brand-4);
-    cursor: text;
+.settings-profile {
+    display: flex;
+    align-items: center;
 }
 
-.settings input[type="color"] {
-    all: unset;
+.settings-profile p {
+    vertical-align: middle;
+    font-size: 24px;
+}
+
+.settings-profile img {
     height: 100%;
-    border-radius: 10px;
+    margin-right: 16px;
+}
+
+.settings-settings {
+    position: relative;
     aspect-ratio: 1/1;
-    outline: none;
-    border: none;
-    background-color: transparent;
+    padding: 10px;
+    border-radius: 10px;
+    fill: #b4b9c0;
     cursor: pointer;
 }
 
-.settings input[type="color"]::-webkit-color-swatch {
-    border-radius: 10px;
-    height: 100%;
-    width: 100%;
-    border: none;
-    outline: none;
+.settings-settings:hover {
+    background-color: #3D3E45;
 }
+
+.settings-settings:hover > svg {
+    animation: spin normal 1s;
+}
+
+/* messages */
 
 .main {
     display: grid;
@@ -223,7 +269,7 @@ h3 {
     display: flex;
     flex-direction: column-reverse;
     overflow-y: scroll;
-    background-color: var(--brand-1);
+    background-color: #313338;
 }
 
 .greating {
@@ -234,14 +280,14 @@ h3 {
 }
 
 .message {
-    display: flex; 
+    display: flex;
     width: 100%;
     overflow-wrap: break-word;
     padding: 4px 12px;
 }
 
-.message-pfp { 
-    height: 50px; 
+.message-pfp {
+    height: 50px;
     margin-right: 12px;
 }
 
@@ -253,7 +299,7 @@ h3 {
 .message-sender svg {
     fill: #ffffff;
     height: 24px;
-    vertical-align: middle
+    vertical-align: middle;
 }
 
 .message-sender span {
@@ -266,9 +312,9 @@ h3 {
     color: gray;
 }
 
-.message-time-multi  {
+.message-time-multi {
     width: 50px;
-    margin-right: 12px; 
+    margin-right: 12px;
     font-weight: normal;
     font-size: 16px;
     color: gray;
@@ -281,7 +327,7 @@ h3 {
 }
 
 .message:not(.message-mention):not(.message-important):hover {
-    background-color: var(--brand-2);
+    background-color: #2E3035;
 }
 
 .message-content {
@@ -289,17 +335,19 @@ h3 {
 }
 
 .message-highlight {
-    background-color: hsl( 235 calc( 1 * 85.6%) 64.7% / 0.3);
+    background-color: hsl(235 calc(1 * 85.6%) 64.7% / 0.3);
     padding: 2px;
     margin-top: 2px;
     border-radius: 10px;
     text-decoration: none;
     cursor: pointer;
-    transition: background-color 50ms ease-out,color 50ms ease-out;
+    transition:
+        background-color 50ms ease-out,
+        color 50ms ease-out;
 }
 
 .message-highlight:hover {
-    background-color: hsl( 235 calc( 1 * 85.6%) 64.7% / 1);
+    background-color: hsl(235 calc(1 * 85.6%) 64.7% / 1);
 }
 
 .message-mention {
@@ -368,14 +416,13 @@ h3 {
     display: flex;
     position: relative;
     justify-content: space-between;
-    padding: 16px;
-    background-color: var(--brand-2);
+    padding: 32px 16px 16px 16px;
 }
 
 .typing-indicator {
     display: flex;
     position: absolute;
-    top: -0.5em;
+    top: 0px;
 }
 
 .typing-indicator svg {
@@ -384,7 +431,7 @@ h3 {
     fill: var(--brand-0);
     margin-right: 4px;
     vertical-align: middle;
-	animation: fa-spin normal 1s infinite steps(8);
+    animation: spin normal 1s infinite steps(8);
 }
 
 .typing-indicator div {
@@ -400,7 +447,7 @@ h3 {
     border: none;
     border-radius: 10px;
     color: var(--brand-0);
-    background-color: var(--brand-4);
+    background-color: #383a40;
 }
 
 .message-create-button {
@@ -412,7 +459,7 @@ h3 {
     border: none;
     border-radius: 10px;
     color: var(--brand-0);
-    background-color: var(--brand-4);
+    background-color: #383a40;
     cursor: pointer;
 }
 
@@ -422,13 +469,9 @@ h3 {
     cursor: initial;
 }
 
-.message-create-button img {
+.message-create-button svg {
     cursor: pointer;
-    filter: grayscale(100%);
-}
-
-.message-create-button img:hover {
-    filter: grayscale(0%);
+    fill: var(--brand-0);
 }
 
 .emoji-picker-div {
@@ -455,7 +498,11 @@ h3 {
     transform: scaleX(-1);
 }
 
-@keyframes fa-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

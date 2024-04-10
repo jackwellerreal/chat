@@ -54,8 +54,8 @@ const serverInfo = document.querySelector("#server-info");
 const channelSidebar = document.querySelector(".channel-sidebar");
 const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
-const nameInput = document.querySelector("#name");
-const colorInput = document.querySelector("#colour");
+const nameInput = localStorage.getItem("name");
+const colorInput = localStorage.getItem("colour");
 const emojiIcon = document.querySelector("#emoji-picker-icon");
 const folderIcon = document.querySelector("#file-upload-icon");
 const fileUpload = document.querySelector("#fileUpload");
@@ -139,14 +139,13 @@ channels.forEach((channelList) => {
     const url = new URL(window.location.href);
     const icon =
         channelList.type === "text"
-            ? `<svg xmlns="http://www.w3.org/2000/svg" height="24px" fill="white" style="vertical-align: -0.125em; margin-right: 4px;" viewBox="0 0 448 512"><path d="M424 136l-74.01-.0254l13.63-75.76c2.344-13.03-6.312-25.53-19.38-27.88c-13-2.188-25.5 6.344-27.88 19.38l-15.16 84.26h-111.2l13.63-75.76c2.344-13.03-6.312-25.53-19.38-27.88C171.2 30.15 158.7 38.69 156.4 51.72l-15.16 84.26H56c-13.25 0-24 10.78-24 24.03c0 13.25 10.75 23.97 24 23.97h76.57l-25.92 144H24c-13.25 0-24 10.76-24 24.01C0 365.3 10.75 376 24 376l74.01-.0078l-13.63 75.76c-2.344 13.03 6.312 25.53 19.38 27.88C105.2 479.9 106.6 480 108 480c11.38 0 21.5-8.158 23.59-19.75l15.16-84.26h111.2l-13.63 75.76c-2.344 13.03 6.312 25.53 19.38 27.88C265.2 479.9 266.6 480 268 480c11.38 0 21.5-8.158 23.59-19.75l15.16-84.26L392 376c13.25 0 24-10.75 24-23.1c0-13.25-10.75-24.01-24-24.01h-76.57l25.92-144L424 184c13.25 0 24-10.75 24-23.1C448 146.8 437.3 136 424 136zM266.7 327.1h-111.2l25.92-144h111.2L266.7 327.1z"/></svg>`
-            : `<svg xmlns="http://www.w3.org/2000/svg" height="24px" fill="white" style="vertical-align: -0.125em; margin-right: 4px;" viewBox="0 0 576 512"><path d="M333.2 34.84c-4.201-1.896-8.729-2.841-13.16-2.841c-7.697 0-15.29 2.784-21.27 8.1L163.8 160H80c-26.51 0-48 21.49-48 47.1v95.1c0 26.51 21.49 47.1 48 47.1h83.84l134.9 119.9C304.7 477.2 312.3 480 320 480c4.438 0 8.959-.9312 13.16-2.837C344.7 472 352 460.6 352 448V64C352 51.41 344.7 39.1 333.2 34.84zM304 412.4L182.1 304H80v-95.1h102.1L304 99.64V412.4zM444.6 181.9c-4.471-3.629-9.857-5.401-15.2-5.401c-6.949 0-13.83 2.994-18.55 8.807c-8.406 10.25-6.906 25.37 3.375 33.78C425.5 228.4 432 241.8 432 256s-6.5 27.62-17.81 36.87c-10.28 8.406-11.78 23.53-3.375 33.78c4.719 5.812 11.62 8.812 18.56 8.812c5.344 0 10.75-1.781 15.19-5.406C467.1 311.6 480 284.7 480 256C480 227.3 467.1 200.4 444.6 181.9zM505.1 108c-4.455-3.637-9.842-5.417-15.2-5.417c-6.934 0-13.82 2.979-18.58 8.761c-8.406 10.25-6.906 25.37 3.344 33.78C508.6 172.9 528 213.3 528 256c0 42.69-19.44 83.09-53.31 110.9c-10.25 8.406-11.75 23.53-3.344 33.78c4.75 5.781 11.62 8.781 18.56 8.781c5.375 0 10.75-1.781 15.22-5.437C550.2 367.1 576 313.1 576 256C576 198.9 550.2 144.9 505.1 108z"/></svg>`;
-    const channelElement = document.createElement("a");
+            ? `<svg xmlns="http://www.w3.org/2000/svg" height="20px" fill="white" style="vertical-align: -0.125em; margin-right: 4px;" viewBox="0 0 448 512"><path d="M424 136l-74.01-.0254l13.63-75.76c2.344-13.03-6.312-25.53-19.38-27.88c-13-2.188-25.5 6.344-27.88 19.38l-15.16 84.26h-111.2l13.63-75.76c2.344-13.03-6.312-25.53-19.38-27.88C171.2 30.15 158.7 38.69 156.4 51.72l-15.16 84.26H56c-13.25 0-24 10.78-24 24.03c0 13.25 10.75 23.97 24 23.97h76.57l-25.92 144H24c-13.25 0-24 10.76-24 24.01C0 365.3 10.75 376 24 376l74.01-.0078l-13.63 75.76c-2.344 13.03 6.312 25.53 19.38 27.88C105.2 479.9 106.6 480 108 480c11.38 0 21.5-8.158 23.59-19.75l15.16-84.26h111.2l-13.63 75.76c-2.344 13.03 6.312 25.53 19.38 27.88C265.2 479.9 266.6 480 268 480c11.38 0 21.5-8.158 23.59-19.75l15.16-84.26L392 376c13.25 0 24-10.75 24-23.1c0-13.25-10.75-24.01-24-24.01h-76.57l25.92-144L424 184c13.25 0 24-10.75 24-23.1C448 146.8 437.3 136 424 136zM266.7 327.1h-111.2l25.92-144h111.2L266.7 327.1z"/></svg>`
+            : `<svg xmlns="http://www.w3.org/2000/svg" height="20px" fill="white" style="vertical-align: -0.125em; margin-right: 4px;" viewBox="0 0 576 512"><path d="M333.2 34.84c-4.201-1.896-8.729-2.841-13.16-2.841c-7.697 0-15.29 2.784-21.27 8.1L163.8 160H80c-26.51 0-48 21.49-48 47.1v95.1c0 26.51 21.49 47.1 48 47.1h83.84l134.9 119.9C304.7 477.2 312.3 480 320 480c4.438 0 8.959-.9312 13.16-2.837C344.7 472 352 460.6 352 448V64C352 51.41 344.7 39.1 333.2 34.84zM304 412.4L182.1 304H80v-95.1h102.1L304 99.64V412.4zM444.6 181.9c-4.471-3.629-9.857-5.401-15.2-5.401c-6.949 0-13.83 2.994-18.55 8.807c-8.406 10.25-6.906 25.37 3.375 33.78C425.5 228.4 432 241.8 432 256s-6.5 27.62-17.81 36.87c-10.28 8.406-11.78 23.53-3.375 33.78c4.719 5.812 11.62 8.812 18.56 8.812c5.344 0 10.75-1.781 15.19-5.406C467.1 311.6 480 284.7 480 256C480 227.3 467.1 200.4 444.6 181.9zM505.1 108c-4.455-3.637-9.842-5.417-15.2-5.417c-6.934 0-13.82 2.979-18.58 8.761c-8.406 10.25-6.906 25.37 3.344 33.78C508.6 172.9 528 213.3 528 256c0 42.69-19.44 83.09-53.31 110.9c-10.25 8.406-11.75 23.53-3.344 33.78c4.75 5.781 11.62 8.781 18.56 8.781c5.375 0 10.75-1.781 15.22-5.437C550.2 367.1 576 313.1 576 256C576 198.9 550.2 144.9 505.1 108z"/></svg>`;
+    const channelElement = document.createElement("div");
 
     url.searchParams.set("channel", channelList.name);
-    channelElement.innerHTML = icon + channelList.name;
-    channelElement.href = url;
-    channelElement.classList = channelList == channel ? "channels-current" : "";
+    channelElement.innerHTML = `<a href="${url}">${icon}${channelList.name}</a>`;
+    channelElement.classList = `channel-sidebar-item${channelList == channel ? " channels-current" : ""}`;
     document.getElementById("channels").appendChild(channelElement);
 });
 
@@ -157,10 +156,12 @@ channelSidebar.addEventListener("scroll", function () {
     if (scrollPosition == 0) {
         serverName.style.backgroundColor = "transparent";
         serverName.style.borderBottom = "none";
+        serverName.style.textShadow = "2px 2px 3px black";
     }
     if (scrollPosition != 0) {
         serverName.style.backgroundColor = "var(--brand-2)";
         serverName.style.borderBottom = "5px solid var(--brand-3)";
+        serverName.style.textShadow = "none";
     }
 });
 
@@ -883,19 +884,19 @@ messageInput.addEventListener("input", async (e) => {
 
     if (messageInput.value) {
         const peopleList = typingDocData.people ? typingDocData.people : [];
-        if (peopleList.includes(nameInput.value)) return;
-        peopleList.push(nameInput.value);
+        if (peopleList.includes(nameInput)) return;
+        peopleList.push(nameInput);
 
         await setDoc(typingDocRef, { people: peopleList });
     } else {
         if (
             !typingDocData.people ||
-            !typingDocData.people.includes(nameInput.value)
+            !typingDocData.people.includes(nameInput)
         ) {
             return;
         }
 
-        const index = typingDocData.people.indexOf(nameInput.value);
+        const index = typingDocData.people.indexOf(nameInput);
         if (index > -1) {
             typingDocData.people.splice(index, 1);
         }
