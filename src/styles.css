@@ -92,6 +92,7 @@ h3 {
     width: calc(100% + 2em);
     aspect-ratio: 16/9;
     overflow: hidden;
+    box-shadow: inset 0px 0px 300px -150px rgba(0,0,0,1);
 }
 
 .server-sidebar-icon {
@@ -233,8 +234,7 @@ h3 {
 }
 
 .message {
-    display: flex;
-    align-items: center;
+    display: flex; 
     width: 100%;
     overflow-wrap: break-word;
     padding: 4px 12px;
@@ -375,7 +375,7 @@ h3 {
 .typing-indicator {
     display: flex;
     position: absolute;
-    top: -59em;
+    top: -0.5em;
 }
 
 .typing-indicator svg {
@@ -406,7 +406,7 @@ h3 {
 .message-create-button {
     position: relative;
     aspect-ratio: 1/1;
-    padding: 0.5em;
+    padding: 10px;
     margin-left: 2em;
     outline: none;
     border: none;
