@@ -56,6 +56,7 @@ const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
 const nameInput = localStorage.getItem("name");
 const colorInput = localStorage.getItem("colour");
+const editSettings = document.querySelector(".settings-settings");
 const emojiIcon = document.querySelector("#emoji-picker-icon");
 const folderIcon = document.querySelector("#file-upload-icon");
 const fileUpload = document.querySelector("#fileUpload");
@@ -850,25 +851,45 @@ folderIcon.addEventListener("mouseout", async (e) => {
         "https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f4c1.svg";
 });
 
+// Edit user information
+
+editSettings.addEventListener("click", async (e) => {
+    let username = prompt("Please enter a username:");
+    if (username == null || username == "") {
+        alert("Please enter a valid username next time");
+        return;
+    }
+    let colour = prompt("Please enter a colour:");
+    if (colour == null || colour == "") {
+        alert("Please enter a valid colour next time");
+        return;
+    }
+
+    localStorage.setItem("name", username);
+    localStorage.setItem("colour", colour);
+});
+
 // Show whos typing
 
 const typingDocRef = doc(db, `${server.id}/channels/${channel.name}`, "typing");
 
 onSnapshot(typingDocRef, (doc) => {
-    if (doc.data().people.length !== 0) {
-        document.querySelector(".typing-indicator").innerHTML =
-            `
+    if (doc.data()) {
+        if (doc.data().people.length !== 0) {
+            document.querySelector(".typing-indicator").innerHTML =
+                `
             <div>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                     <path d="M256 116a52 52 0 1 1 0-104 52 52 0 1 1 0 104zm0 364a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM448 288a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM32 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm399.4-96.2A56 56 0 1 1 352.2 80.6a56 56 0 1 1 79.2 79.2zM97.6 414.4a32 32 0 1 1 45.3-45.3A32 32 0 1 1 97.6 414.4zm271.5 0a32 32 0 1 1 45.3-45.3 32 32 0 1 1 -45.3 45.3zM86.3 86.3a48 48 0 1 1 67.9 67.9A48 48 0 1 1 86.3 86.3z"/>
                 </svg>
             </div>` +
-            `<div>
+                `<div>
                 <span style="font-weight:bold">${doc.data().people}</span> is typing...
             </div>`;
-    }
-    if (doc.data().people.length === 0) {
-        document.querySelector(".typing-indicator").innerHTML = ``;
+        }
+        if (doc.data().people.length === 0) {
+            document.querySelector(".typing-indicator").innerHTML = ``;
+        }
     }
 });
 
@@ -914,16 +935,16 @@ messageInput.addEventListener("input", async (e) => {
 
         if (
             currentDocData.people &&
-            currentDocData.people.includes(nameInput.value)
+            currentDocData.people.includes(nameInput)
         ) {
-            const index = currentDocData.people.indexOf(nameInput.value);
+            const index = currentDocData.people.indexOf(nameInput);
             if (index > -1) {
                 currentDocData.people.splice(index, 1);
             }
 
             await setDoc(typingDocRef, { people: currentDocData.people });
         }
-    }, 15000);
+    }, 10000);
 });
 
 // Send Message
@@ -935,9 +956,9 @@ form.addEventListener("submit", async (e) => {
         return;
     }
     console.log("form submitted");
-    let name = nameInput.value;
+    const name = localStorage.getItem("name");
     const message = messageInput.value;
-    const color = colorInput.value;
+    const color = localStorage.getItem("colour");
     const ip = await fetch("https://api.ipify.org/?format=json")
         .then((response) => response.json())
         .then((data) => {
@@ -1282,5 +1303,18 @@ form.addEventListener("submit", async (e) => {
                 console.error("Error adding document: ", error);
             }
         }
+    }
+    const currentDocSnapshot = await getDoc(typingDocRef);
+    const currentDocData = currentDocSnapshot.exists()
+        ? currentDocSnapshot.data()
+        : {};
+
+    if (currentDocData.people && currentDocData.people.includes(nameInput)) {
+        const index = currentDocData.people.indexOf(nameInput);
+        if (index > -1) {
+            currentDocData.people.splice(index, 1);
+        }
+
+        await setDoc(typingDocRef, { people: currentDocData.people });
     }
 });
