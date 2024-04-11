@@ -63,8 +63,8 @@ h3 {
 
 .sidebar {
     display: grid;
-    grid-template-columns: 96px 352px;
-    grid-template-rows: auto 80px;
+    grid-template-columns: 72px 240px;
+    grid-template-rows: auto 53px;
     background-color: #2b2d31;
     height: 100vh;
 }
@@ -72,30 +72,30 @@ h3 {
 .server-sidebar {
     display: flex;
     flex-direction: column;
-    width: 96px;
-    padding: 1em;
+    padding: 12px;
     grid-row: span 2;
     background-color: #1e1f22;
 }
 
 #server-name {
     position: fixed;
-    width: 352px;
+    width: 240px;
     padding: 16px;
     text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
+    font-size: 16px;
 }
 
 #server-description {
-    width: 320px;
-    padding-bottom: 16px;
+    width: 224px;
+    padding: 0px 12px 16px;
     color: #949ba4;
     border-bottom: 2.5px solid #3b3d44;
 }
 
 .server-banner {
     position: relative;
-    top: -1em;
-    left: -1em;
+    top: -8px;
+    left: -8px;
     width: calc(100% + 2em);
     aspect-ratio: 16/9;
     overflow: hidden;
@@ -108,9 +108,8 @@ h3 {
 }
 
 .server-sidebar-plus {
-    width: 64px;
-    height: 64px;
-    padding: 16px;
+    width: 48px;
+    padding: 12px;
     cursor: pointer;
     transition: 0.25s ease;
     background-color: #2b2d31;
@@ -140,7 +139,7 @@ h3 {
 }
 
 .server-sidebar-icon img {
-    width: 64px;
+    width: 48px;
     aspect-ratio: 1/1;
     border-radius: 100%;
     cursor: pointer;
@@ -155,7 +154,7 @@ h3 {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 1em;
+    padding: 8px;
     overflow-y: scroll;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -188,6 +187,7 @@ h3 {
 .channel-sidebar-item a {
     display: block;
     width: 100%;
+    font-size: 16px;
 }
 
 .channels-current {
@@ -214,7 +214,7 @@ h3 {
 .settings {
     display: flex;
     justify-content: space-between;
-    padding: 16px;
+    padding: 8px;
     background-color: #232428;
 }
 
@@ -226,11 +226,13 @@ h3 {
 .settings-profile p {
     vertical-align: middle;
     font-size: 24px;
+    font-size: 14px;
 }
 
 .settings-profile img {
     height: 100%;
     margin-right: 16px;
+    height: 32px;
 }
 
 .settings-settings {
@@ -410,7 +412,8 @@ h3 {
 .typing-indicator {
     display: flex;
     position: absolute;
-    top: 2px;
+    top: -30px;
+    left: 56px;
 }
 
 .typing-indicator svg {
@@ -432,13 +435,14 @@ h3 {
 .create {
     display: flex;
     position: relative;
-    padding: 32px 16px 16px 16px;
+    height: 44px;
+    margin: 32px 16px 24px 16px;
 }
 
 .message-create {
     flex-grow: 1;
     height: 100%;
-    padding: 10px;
+    padding: 10px 12px;
     outline: none;
     border: none;
     border-radius: 0px;
