@@ -128,7 +128,7 @@ h3 {
 
 .server-sidebar-icon:nth-child(1) {
     padding-bottom: 16px;
-    border-bottom: 5px solid #313338;
+    border-bottom: 2.5px solid #313338;
 }
 
 .server-sidebar-icon:nth-child(1) img {
@@ -254,7 +254,7 @@ h3 {
 
 .main {
     display: grid;
-    grid-template-rows: 10fr 1fr;
+    grid-template-rows: auto 96px;
     height: 100vh;
 }
 
@@ -263,7 +263,6 @@ h3 {
     flex-direction: column-reverse;
     overflow-y: scroll;
     background-color: #313338;
-    height: 864px;
 }
 
 .greating {
@@ -411,7 +410,7 @@ h3 {
 .typing-indicator {
     display: flex;
     position: absolute;
-    top: 16px;
+    top: 2px;
 }
 
 .typing-indicator svg {
@@ -432,7 +431,8 @@ h3 {
 
 .create {
     display: flex;
-    padding: 16px;
+    position: relative;
+    padding: 32px 16px 16px 16px;
 }
 
 .message-create {
@@ -447,8 +447,8 @@ h3 {
 }
 
 .message-create-button {
-    aspect-ratio: 1/1;
     padding: 10px;
+    aspect-ratio: 1/1;
     outline: none;
     border: none;
     color: #ffffff;
@@ -457,8 +457,13 @@ h3 {
 }
 
 .message-create-button svg {
+    height: 100%;
     cursor: pointer;
-    fill: #ffffff;
+    fill: #B5BAC1;
+}
+
+.message-create-button svg:hover {
+    fill: #dbdee1;
 }
 
 .message-create-button:nth-of-type(2) {
