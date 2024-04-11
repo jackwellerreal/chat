@@ -1,11 +1,4 @@
 :root {
-    --brand-5: #1e1f22;
-    --brand-4: #232428;
-    --brand-3: #2b2d31;
-    --brand-2: #313338;
-    --brand-1: #383a40;
-    --brand-0: #ffffff;
-
     --red: hsl(0 86% 57%);
     --orange: hsl(40 86% 57%);
     --yellow: hsl(70 86% 57%);
@@ -29,7 +22,7 @@
     font-family: "Poppins", sans-serif;
     font-style: normal;
     box-sizing: border-box;
-    color: var(--brand-0);
+    color: #ffffff;
 }
 
 body {
@@ -72,7 +65,7 @@ h3 {
     display: grid;
     grid-template-columns: 96px 352px;
     grid-template-rows: auto 80px;
-    background-color: #2B2D31;
+    background-color: #2b2d31;
     height: 100vh;
 }
 
@@ -95,8 +88,8 @@ h3 {
 #server-description {
     width: 320px;
     padding-bottom: 16px;
-    color: #949ba4 ;
-    border-bottom: 2.5px solid #3B3D44 ;
+    color: #949ba4;
+    border-bottom: 2.5px solid #3b3d44;
 }
 
 .server-banner {
@@ -120,7 +113,7 @@ h3 {
     padding: 16px;
     cursor: pointer;
     transition: 0.25s ease;
-    background-color: var(--brand-3);
+    background-color: #2b2d31;
     fill: #23a559;
     margin-bottom: 16px;
     aspect-ratio: 1/1;
@@ -129,13 +122,13 @@ h3 {
 
 .server-sidebar-plus:hover {
     border-radius: 20px;
-    fill: var(--brand-0);
+    fill: #ffffff;
     background-color: #23a559;
 }
 
 .server-sidebar-icon:nth-child(1) {
     padding-bottom: 16px;
-    border-bottom: 5px solid var(--brand-2);
+    border-bottom: 5px solid #313338;
 }
 
 .server-sidebar-icon:nth-child(1) img {
@@ -203,8 +196,8 @@ h3 {
 
 .channels-current a,
 .channels-current svg {
-    color: var(--brand-0) !important;
-    fill: var(--brand-0) !important;
+    color: #ffffff !important;
+    fill: #ffffff !important;
 }
 
 .channels-current:hover {
@@ -221,7 +214,7 @@ h3 {
 .settings {
     display: flex;
     justify-content: space-between;
-    padding: 1em;
+    padding: 16px;
     background-color: #232428;
 }
 
@@ -250,7 +243,7 @@ h3 {
 }
 
 .settings-settings:hover {
-    background-color: #3D3E45;
+    background-color: #3d3e45;
 }
 
 .settings-settings:hover > svg {
@@ -270,10 +263,11 @@ h3 {
     flex-direction: column-reverse;
     overflow-y: scroll;
     background-color: #313338;
+    height: 864px;
 }
 
 .greating {
-    color: var(--brand-0);
+    color: #ffffff;
     opacity: 30%;
     text-align: center;
     padding: 1em;
@@ -327,7 +321,7 @@ h3 {
 }
 
 .message:not(.message-mention):not(.message-important):hover {
-    background-color: #2E3035;
+    background-color: #2e3035;
 }
 
 .message-content {
@@ -362,8 +356,8 @@ h3 {
 
 .message-spoiler {
     width: fit-content;
-    background-color: var(--brand-2);
-    border: 2px solid var(--brand-3);
+    background-color: #313338;
+    border: 2px solid #2b2d31;
     padding: 2px;
     margin-top: 2px;
     border-radius: 10px;
@@ -374,8 +368,8 @@ h3 {
 .sign-in {
     font-size: 24px;
     width: fit-content;
-    background-color: var(--brand-2);
-    border: 2px solid var(--brand-3);
+    background-color: #313338;
+    border: 2px solid #2b2d31;
     padding: 2px;
     margin-top: 2px;
     border-radius: 10px;
@@ -403,7 +397,7 @@ h3 {
     padding: 1em;
     margin-top: 12px;
     border-radius: 10px;
-    background-color: var(--brand-2);
+    background-color: #313338;
 }
 
 .emoji {
@@ -412,23 +406,18 @@ h3 {
     vertical-align: middle;
 }
 
-.create {
-    display: flex;
-    position: relative;
-    justify-content: space-between;
-    padding: 32px 16px 16px 16px;
-}
+/* Typing indicator */
 
 .typing-indicator {
     display: flex;
     position: absolute;
-    top: 0px;
+    top: 16px;
 }
 
 .typing-indicator svg {
     width: 23px;
     aspect-ratio: 1/1;
-    fill: var(--brand-0);
+    fill: #ffffff;
     margin-right: 4px;
     vertical-align: middle;
     animation: spin normal 1s infinite steps(8);
@@ -439,40 +428,46 @@ h3 {
     display: inline-block;
 }
 
+/* Message create */
+
+.create {
+    display: flex;
+    padding: 16px;
+}
+
 .message-create {
     flex-grow: 1;
     height: 100%;
-    padding: 1em;
+    padding: 10px;
     outline: none;
     border: none;
-    border-radius: 10px;
-    color: var(--brand-0);
+    border-radius: 0px;
+    color: #ffffff;
     background-color: #383a40;
 }
 
 .message-create-button {
-    position: relative;
     aspect-ratio: 1/1;
     padding: 10px;
-    margin-left: 2em;
     outline: none;
     border: none;
-    border-radius: 10px;
-    color: var(--brand-0);
+    color: #ffffff;
     background-color: #383a40;
     cursor: pointer;
 }
 
-.message-create-button:disabled,
-.message-create-button[disabled] {
-    opacity: 50%;
-    cursor: initial;
-}
-
 .message-create-button svg {
     cursor: pointer;
-    fill: var(--brand-0);
+    fill: #ffffff;
 }
+
+.message-create-button:nth-of-type(2) {
+    border-radius: 10px 0px 0px 10px;
+} 
+
+.message-create-button:nth-of-type(3) {
+    border-radius: 0px 10px 10px 0px;
+} 
 
 .emoji-picker-div {
     position: absolute;
@@ -480,6 +475,8 @@ h3 {
     right: 0;
     bottom: 64px;
 }
+
+/* Video */
 
 .video {
     height: 100%;
@@ -491,7 +488,7 @@ h3 {
 
 .video video {
     display: flex;
-    background: var(--brand-2);
+    background: #313338;
     border-radius: 10px;
     align-self: center;
     width: 100%;

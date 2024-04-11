@@ -160,8 +160,8 @@ channelSidebar.addEventListener("scroll", function () {
         serverName.style.textShadow = "2px 2px 3px black";
     }
     if (scrollPosition != 0) {
-        serverName.style.backgroundColor = "var(--brand-2)";
-        serverName.style.borderBottom = "5px solid var(--brand-3)";
+        serverName.style.backgroundColor = "#313338";
+        serverName.style.borderBottom = "5px solid #2b2d31";
         serverName.style.textShadow = "none";
     }
 });
