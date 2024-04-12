@@ -126,6 +126,10 @@ document.querySelector("#addServer").addEventListener("click", () => {
     }
 });
 
+document.querySelector("#findServer").addEventListener("click", () => {
+    alert("This button does nothing yet...")
+});
+
 // List channels for selected server
 
 const channels = server.channels;
