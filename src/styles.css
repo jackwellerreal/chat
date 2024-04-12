@@ -99,7 +99,7 @@ h3 {
     position: relative;
     top: -8px;
     left: -8px;
-    width: calc(100% + 2em);
+    width: calc(100% + 16px);
     aspect-ratio: 16/9;
     overflow: hidden;
     box-shadow: inset 0px 0px 300px -150px rgba(0, 0, 0, 1);
