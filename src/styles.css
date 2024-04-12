@@ -115,7 +115,7 @@ h3 {
     padding: 12px;
     cursor: pointer;
     transition: 0.25s ease;
-    background-color: #2b2d31;
+    background-color: #313338;
     fill: #23a559;
     margin-bottom: 16px;
     aspect-ratio: 1/1;
@@ -123,7 +123,7 @@ h3 {
 }
 
 .server-sidebar-plus:hover {
-    border-radius: 20px;
+    border-radius: 15px;
     fill: #ffffff;
     background-color: #23a559;
 }
