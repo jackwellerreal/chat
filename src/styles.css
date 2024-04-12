@@ -85,7 +85,6 @@ h3 {
     padding: 16px;
     filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 1));
     font-size: 16px;
-    cursor: pointer;
 }
 
 #server-description {
@@ -171,7 +170,7 @@ h3 {
     display: block;
     width: 100%;
     padding: 4px 12px;
-    border-radius: 10px;
+    border-radius: 4px;
     font-size: 20px;
     margin-top: 12px;
 }
@@ -208,8 +207,7 @@ h3 {
 }
 
 #server-info {
-    margin: 12px;
-    opacity: 50%;
+    cursor: pointer;
 }
 
 /* settings */
