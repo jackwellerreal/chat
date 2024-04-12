@@ -50,7 +50,6 @@ const favicon = document.querySelector("#favicon");
 const serverName = document.querySelector("#server-name");
 const serverDesc = document.querySelector("#server-description");
 const serverBanner = document.querySelector("#server-banner");
-const serverInfo = document.querySelector("#server-info");
 const channelSidebar = document.querySelector(".channel-sidebar");
 const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
@@ -175,7 +174,7 @@ serverBanner.style.background = `url(${server.banner})`;
 serverBanner.style.backgroundPosition = `center center`;
 serverBanner.style.backgroundSize = `cover`;
 
-serverInfo.addEventListener("click", () => {
+serverName.addEventListener("click", () => {
     alert(
         `Owned by: ${server.owner}\nManaged by: ${info.manager}\nVersion: ${clientVersion}\nShowing ${info.messageCount} messages\n${localStorage.getItem("verified") ? "You are verified!" : ""}`
     );
