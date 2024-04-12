@@ -155,12 +155,12 @@ channelSidebar.addEventListener("scroll", function () {
     if (scrollPosition == 0) {
         serverName.style.backgroundColor = "transparent";
         serverName.style.borderBottom = "none";
-        serverName.style.textShadow = "2px 2px 3px black";
+        serverName.style.filter = "drop-shadow(2px 2px 3px #000)";
     }
     if (scrollPosition != 0) {
         serverName.style.backgroundColor = "#2b2d31";
         serverName.style.borderBottom = "2.5px solid #3b3d44";
-        serverName.style.textShadow = "none";
+        serverName.style.filter = "none";
     }
 });
 
