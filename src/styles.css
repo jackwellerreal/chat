@@ -85,6 +85,7 @@ h3 {
     padding: 16px;
     filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 1));
     font-size: 16px;
+    cursor: pointer;
 }
 
 #server-description {
@@ -204,10 +205,6 @@ h3 {
 
 .channels-current:hover {
     background-color: #383a40;
-}
-
-#server-info {
-    cursor: pointer;
 }
 
 /* settings */
