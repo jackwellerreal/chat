@@ -50,12 +50,10 @@ const favicon = document.querySelector("#favicon");
 const serverName = document.querySelector("#server-name");
 const serverDesc = document.querySelector("#server-description");
 const serverBanner = document.querySelector("#server-banner");
-const serverInfo = document.querySelector("#server-info");
 const channelSidebar = document.querySelector(".channel-sidebar");
 const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
 const nameInput = localStorage.getItem("name");
-const colorInput = localStorage.getItem("colour");
 const editSettings = document.querySelector(".settings-settings");
 const emojiIcon = document.querySelector("#emoji-picker-icon");
 const folderIcon = document.querySelector("#file-upload-icon");
@@ -170,17 +168,17 @@ channelSidebar.addEventListener("scroll", function () {
 
 pageTitle.innerHTML = `${server.name} - #${channel.name}`;
 favicon.href = server.icon;
-serverName.innerHTML = server.name;
+serverName.innerHTML = `${server.name} <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="height: 25px;fill: #ffffff;"><path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>`;
 serverDesc.innerHTML = server.description;
 serverBanner.style.background = `url(${server.banner})`;
 serverBanner.style.backgroundPosition = `center center`;
 serverBanner.style.backgroundSize = `cover`;
-serverInfo.innerHTML = `Owned by: ${server.owner}<br>Managed by: ${
-    info.manager
-}<br>Version: ${clientVersion}<br>Showing ${info.messageCount} messages<br>${
-    localStorage.getItem("verified") ? "You are verified!<br>" : ""
-}<a href="https://jack-weller.gitbook.io/chat/" target="_blank" style="margin: 0; font-size: inherit;">Information</a>`;
 
+serverName.addEventListener("click", () => {
+    alert(
+        `Owned by: ${server.owner}\nManaged by: ${info.manager}\nVersion: ${clientVersion}\nShowing ${info.messageCount} messages\n${localStorage.getItem("verified") ? "You are verified!" : ""}`
+    );
+});
 // Get the refrence to the messages
 
 const messageRef = collection(db, `${server.id}/channels/${channel.name}`);

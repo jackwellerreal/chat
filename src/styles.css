@@ -78,16 +78,19 @@ h3 {
 }
 
 #server-name {
+    display: flex;
+    justify-content: space-between;
     position: fixed;
     width: 240px;
     padding: 16px;
-    text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
+    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 1));
     font-size: 16px;
+    cursor: pointer;
 }
 
 #server-description {
     width: 224px;
-    padding: 0px 12px 16px;
+    padding: 8px 12px 16px;
     color: #949ba4;
     border-bottom: 2.5px solid #3b3d44;
 }
