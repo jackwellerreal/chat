@@ -185,41 +185,7 @@ serverName.addEventListener("click", () => {
 
 // Show online users
 
-const onlineDocRef = doc(db, `${server.id}/channels/${channel.name}`, "online");
-
-window.onload = async () => {
-    const name = localStorage.getItem("name");
-
-    const peopleList = typingDocData.people ? typingDocData.people : [];
-    if (peopleList.includes(name)) return;
-    peopleList.push(name);
-
-    await setDoc(onlineDocRef, { people: peopleList });
-};
-
-window.onbeforeunload = async () => {
-    if (!onlineDocRef.people || !onlineDocRef.people.includes(name)) {
-        return;
-    }
-
-    const index = onlineDocRef.people.indexOf(name);
-    if (index > -1) {
-        onlineDocRef.people.splice(index, 1);
-    }
-
-    await setDoc(onlineDocRef, { people: onlineDocRef.people });
-};
-
-onSnapshot(onlineDocRef, (doc) => {
-    if (doc.data()) {
-        if (doc.data().people.length !== 0) {
-            document.querySelector("#online-list").innerHTML =
-                doc.data().people;
-        }
-        if (doc.data().people.length === 0) {
-        }
-    }
-});
+// Coming soon
 
 // Get the refrence to the messages
 

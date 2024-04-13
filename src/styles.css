@@ -274,7 +274,7 @@ h3 {
     scrollbar-width: none;
 }
 
-.message:nth-child(1) {
+.messages:first-child {
     margin-bottom: 100px;
 }
 
