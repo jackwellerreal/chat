@@ -239,6 +239,8 @@ async function loadOnline() {
         `;
         document.querySelector("#online-list").appendChild(userElement);
     });
+
+    document.querySelector("#online-title").innerText = `Online - ${onlineDocData.people.length}`
 }
 
 setOnline();
