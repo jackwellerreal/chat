@@ -38,12 +38,12 @@ em-emoji-picker {
     --background-rgb: 41, 43, 47;
     --border-radius: 10px;
     --category-icon-size: 20px;
-    --color-border: rgb(41, 43, 47);
+    --color-border: #1e1f22;
     font-family: "Poppins", sans-serif !important;
     --font-size: 20px;
     --rgb-accent: 88, 101, 242;
-    --rgb-background: 47, 49, 54;
-    --rgb-color: 255, 255, 255;
+    --rgb-background: 43, 45, 49;
+    --rgb-color: 181, 186, 193;
     --rgb-input: 41, 43, 47;
 }
 
@@ -213,6 +213,7 @@ h3 {
 .settings {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 8px;
     background-color: #232428;
 }
@@ -221,18 +222,18 @@ h3 {
     display: flex;
     align-items: center;
     border-radius: 4px;
-    padding: 0px 2px    ;
+    padding: 4px;
+    cursor: pointer;
 }
 
 .settings-profile p {
-    vertical-align: middle;
-    font-size: 24px;
+    width: 76px;
     font-size: 14px;
 }
 
 .settings-profile img {
     height: 100%;
-    margin-right: 16px;
+    margin-right: 8px;
     height: 32px;
     border-radius: 10px;
 }
@@ -242,10 +243,12 @@ h3 {
 }
 
 .settings-settings {
+    width: 32px;
+    height: 32px;
     position: relative;
     aspect-ratio: 1/1;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 6px;
+    border-radius: 4px;
     fill: #b4b9c0;
     cursor: pointer;
 }
@@ -525,17 +528,48 @@ h3 {
 
 /* Sidebar Right */
 
-.sidebar-right {
+.online-sidebar {
     width: 240px;
-    padding: 24px 8px 0 16px;
+    padding-top: 20px;
     background-color: #2b2d31;
 }
 
-.sidebar-right-online {
+.online-title {
+    padding: 4px 8px 0 16px;
     color: #949ba4;
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
+}
+
+.online-user {
+    display: flex;
+    align-items: center;
+    margin: 0px 8px;
+    padding: 1px 8px;
+    width: calc(100% - 16px);
+    height: 44px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.online-user:hover {
+    background-color: #35373c;
+}
+
+.online-user img {
+    height: 32px;
+}
+
+.online-user svg {
+    margin-right: 12px;
+}
+
+.online-user p {
+    height: min-content;
+    font-size: 16px;
+    font-weight: 500;
+    color: #949ba4;
 }
 
 /* Animations */

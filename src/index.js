@@ -185,6 +185,85 @@ serverName.addEventListener("click", () => {
 
 // Show online users
 
+const onlineDocRef = doc(db, "info", "online");
+
+async function setOnline() {
+    const name = localStorage.getItem("name");
+    
+    const onlineDocSnapshot = await getDoc(onlineDocRef);
+    const onlineDocData = onlineDocSnapshot.exists()
+        ? onlineDocSnapshot.data()
+        : {};
+
+    const peopleList = onlineDocData.people ? onlineDocData.people : [];
+    if (peopleList.includes(name)) return;
+    peopleList.push(name);
+
+    console.log(peopleList)
+    await setDoc(onlineDocRef, { people: peopleList });
+}
+
+async function loadOnline() {
+    const onlineDocSnapshot = await getDoc(onlineDocRef);
+    const onlineDocData = onlineDocSnapshot.exists()
+        ? onlineDocSnapshot.data()
+        : {};
+
+    onlineDocData.people.forEach(user => {
+        const userElement = document.createElement("div");
+        userElement.className = "online-user";
+        userElement.innerHTML = `
+            <svg width="32" height="32" viewBox="0 0 32 32">
+                <mask id=":r4:" width="32" height="32">
+                    <circle cx="16" cy="16" r="16" fill="white"></circle>
+                    <rect color="black" x="19" y="19" width="16" height="16" rx="8" ry="8"></rect>
+                </mask>
+                <foreignObject x="0" y="0" width="32" height="32" mask="url(#:r4:)">
+                    <div>
+                        <img src="https://source.boringavatars.com/beam/40/${user}?colors=f03333,f0b133,d0f033,33f052,33f0e0,33b1f0,a133f0">
+                    </div>
+                </foreignObject>
+                <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
+                    <mask id=":r5:">
+                        <rect x="7.5" y="5" width="10" height="10" rx="5" ry="5" fill="white"></rect>
+                        <rect x="12.5" y="10" width="0" height="0" rx="0" ry="0" fill="black"></rect>
+                        <polygon points="-2.16506,-2.5 2.16506,0 -2.16506,2.5" fill="black"
+                            transform="scale(0) translate(13.125 10)"></polygon>
+                        <circle fill="black" cx="12.5" cy="10" r="0"></circle>
+                    </mask>
+                    <rect fill="#23a55a" width="25" height="15" mask="url(#:r5:)"></rect>
+                </svg>
+            </svg>
+
+            <p id="settings-profile-name">${user}</p>
+        `;
+        document.querySelector("#online-list").appendChild(userElement);
+    });
+}
+
+setOnline();
+loadOnline();
+
+onSnapshot(onlineDocRef, (doc) => {
+    if (doc.data()) {
+        if (doc.data().people.length !== 0) {
+            document.querySelector(".typing-indicator").innerHTML =
+                `
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path d="M256 116a52 52 0 1 1 0-104 52 52 0 1 1 0 104zm0 364a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM448 288a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM32 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm399.4-96.2A56 56 0 1 1 352.2 80.6a56 56 0 1 1 79.2 79.2zM97.6 414.4a32 32 0 1 1 45.3-45.3A32 32 0 1 1 97.6 414.4zm271.5 0a32 32 0 1 1 45.3-45.3 32 32 0 1 1 -45.3 45.3zM86.3 86.3a48 48 0 1 1 67.9 67.9A48 48 0 1 1 86.3 86.3z"/>
+                </svg>
+            </div>` +
+                `<div>
+                <span style="font-weight:bold">${doc.data().people}</span> is typing...
+            </div>`;
+        }
+        if (doc.data().people.length === 0) {
+            document.querySelector(".typing-indicator").innerHTML = ``;
+        }
+    }
+});
+
 // Coming soon
 
 // Get the refrence to the messages
