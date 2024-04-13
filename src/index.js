@@ -51,6 +51,7 @@ const serverName = document.querySelector("#server-name");
 const serverDesc = document.querySelector("#server-description");
 const serverBanner = document.querySelector("#server-banner");
 const channelSidebar = document.querySelector(".channel-sidebar");
+const onlineList = document.querySelector("#online-list");
 const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
 const editSettings = document.querySelector(".settings-settings");
@@ -203,11 +204,13 @@ async function setOnline() {
     await setDoc(onlineDocRef, { people: peopleList });
 }
 
-async function loadOnline() {
+onSnapshot(onlineDocRef, async () => {
+    onlineList.innerHTML = "";
+
     const onlineDocSnapshot = await getDoc(onlineDocRef);
     const onlineDocData = onlineDocSnapshot.exists()
         ? onlineDocSnapshot.data()
-        : {};
+        : [];
 
     onlineDocData.people.forEach((user) => {
         const userElement = document.createElement("div");
@@ -220,7 +223,7 @@ async function loadOnline() {
                 </mask>
                 <foreignObject x="0" y="0" width="32" height="32" mask="url(#:r4:)">
                     <div>
-                        <img src="https://source.boringavatars.com/beam/40/${user}?colors=f03333,f0b133,d0f033,33f052,33f0e0,33b1f0,a133f0">
+                        <img src="https://source.boringavatars.com/beam/40/${user}?colors=ED4245,FEE75C,57F287,5865F2,EB459E">
                     </div>
                 </foreignObject>
                 <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
@@ -237,35 +240,14 @@ async function loadOnline() {
 
             <p >${user}</p>
         `;
-        document.querySelector("#online-list").appendChild(userElement);
+        onlineList.appendChild(userElement);
     });
 
     document.querySelector("#online-title").innerText =
         `Online - ${onlineDocData.people.length}`;
-}
+});
 
 setOnline();
-loadOnline();
-
-onSnapshot(onlineDocRef, (doc) => {
-    if (doc.data()) {
-        if (doc.data().people.length !== 0) {
-            document.querySelector(".typing-indicator").innerHTML =
-                `
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                    <path d="M256 116a52 52 0 1 1 0-104 52 52 0 1 1 0 104zm0 364a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM448 288a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM32 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm399.4-96.2A56 56 0 1 1 352.2 80.6a56 56 0 1 1 79.2 79.2zM97.6 414.4a32 32 0 1 1 45.3-45.3A32 32 0 1 1 97.6 414.4zm271.5 0a32 32 0 1 1 45.3-45.3 32 32 0 1 1 -45.3 45.3zM86.3 86.3a48 48 0 1 1 67.9 67.9A48 48 0 1 1 86.3 86.3z"/>
-                </svg>
-            </div>` +
-                `<div>
-                <span style="font-weight:bold">${doc.data().people}</span> is typing...
-            </div>`;
-        }
-        if (doc.data().people.length === 0) {
-            document.querySelector(".typing-indicator").innerHTML = ``;
-        }
-    }
-});
 
 // Coming soon
 
@@ -526,7 +508,7 @@ async function displayPosts(posts) {
 
         messageElement.innerHTML = `
             <div style="display: flex; align-items: center;">
-                <img src="https://source.boringavatars.com/beam/120/${post.name}?colors=f03333,f0b133,d0f033,33f052,33f0e0,33b1f0,a133f0" class="message-pfp">
+                <img src="https://source.boringavatars.com/beam/120/${post.name}?colors=ED4245,FEE75C,57F287,5865F2,EB459E" class="message-pfp">
             </div>
             <div>
                 <div class="message-sender">
@@ -951,9 +933,12 @@ folderIcon.addEventListener("mouseout", async (e) => {
 // Edit user information
 
 editSettings.addEventListener("click", async (e) => {
-    alert("TIP: Leave the form blank to not change that field");
-    let username = prompt("Please enter a username:");
-    let colour = prompt("Please enter a colour:");
+    let username = prompt(
+        "Please enter a username:\nTIP: Leave the form blank to not change that field"
+    );
+    let colour = prompt(
+        "Please enter a colour:\nTIP: Leave the form blank to not change that field"
+    );
 
     if (username) {
         localStorage.setItem("name", username);
