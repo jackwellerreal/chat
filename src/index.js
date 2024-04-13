@@ -189,7 +189,7 @@ const onlineDocRef = doc(db, "info", "online");
 
 async function setOnline() {
     const name = localStorage.getItem("name");
-    
+
     const onlineDocSnapshot = await getDoc(onlineDocRef);
     const onlineDocData = onlineDocSnapshot.exists()
         ? onlineDocSnapshot.data()
@@ -199,7 +199,7 @@ async function setOnline() {
     if (peopleList.includes(name)) return;
     peopleList.push(name);
 
-    console.log(peopleList)
+    console.log(peopleList);
     await setDoc(onlineDocRef, { people: peopleList });
 }
 
@@ -209,7 +209,7 @@ async function loadOnline() {
         ? onlineDocSnapshot.data()
         : {};
 
-    onlineDocData.people.forEach(user => {
+    onlineDocData.people.forEach((user) => {
         const userElement = document.createElement("div");
         userElement.className = "online-user";
         userElement.innerHTML = `
@@ -235,12 +235,13 @@ async function loadOnline() {
                 </svg>
             </svg>
 
-            <p id="settings-profile-name">${user}</p>
+            <p >${user}</p>
         `;
         document.querySelector("#online-list").appendChild(userElement);
     });
 
-    document.querySelector("#online-title").innerText = `Online - ${onlineDocData.people.length}`
+    document.querySelector("#online-title").innerText =
+        `Online - ${onlineDocData.people.length}`;
 }
 
 setOnline();
@@ -1000,24 +1001,11 @@ messageInput.addEventListener("input", async (e) => {
         ? typingDocSnapshot.data()
         : {};
 
-    if (messageInput.value) {
-        const peopleList = typingDocData.people ? typingDocData.people : [];
-        if (peopleList.includes(name)) return;
-        peopleList.push(name);
+    const peopleList = typingDocData.people ? typingDocData.people : [];
+    if (peopleList.includes(name)) return;
+    peopleList.push(name);
 
-        await setDoc(typingDocRef, { people: peopleList });
-    } else {
-        if (!typingDocData.people || !typingDocData.people.includes(name)) {
-            return;
-        }
-
-        const index = typingDocData.people.indexOf(name);
-        if (index > -1) {
-            typingDocData.people.splice(index, 1);
-        }
-
-        await setDoc(typingDocRef, { people: typingDocData.people });
-    }
+    await setDoc(typingDocRef, { people: peopleList });
 
     // Reset the timeout
     clearTimeout(typingTimeout);

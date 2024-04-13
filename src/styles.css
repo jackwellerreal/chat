@@ -226,14 +226,16 @@ h3 {
     cursor: pointer;
 }
 
+.settings-profile svg {
+    margin-right: 8px;
+}
+
 .settings-profile p {
     width: 76px;
     font-size: 14px;
 }
 
 .settings-profile img {
-    height: 100%;
-    margin-right: 8px;
     height: 32px;
     border-radius: 10px;
 }
@@ -464,7 +466,7 @@ h3 {
 .message-create {
     flex-grow: 1;
     height: 100%;
-    padding: 10px 12px;
+    padding: 10px 0px;
     outline: none;
     border: none;
     border-radius: 0px;
@@ -473,7 +475,8 @@ h3 {
 }
 
 .message-create-button {
-    padding: 10px;
+    width: 56px;
+    padding: 10px 16px;
     aspect-ratio: 1/1;
     outline: none;
     border: none;
