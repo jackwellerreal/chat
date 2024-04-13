@@ -53,7 +53,6 @@ const serverBanner = document.querySelector("#server-banner");
 const channelSidebar = document.querySelector(".channel-sidebar");
 const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
-const nameInput = localStorage.getItem("name");
 const editSettings = document.querySelector(".settings-settings");
 const emojiIcon = document.querySelector("#emoji-picker-icon");
 const folderIcon = document.querySelector("#file-upload-icon");
@@ -127,7 +126,7 @@ document.querySelector("#addServer").addEventListener("click", () => {
 });
 
 document.querySelector("#findServer").addEventListener("click", () => {
-    alert("This button does nothing yet...")
+    alert("This button does nothing yet...");
 });
 
 // List channels for selected server
@@ -488,8 +487,12 @@ async function displayPosts(posts) {
                 const multiTime = document.createElement("span");
                 multiTime.className = "message-time-multi";
                 multiTime.innerHTML = `${moment.unix(post.timestamp.seconds).format("HH:mm")}`;
-                previousMessage.insertBefore(
-                    multiTime,
+
+                previousMessage.appendChild(multiTime);
+                previousMessage.appendChild(
+                    previousMessage.children[0].children[0]
+                );
+                previousMessage.children[0].parentNode.removeChild(
                     previousMessage.children[0]
                 );
             }
@@ -861,19 +864,18 @@ folderIcon.addEventListener("mouseout", async (e) => {
 // Edit user information
 
 editSettings.addEventListener("click", async (e) => {
+    alert("TIP: Leave the form blank to not change that field");
     let username = prompt("Please enter a username:");
-    if (username == null || username == "") {
-        alert("Please enter a valid username next time");
-        return;
-    }
     let colour = prompt("Please enter a colour:");
-    if (colour == null || colour == "") {
-        alert("Please enter a valid colour next time");
-        return;
+
+    if (username) {
+        localStorage.setItem("name", username);
+    }
+    if (colour) {
+        localStorage.setItem("colour", colour);
     }
 
-    localStorage.setItem("name", username);
-    localStorage.setItem("colour", colour);
+    window.location.reload()
 });
 
 // Show whos typing
@@ -905,6 +907,8 @@ onSnapshot(typingDocRef, (doc) => {
 let typingTimeout;
 
 messageInput.addEventListener("input", async (e) => {
+    const name = localStorage.getItem("name");
+
     const typingDocSnapshot = await getDoc(typingDocRef);
     const typingDocData = typingDocSnapshot.exists()
         ? typingDocSnapshot.data()
@@ -912,19 +916,16 @@ messageInput.addEventListener("input", async (e) => {
 
     if (messageInput.value) {
         const peopleList = typingDocData.people ? typingDocData.people : [];
-        if (peopleList.includes(nameInput)) return;
-        peopleList.push(nameInput);
+        if (peopleList.includes(name)) return;
+        peopleList.push(name);
 
         await setDoc(typingDocRef, { people: peopleList });
     } else {
-        if (
-            !typingDocData.people ||
-            !typingDocData.people.includes(nameInput)
-        ) {
+        if (!typingDocData.people || !typingDocData.people.includes(name)) {
             return;
         }
 
-        const index = typingDocData.people.indexOf(nameInput);
+        const index = typingDocData.people.indexOf(name);
         if (index > -1) {
             typingDocData.people.splice(index, 1);
         }
@@ -940,11 +941,8 @@ messageInput.addEventListener("input", async (e) => {
             ? currentDocSnapshot.data()
             : {};
 
-        if (
-            currentDocData.people &&
-            currentDocData.people.includes(nameInput)
-        ) {
-            const index = currentDocData.people.indexOf(nameInput);
+        if (currentDocData.people && currentDocData.people.includes(name)) {
+            const index = currentDocData.people.indexOf(name);
             if (index > -1) {
                 currentDocData.people.splice(index, 1);
             }
@@ -1316,8 +1314,8 @@ form.addEventListener("submit", async (e) => {
         ? currentDocSnapshot.data()
         : {};
 
-    if (currentDocData.people && currentDocData.people.includes(nameInput)) {
-        const index = currentDocData.people.indexOf(nameInput);
+    if (currentDocData.people && currentDocData.people.includes(name)) {
+        const index = currentDocData.people.indexOf(name);
         if (index > -1) {
             currentDocData.people.splice(index, 1);
         }

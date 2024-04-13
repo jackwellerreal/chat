@@ -288,7 +288,6 @@ h3 {
 .message {
     display: flex;
     width: 100%;
-    overflow-wrap: break-word;
     padding: 4px 12px;
 }
 
@@ -319,7 +318,7 @@ h3 {
 }
 
 .message-time-multi {
-    width: 50px;
+    min-width: 50px !important;
     margin-right: 12px;
     font-weight: normal;
     font-size: 16px;
@@ -337,6 +336,8 @@ h3 {
 }
 
 .message-content {
+    width: calc(100% - 62px);
+    overflow-wrap: break-word;
     font-size: 20px;
 }
 

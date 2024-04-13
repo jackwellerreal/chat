@@ -36,9 +36,8 @@
 
         <div class="settings">
             <div class="settings-profile">
-                <img
-                    src="https://source.boringavatars.com/beam/40/Jack?colors=f03333,f0b133,d0f033,33f052,33f0e0,33b1f0,a133f0">
-                <p id="settings-profile-name">Jack</p>
+                <img id="settings-profile-picture">
+                <p id="settings-profile-name"></p>
             </div>
             <div class="settings-settings">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -87,6 +86,7 @@
 
 
         document.getElementById("settings-profile-name").innerText = localStorage.getItem("name") == null ? "Unnamed_User" : localStorage.getItem("name");
+        document.getElementById("settings-profile-picture").src = `https://source.boringavatars.com/beam/40/${localStorage.getItem("name") == null ? "Unnamed_User" : localStorage.getItem("name")}?colors=f03333,f0b133,d0f033,33f052,33f0e0,33b1f0,a133f0`
 
         // dev tag here
     </script>
