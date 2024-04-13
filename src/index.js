@@ -182,6 +182,45 @@ serverName.addEventListener("click", () => {
         `Owned by: ${server.owner}\nManaged by: ${info.manager}\nVersion: ${clientVersion}\nShowing ${info.messageCount} messages\n${localStorage.getItem("verified") ? "You are verified!" : ""}`
     );
 });
+
+// Show online users
+
+const onlineDocRef = doc(db, `${server.id}/channels/${channel.name}`, "online");
+
+window.onload = async () => {
+    const name = localStorage.getItem("name");
+
+    const peopleList = typingDocData.people ? typingDocData.people : [];
+    if (peopleList.includes(name)) return;
+    peopleList.push(name);
+
+    await setDoc(onlineDocRef, { people: peopleList });
+};
+
+window.onbeforeunload = async () => {
+    if (!onlineDocRef.people || !onlineDocRef.people.includes(name)) {
+        return;
+    }
+
+    const index = onlineDocRef.people.indexOf(name);
+    if (index > -1) {
+        onlineDocRef.people.splice(index, 1);
+    }
+
+    await setDoc(onlineDocRef, { people: onlineDocRef.people });
+};
+
+onSnapshot(onlineDocRef, (doc) => {
+    if (doc.data()) {
+        if (doc.data().people.length !== 0) {
+            document.querySelector("#online-list").innerHTML =
+                doc.data().people;
+        }
+        if (doc.data().people.length === 0) {
+        }
+    }
+});
+
 // Get the refrence to the messages
 
 const messageRef = collection(db, `${server.id}/channels/${channel.name}`);
@@ -875,7 +914,7 @@ editSettings.addEventListener("click", async (e) => {
         localStorage.setItem("colour", colour);
     }
 
-    window.location.reload()
+    window.location.reload();
 });
 
 // Show whos typing

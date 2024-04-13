@@ -262,7 +262,6 @@ h3 {
 
 .main {
     display: grid;
-    grid-template-rows: auto 96px;
     height: 100vh;
 }
 
@@ -273,6 +272,10 @@ h3 {
     background-color: #313338;
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+.message:nth-child(1) {
+    margin-bottom: 100px;
 }
 
 .channel-sidebar::-webkit-scrollbar {
@@ -400,7 +403,7 @@ h3 {
 }
 
 .message-content img {
-    max-width: 50%;
+    max-width: 40%;
     border-radius: 10px;
 }
 
@@ -427,6 +430,7 @@ h3 {
     position: absolute;
     top: -30px;
     left: 56px;
+    filter: drop-shadow(0px 0px 3px #000);
 }
 
 .typing-indicator svg {
@@ -447,8 +451,10 @@ h3 {
 
 .create {
     display: flex;
-    position: relative;
+    position: fixed;
+    width: calc(100% - 584px);
     height: 44px;
+    bottom: 0;
     margin: 32px 16px 24px 16px;
 }
 
