@@ -29,14 +29,6 @@ em-emoji-picker {
     --rgb-input: 41, 43, 47;
 }
 
-img {
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-drag: none;
-}
-
 h1,
 h2,
 h3 {
@@ -263,10 +255,6 @@ h3 {
     scrollbar-width: none;
 }
 
-.messages:first-child {
-    margin-bottom: 100px;
-}
-
 .channel-sidebar::-webkit-scrollbar {
     display: none;
 }
@@ -282,6 +270,10 @@ h3 {
     display: flex;
     width: 100%;
     padding: 4px 12px;
+}
+
+.message:first-child {
+    margin-bottom: 100px;
 }
 
 .message-pfp {
@@ -399,11 +391,11 @@ h3 {
 .message-content-embed {
     width: fit-content;
     border-left-style: solid;
-    border-width: 6px;
-    padding: 1em;
+    border-width: 4px;
+    padding: 16px 14px 16px 12px;
     margin-top: 12px;
-    border-radius: 10px;
-    background-color: #313338;
+    border-radius: 4px;
+    background-color: #2b2d31;
 }
 
 .emoji {

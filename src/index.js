@@ -200,7 +200,6 @@ async function setOnline() {
     if (peopleList.includes(name)) return;
     peopleList.push(name);
 
-    console.log(peopleList);
     await setDoc(onlineDocRef, { people: peopleList });
 }
 
@@ -507,7 +506,7 @@ async function displayPosts(posts) {
         messageElement.id = post.id;
 
         messageElement.innerHTML = `
-            <div style="display: flex; align-items: center;">
+            <div style="height: 60px;display: flex;align-items: center;">
                 <img src="https://source.boringavatars.com/beam/120/${post.name}?colors=ED4245,FEE75C,57F287,5865F2,EB459E" class="message-pfp">
             </div>
             <div>
@@ -516,7 +515,7 @@ async function displayPosts(posts) {
                         bot === true
                             ? '<span style="color: ' +
                               color +
-                              '; font-weight: 800;">' +
+                              ';">' +
                               name +
                               '</span> <span style="font-weight: 400;">used</span> <span class="message-highlight" style="font-weight: 400;" onclick="document.getElementById(\'created-message\').value = \'' +
                               command +
@@ -1094,7 +1093,7 @@ form.addEventListener("submit", async (e) => {
             // Bot Commands
 
             if (message.startsWith("/")) {
-                if (channel == "bot-spam") {
+                if (channel.name.includes("bot")) {
                     if (message.startsWith("/verify")) {
                         if (
                             server.codes.includes(
