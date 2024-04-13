@@ -207,7 +207,7 @@ h3 {
 }
 
 .settings-profile p {
-    width: 76px;
+    min-width: 76px;
     font-size: 14px;
 }
 
@@ -364,10 +364,10 @@ h3 {
 }
 
 .sign-in {
-    font-size: 24px;
+    font-size: 20px;
     width: fit-content;
-    background-color: #313338;
-    border: 2px solid #2b2d31;
+    background-color: #383a40;
+    border: none;
     padding: 2px;
     margin-top: 2px;
     border-radius: 10px;

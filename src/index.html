@@ -43,7 +43,7 @@
                     </mask>
                     <foreignObject x="0" y="0" width="32" height="32" mask="url(#:r4:)">
                         <div>
-                            <img id="settings-profile-picture">
+                            <img id="settings-profile-picture" />
                         </div>
                     </foreignObject>
                     <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
@@ -108,6 +108,7 @@
                     : subString);
             };
 
+        localStorage.setItem("name", localStorage.getItem("name") ? localStorage.getItem("name") : "Unnamed_User")
 
         document.getElementById("settings-profile-name").innerText = localStorage.getItem("name") == null ? "Unnamed_User" : localStorage.getItem("name");
         document.getElementById("settings-profile-picture").src = `https://source.boringavatars.com/beam/40/${localStorage.getItem("name") == null ? "Unnamed_User" : localStorage.getItem("name")}?colors=ED4245,FEE75C,57F287,5865F2,EB459E`
