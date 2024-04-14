@@ -260,10 +260,20 @@ h3 {
 }
 
 .greating {
-    color: #ffffff;
-    opacity: 30%;
     text-align: center;
-    padding: 1em;
+    margin: 16px;
+}
+
+.greeting-title {
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.greeting-desc {
+    color: #b5bac1;
+    font-size: 14px;
+    font-weight: 400;
 }
 
 .message {
@@ -272,7 +282,7 @@ h3 {
     padding: 4px 12px;
 }
 
-.messages:first-child {
+.messages:nth-child(1) {
     margin-bottom: 100px;
 }
 
@@ -354,37 +364,46 @@ h3 {
 
 .message-spoiler {
     width: fit-content;
-    background-color: #313338;
-    border: 2px solid #2b2d31;
+    background-color: #1e1f22;
     padding: 2px;
     margin-top: 2px;
-    border-radius: 10px;
+    border-radius: 5px;
     text-decoration: none;
     cursor: pointer;
 }
 
+.message-spoiler:hover {
+    transition: background-color 170ms ease, opacity 170ms ease;
+    background-color: hsl( 0 0% 100% / 0.1);
+}
+
 .sign-in {
-    font-size: 20px;
-    width: fit-content;
-    background-color: #383a40;
+    height: 32px;
+    padding: 2px 16px;
+    border-radius: 3px;
+    background-color: #5865f2;
+    font-size: 14px;
+    font-weight: 500;
     border: none;
-    padding: 2px;
-    margin-top: 2px;
-    border-radius: 10px;
-    text-decoration: none;
+    outline: none;
+    transition: background-color 170ms ease, color 170ms ease;
     cursor: pointer;
+}
+
+.sign-in:hover {
+    background-color: #4752c4;
 }
 
 .message-spoiler-text {
     opacity: 0;
 }
 
-.message-spoiler-text:hover {
+.message-spoiler:hover .message-spoiler-text {
     opacity: 1;
 }
 
 .message-content img {
-    max-width: 40%;
+    max-width: 400px;
     border-radius: 10px;
 }
 
