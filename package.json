@@ -1,17 +1,19 @@
 {
     "name": "chat-v2",
     "devDependencies": {
+        "electron": "^29.3.0",
         "javascript-obfuscator": "^4.1.0"
     },
     "scripts": {
         "compile": "node ./commands/compiler.js",
         "create-user": "node ./commands/createUser.js",
-        "create-server": "node ./commands/createServer.js"
+        "create-server": "node ./commands/createServer.js",
+        "compile-electron": "electron-packager ./ --platform=win32 --arch=x64 --overwrite --icon=assets/icon.ico --ignore=node_modules --out ./dist"
     },
     "dependencies": {
         "@prettier/sync": "^0.5.1",
         "dotenv": "^16.4.5",
-        "firebase": "^10.10.0",
+        "firebase": "^10.11.0",
         "prettier": "^3.2.5",
         "prompt-sync": "^4.2.0"
     }
