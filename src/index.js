@@ -56,6 +56,7 @@ const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
 const editSettings = document.querySelector(".settings-settings");
 const emojiIcon = document.querySelector("#emoji-picker-icon");
+const gifIcon = document.querySelector("#gif-picker-icon");
 const folderIcon = document.querySelector("#file-upload-icon");
 const fileUpload = document.querySelector("#fileUpload");
 const emojiPicker = document.querySelector("#emoji-picker-div");
@@ -467,18 +468,19 @@ async function displayPosts(posts) {
             time = momentObj.format("DD/MM/YYYY HH:mm");
         }
 
-        var name = post.name;
-        const verified = post.verified;
-        const bot = post.bot;
+        var name = post.user.name;
+        const verified = post.user.verified;
+        const bot = post.user.bot;
         const message = twemoji.parse(
-            checkMessage(bot === true ? "raw:" + post.content : post.content),
+            checkMessage(bot === true ? "raw:" + post.message.content : post.message.content),
             {
                 size: "svg",
                 ext: ".svg",
             }
         );
-        const color = post.colour;
-        const command = post.command;
+        const color = post.user.colour;
+        const command = post.message.command;
+
         const messageElement = document.createElement("div");
         const mention =
             message.match(/(?<!\\)@everyone/) ||
@@ -505,7 +507,7 @@ async function displayPosts(posts) {
 
         messageElement.innerHTML = `
             <div style="height: 60px;display: flex;align-items: center;">
-                <img src="https://source.boringavatars.com/beam/120/${post.name}?colors=ED4245,FEE75C,57F287,5865F2,EB459E" class="message-pfp">
+                <img src="https://source.boringavatars.com/beam/120/${post.user.name}?colors=ED4245,FEE75C,57F287,5865F2,EB459E" class="message-pfp">
             </div>
             <div>
                 <div class="message-sender">
@@ -905,28 +907,24 @@ emojiIcon.addEventListener("click", async (e) => {
     }
 });
 
-emojiIcon.addEventListener("mouseover", async (e) => {
-    emojiIcon.src =
-        "https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f600.svg";
-});
-emojiIcon.addEventListener("mouseout", async (e) => {
-    emojiIcon.src =
-        "https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f642.svg";
-});
-
 // File Upload
 
 fileUpload.onchange = () => {
-    messageInput.value = messageInput.value + "&file&";
+    messageInput.value = "&file&";
 };
 
-folderIcon.addEventListener("mouseover", async (e) => {
-    folderIcon.src =
-        "https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f4c2.svg";
-});
-folderIcon.addEventListener("mouseout", async (e) => {
-    folderIcon.src =
-        "https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/svg/1f4c1.svg";
+// GIF Picker
+
+gifIcon.addEventListener("click", async (e) => {
+    fetch(
+        `https://tenor.googleapis.com/v2/search?q=${messageInput.value}&key=AIzaSyAA3cmMrIrv4T2QgdiyIsHF3lx8llmLy6U&client_key=my_test_app&limit=1`,
+        { method: "GET" }
+    )
+        .then((response) => response.json())
+        .then((response) => {
+            messageInput.value = `image :${response.results[0].media_formats.gif.url}`;
+        })
+        .catch((err) => console.error(err));
 });
 
 // Edit user information
@@ -1048,22 +1046,25 @@ form.addEventListener("submit", async (e) => {
                     getDownloadURL(storageRef)
                         .then(async (url) => {
                             await addDoc(messageRef, {
-                                name: name,
-                                verified:
-                                    localStorage.getItem("verified") == "true"
-                                        ? true
-                                        : false,
-                                bot: false,
-                                owner:
-                                    localStorage.getItem("owner") == "true"
-                                        ? true
-                                        : false,
-                                content: `image:${url}`,
-                                colour: color,
+                                user: {
+                                    auth: {
+                                        id: auth.currentUser.uid,
+                                        ip: ip,
+                                        userAgent: navigator.userAgent,
+                                    },
+                                    bot: false,
+                                    verified:
+                                        localStorage.getItem("verified") ==
+                                        "true"
+                                            ? true
+                                            : false,
+                                    colour: color,
+                                    name: name,
+                                },
+                                message: {
+                                    content: `image:${url}`,
+                                },
                                 timestamp: new Date(),
-                                ip: ip,
-                                useragent: navigator.userAgent,
-                                auth: auth.currentUser.uid,
                             });
                         })
                         .catch((error) => {
@@ -1096,9 +1097,7 @@ form.addEventListener("submit", async (e) => {
                 if (channel.name.includes("bot")) {
                     if (message.startsWith("/verify")) {
                         if (
-                            info.codes.includes(
-                                message.replace("/verify ", "")
-                            )
+                            info.codes.includes(message.replace("/verify ", ""))
                         ) {
                             localStorage.setItem("verified", true);
                             alert("You are now Verified");
@@ -1109,38 +1108,51 @@ form.addEventListener("submit", async (e) => {
                     }
                     if (message.startsWith("/random")) {
                         await addDoc(messageRef, {
-                            name: name,
-                            verified:
-                                localStorage.getItem("verified") == "true"
-                                    ? true
-                                    : false,
-                            bot: true,
-                            command: message,
-                            content: `${Math.floor(Math.random() * 100)}`,
-                            colour: color,
+                            user: {
+                                auth: {
+                                    id: auth.currentUser.uid,
+                                    ip: ip,
+                                    userAgent: navigator.userAgent,
+                                },
+                                bot: true,
+                                verified:
+                                    localStorage.getItem("verified") == "true"
+                                        ? true
+                                        : false,
+                                colour: color,
+                                name: name,
+                            },
+                            message: {
+                                content: `${Math.floor(Math.random() * 100)}`,
+                                command: message
+                            },
                             timestamp: new Date(),
-                            ip: ip,
-                            useragent: navigator.userAgent,
-                            auth: auth.currentUser.uid,
                         });
                         return;
                     }
                     if (message.startsWith("/test")) {
                         if (localStorage.getItem("verified") == "true") {
                             await addDoc(messageRef, {
-                                name: name,
-                                verified:
-                                    localStorage.getItem("verified") == "true"
-                                        ? true
-                                        : false,
-                                bot: true,
-                                command: message,
-                                content: `embed:${message}`,
-                                colour: color,
+                                user: {
+                                    auth: {
+                                        id: auth.currentUser.uid,
+                                        ip: ip,
+                                        userAgent: navigator.userAgent,
+                                    },
+                                    bot: true,
+                                    verified:
+                                        localStorage.getItem("verified") ==
+                                        "true"
+                                            ? true
+                                            : false,
+                                    colour: color,
+                                    name: name,
+                                },
+                                message: {
+                                    content: `embed:test`,
+                                    command: message
+                                },
                                 timestamp: new Date(),
-                                ip: ip,
-                                useragent: navigator.userAgent,
-                                auth: auth.currentUser.uid,
                             });
                         } else {
                             alert("No permission");
@@ -1149,23 +1161,29 @@ form.addEventListener("submit", async (e) => {
                     }
                     if (message.startsWith("/coinflip")) {
                         await addDoc(messageRef, {
-                            name: name,
-                            verified:
-                                localStorage.getItem("verified") == "true"
-                                    ? true
-                                    : false,
-                            bot: true,
-                            command: message,
-                            content: `embed:${
-                                (Math.floor(Math.random() * 2) == 0) == true
-                                    ? "🪙 Heads"
-                                    : "🪙 Tails"
-                            }`,
-                            colour: color,
+                            user: {
+                                auth: {
+                                    id: auth.currentUser.uid,
+                                    ip: ip,
+                                    userAgent: navigator.userAgent,
+                                },
+                                bot: true,
+                                verified:
+                                    localStorage.getItem("verified") == "true"
+                                        ? true
+                                        : false,
+                                colour: color,
+                                name: name,
+                            },
+                            message: {
+                                content: `embed:${
+                                    (Math.floor(Math.random() * 2) == 0) == true
+                                        ? "🪙 Heads"
+                                        : "🪙 Tails"
+                                }`,
+                                command: message
+                            },
                             timestamp: new Date(),
-                            ip: ip,
-                            useragent: navigator.userAgent,
-                            auth: auth.currentUser.uid,
                         });
                     }
                     if (message.startsWith("/slots")) {
@@ -1204,19 +1222,26 @@ form.addEventListener("submit", async (e) => {
                                     " moneys lol";
                             }
                             await addDoc(messageRef, {
-                                name: name,
-                                verified:
-                                    localStorage.getItem("verified") == "true"
-                                        ? true
-                                        : false,
-                                bot: true,
-                                command: message,
-                                content: `embed:${status}\\n${slots1} | ${slots2} | ${slots3}`,
-                                colour: color,
+                                user: {
+                                    auth: {
+                                        id: auth.currentUser.uid,
+                                        ip: ip,
+                                        userAgent: navigator.userAgent,
+                                    },
+                                    bot: true,
+                                    verified:
+                                        localStorage.getItem("verified") ==
+                                        "true"
+                                            ? true
+                                            : false,
+                                    colour: color,
+                                    name: name,
+                                },
+                                message: {
+                                    content: `embed:${status}\\n${slots1} | ${slots2} | ${slots3}`,
+                                    command: message
+                                },
                                 timestamp: new Date(),
-                                ip: ip,
-                                useragent: navigator.userAgent,
-                                auth: auth.currentUser.uid,
                             });
                             return;
                         } else {
@@ -1232,38 +1257,50 @@ form.addEventListener("submit", async (e) => {
                             .then((response) => response.json())
                             .then(async (data) => {
                                 await addDoc(messageRef, {
-                                    name: name,
-                                    verified:
-                                        localStorage.getItem("verified") ==
-                                        "true"
-                                            ? true
-                                            : false,
-                                    bot: true,
-                                    command: message,
-                                    content: `${data.joke}`,
-                                    colour: color,
+                                    user: {
+                                        auth: {
+                                            id: auth.currentUser.uid,
+                                            ip: ip,
+                                            userAgent: navigator.userAgent,
+                                        },
+                                        bot: true,
+                                        verified:
+                                            localStorage.getItem("verified") ==
+                                            "true"
+                                                ? true
+                                                : false,
+                                        colour: color,
+                                        name: name,
+                                    },
+                                    message: {
+                                        content: `${data.joke}`,
+                                        command: message
+                                    },
                                     timestamp: new Date(),
-                                    ip: ip,
-                                    useragent: navigator.userAgent,
-                                    auth: auth.currentUser.uid,
                                 });
                             })
                             .catch(async (error) => {
                                 await addDoc(messageRef, {
-                                    name: name,
-                                    verified:
-                                        localStorage.getItem("verified") ==
-                                        "true"
-                                            ? true
-                                            : false,
-                                    bot: true,
-                                    command: message,
-                                    content: `Unable to fetch API: ${error}`,
-                                    colour: color,
+                                    user: {
+                                        auth: {
+                                            id: auth.currentUser.uid,
+                                            ip: ip,
+                                            userAgent: navigator.userAgent,
+                                        },
+                                        bot: true,
+                                        verified:
+                                            localStorage.getItem("verified") ==
+                                            "true"
+                                                ? true
+                                                : false,
+                                        colour: color,
+                                        name: name,
+                                    },
+                                    message: {
+                                        content: `Unable to fetch API: ${error}`,
+                                        command: message
+                                    },
                                     timestamp: new Date(),
-                                    ip: ip,
-                                    useragent: navigator.userAgent,
-                                    auth: auth.currentUser.uid,
                                 });
                             });
                         return;
@@ -1280,38 +1317,50 @@ form.addEventListener("submit", async (e) => {
                             .then((response) => response.json())
                             .then(async (data) => {
                                 await addDoc(messageRef, {
-                                    name: name,
-                                    verified:
-                                        localStorage.getItem("verified") ==
-                                        "true"
-                                            ? true
-                                            : false,
-                                    bot: true,
-                                    command: message,
-                                    content: `${data.text.replace("`", "'")}`,
-                                    colour: color,
+                                    user: {
+                                        auth: {
+                                            id: auth.currentUser.uid,
+                                            ip: ip,
+                                            userAgent: navigator.userAgent,
+                                        },
+                                        bot: true,
+                                        verified:
+                                            localStorage.getItem("verified") ==
+                                            "true"
+                                                ? true
+                                                : false,
+                                        colour: color,
+                                        name: name,
+                                    },
+                                    message: {
+                                        content: `${data.text.replace("`", "'")}`,
+                                        command: message
+                                    },
                                     timestamp: new Date(),
-                                    ip: ip,
-                                    useragent: navigator.userAgent,
-                                    auth: auth.currentUser.uid,
                                 });
                             })
                             .catch(async (error) => {
                                 await addDoc(messageRef, {
-                                    name: name,
-                                    verified:
-                                        localStorage.getItem("verified") ==
-                                        "true"
-                                            ? true
-                                            : false,
-                                    bot: true,
-                                    command: message,
-                                    content: `Unable to fetch API: ${error}`,
-                                    colour: color,
+                                    user: {
+                                        auth: {
+                                            id: auth.currentUser.uid,
+                                            ip: ip,
+                                            userAgent: navigator.userAgent,
+                                        },
+                                        bot: true,
+                                        verified:
+                                            localStorage.getItem("verified") ==
+                                            "true"
+                                                ? true
+                                                : false,
+                                        colour: color,
+                                        name: name,
+                                    },
+                                    message: {
+                                        content: `Unable to fetch API: ${error}`,
+                                        command: message
+                                    },
                                     timestamp: new Date(),
-                                    ip: ip,
-                                    useragent: navigator.userAgent,
-                                    auth: auth.currentUser.uid,
                                 });
                             });
                         return;
@@ -1328,16 +1377,23 @@ form.addEventListener("submit", async (e) => {
             if (channel == "anonymous") {
                 try {
                     await addDoc(messageRef, {
-                        name: "Anonymous",
-                        verified: false,
-                        bot: false,
-                        content: message,
-                        colour: `#${Math.floor(
-                            Math.random() * 16777215
-                        ).toString(16)}`,
+                        user: {
+                            auth: {
+                                id: null,
+                                ip: null,
+                                userAgent: null,
+                            },
+                            bot: false,
+                            verified: false,
+                            colour: `#${Math.floor(
+                                Math.random() * 16777215
+                            ).toString(16)}`,
+                            name: "Anonymous",
+                        },
+                        message: {
+                            content: message,
+                        },
                         timestamp: new Date(),
-                        ip: null,
-                        useragent: null,
                     });
                 } catch (error) {
                     console.error("Error adding document: ", error);
@@ -1349,18 +1405,24 @@ form.addEventListener("submit", async (e) => {
 
             try {
                 await addDoc(messageRef, {
-                    name: name,
-                    verified:
-                        localStorage.getItem("verified") == "true"
-                            ? true
-                            : false,
-                    bot: false,
-                    content: message,
-                    colour: color,
+                    user: {
+                        auth: {
+                            id: auth.currentUser.uid,
+                            ip: ip,
+                            userAgent: navigator.userAgent,
+                        },
+                        bot: false,
+                        verified:
+                            localStorage.getItem("verified") == "true"
+                                ? true
+                                : false,
+                        colour: color,
+                        name: name,
+                    },
+                    message: {
+                        content: message,
+                    },
                     timestamp: new Date(),
-                    ip: ip,
-                    useragent: navigator.userAgent,
-                    auth: auth.currentUser.uid,
                 });
             } catch (error) {
                 console.error("Error adding document: ", error);
