@@ -4,9 +4,9 @@
         "javascript-obfuscator": "^4.1.0"
     },
     "scripts": {
-        "compile": "node compiler.js",
-        "create-user": "node createUser.js",
-        "create-server": "node createServer.js"
+        "compile": "node ./commands/compiler.js",
+        "create-user": "node ./commands/createUser.js",
+        "create-server": "node ./commands/createServer.js"
     },
     "dependencies": {
         "@prettier/sync": "^0.5.1",
