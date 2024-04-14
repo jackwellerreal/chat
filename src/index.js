@@ -543,7 +543,7 @@ async function displayPosts(posts) {
                     " "
                 )[0];
             if (
-                previousMessageName == post.name &&
+                previousMessageName == post.user.name &&
                 !bot &&
                 previousMessage.getAttribute("bot") == "false"
             ) {
