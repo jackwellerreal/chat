@@ -53,8 +53,6 @@ app.on("window-all-closed", async () => {
             await onlineRef.set({ people: onlineData.people });
         }
 
-        console.log(name, onlineData.people)
-
         app.quit();
     }
 });
