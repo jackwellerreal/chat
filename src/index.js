@@ -922,7 +922,7 @@ gifIcon.addEventListener("click", async (e) => {
     )
         .then((response) => response.json())
         .then((response) => {
-            messageInput.value = `image :${response.results[0].media_formats.gif.url}`;
+            messageInput.value = `image:${response.results[0].media_formats.gif.url}`;
         })
         .catch((err) => console.error(err));
 });
