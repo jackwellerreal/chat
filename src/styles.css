@@ -35,6 +35,101 @@ h3 {
     font-weight: 600;
 }
 
+button {
+    height: 32px;
+    padding: 2px 16px;
+    border-radius: 3px;
+    background-color: #5865f2;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    outline: none;
+    transition:
+        background-color 170ms ease,
+        color 170ms ease;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #4752c4;
+}
+
+.overlay {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    background-color: #000000b3;
+    z-index: 100;
+}
+
+.overlay-form {
+    width: 440px;
+    height: fit-content;
+    border-radius: 4px;
+    background-color: #313338;
+}
+
+.overlay-form-content {
+    padding: 16px;
+}
+
+.overlay-form-content h1 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.overlay-form-content p {
+    text-align: center;
+    color: #b5bac1;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.overlay-form-questions {
+    padding: 0 16px;
+}
+
+.overlay-form-questions h2 {
+    color: #b5bac1;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.overlay-form-questions input {
+    padding: 10px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    width: 100%;
+    border-radius: 3px;
+    background-color: #1e1f22;
+    border: 0;
+    outline: 0;
+    text-rendering: optimizeLegibility;
+}
+
+.overlay-form-confirm {
+    display: flex;
+    justify-content: space-between;
+    background-color: #2b2d31;
+    padding: 16px;
+    border-radius: 0px 0px 4px 4px;
+}
+
+.overlay-form-confirm button:nth-of-type(1) {
+    background-color: transparent !important;
+}
+
+.overlay-form-confirm button:nth-of-type(1):hover {
+    text-decoration: underline;
+}
+
 .sidebar {
     display: grid;
     grid-template-columns: 72px 240px;
@@ -373,25 +468,7 @@ h3 {
 }
 
 .message-spoiler:hover {
-    transition: background-color 170ms ease, opacity 170ms ease;
-    background-color: hsl( 0 0% 100% / 0.1);
-}
-
-.sign-in {
-    height: 32px;
-    padding: 2px 16px;
-    border-radius: 3px;
-    background-color: #5865f2;
-    font-size: 14px;
-    font-weight: 500;
-    border: none;
-    outline: none;
-    transition: background-color 170ms ease, color 170ms ease;
-    cursor: pointer;
-}
-
-.sign-in:hover {
-    background-color: #4752c4;
+    background-color: hsl(0 0% 100% / 0.1);
 }
 
 .message-spoiler-text {

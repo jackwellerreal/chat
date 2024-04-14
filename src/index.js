@@ -45,16 +45,22 @@ const urlParams = new URLSearchParams(window.location.search);
 
 // Define elements
 
+const overlayForm = document.querySelector("#overlay");
 const pageTitle = document.querySelector("#title");
 const favicon = document.querySelector("#favicon");
+
 const serverName = document.querySelector("#server-name");
 const serverDesc = document.querySelector("#server-description");
 const serverBanner = document.querySelector("#server-banner");
+
 const channelSidebar = document.querySelector(".channel-sidebar");
+const editSettings = document.querySelector(".settings-settings");
+
 const onlineList = document.querySelector("#online-list");
+
 const messageInput = document.querySelector("#created-message");
 const messagesDiv = document.querySelector("#messages");
-const editSettings = document.querySelector(".settings-settings");
+
 const emojiIcon = document.querySelector("#emoji-picker-icon");
 const gifIcon = document.querySelector("#gif-picker-icon");
 const folderIcon = document.querySelector("#file-upload-icon");
@@ -113,18 +119,45 @@ document
     );
 
 document.querySelector("#addServer").addEventListener("click", () => {
-    let serverID = prompt("Please enter the server ID:");
-    if (serverID == null || serverID == "") {
-        alert("Please enter a valid server ID next time");
-        return;
-    }
-    if (localStorage.getItem("servers") == null) {
-        let servers = `${serverID}`;
-        localStorage.setItem("servers", servers);
-    } else {
-        let servers = localStorage.getItem("servers") + `,${serverID}`;
-        localStorage.setItem("servers", servers);
-    }
+    overlayForm.style.display = "flex";
+
+    const formElement = document.createElement("div");
+    formElement.className = "overlay-form";
+    formElement.innerHTML = `
+    <div class="overlay-form-content">
+        <h1>Join a Server</h1>
+        <p>Enter an invite below to join an existing server</p>
+    </div>
+    <div class="overlay-form-questions">
+        <h2>Server ID</h2>
+        <input id="form-id" placeholder="40a2eee5" />
+    </div>
+    <div class="overlay-form-confirm">
+        <button id="button-exit">Cancel</button>
+        <button id="button-confirm">Join Server</button>
+    </div>
+    `;
+    overlayForm.appendChild(formElement);
+
+    document.querySelector("#button-exit").addEventListener("click", () => {
+        formElement.remove();
+        overlayForm.style.display = "none";
+    });
+
+    document.querySelector("#button-confirm").addEventListener("click", () => {
+        const serverID = document.querySelector("#form-id").value;
+
+        formElement.remove();
+        overlayForm.style.display = "none";
+
+        if (localStorage.getItem("servers") == null) {
+            let servers = `${serverID}`;
+            localStorage.setItem("servers", servers);
+        } else {
+            let servers = localStorage.getItem("servers") + `,${serverID}`;
+            localStorage.setItem("servers", servers);
+        }
+    });
 });
 
 document.querySelector("#findServer").addEventListener("click", () => {
@@ -191,7 +224,9 @@ const onlineDocRef = doc(db, "info", "online");
 
 async function setOnline() {
     const name = localStorage.getItem("name");
-    if (name == "Unnamed_User") {return}
+    if (name == "Unnamed_User") {
+        return;
+    }
 
     const onlineDocSnapshot = await getDoc(onlineDocRef);
     const onlineDocData = onlineDocSnapshot.exists()
@@ -473,7 +508,11 @@ async function displayPosts(posts) {
         const verified = post.user.verified;
         const bot = post.user.bot;
         const message = twemoji.parse(
-            checkMessage(bot === true ? "raw:" + post.message.content : post.message.content),
+            checkMessage(
+                bot === true
+                    ? "raw:" + post.message.content
+                    : post.message.content
+            ),
             {
                 size: "svg",
                 ext: ".svg",
@@ -844,30 +883,66 @@ if (info.version == clientVersion) {
         </div>
         `;
         messagesDiv.appendChild(messageElement);
-        const signIn = document.querySelector("#sign-in");
-        signIn.addEventListener("click", function (event) {
-            event.preventDefault();
-            let username = prompt("Please enter your username:");
-            if (username == null || username == "") {
-                alert("Please enter a valid email next time");
-                return;
-            }
-            let password = prompt("Please enter your password:");
-            if (password == null || password == "") {
-                alert("Please enter a valid password next time");
-                return;
-            }
-            signInWithEmailAndPassword(auth, username + "@chat.com", password)
-                .then((userCredential) => {
-                    console.log(userCredential);
-                    window.location.reload();
-                })
-                .catch((error) => {
-                    alert(
-                        `An error occured, please send this to a developer:\n${error}`
-                    );
-                });
-        });
+
+        document
+            .querySelector("#sign-in")
+            .addEventListener("click", function (event) {
+                overlayForm.style.display = "flex";
+
+                const formElement = document.createElement("div");
+                formElement.className = "overlay-form";
+                formElement.innerHTML = `
+                <div class="overlay-form-content">
+                    <h1>Sign In</h1>
+                    <p>Please enter your username and password</p>
+                </div>
+                <div class="overlay-form-questions">
+                    <h2>Username</h2>
+                    <input id="form-username" type="text" />
+                    <h2>Password</h2>
+                    <input id="form-password" type="password" />
+                </div>
+                <div class="overlay-form-confirm">
+                    <button id="button-exit">Cancel</button>
+                    <button id="button-confirm">Sign-In</button>
+                </div>
+                `;
+                overlayForm.appendChild(formElement);
+
+                document
+                    .querySelector("#button-exit")
+                    .addEventListener("click", () => {
+                        formElement.remove();
+                        overlayForm.style.display = "none";
+                    });
+
+                document
+                    .querySelector("#button-confirm")
+                    .addEventListener("click", () => {
+                        const username =
+                            document.querySelector("#form-username").value;
+                        const password =
+                            document.querySelector("#form-password").value;
+
+                        formElement.remove();
+                        overlayForm.style.display = "none";
+
+                        signInWithEmailAndPassword(
+                            auth,
+                            username + "@chat.com",
+                            password
+                        )
+                            .then((userCredential) => {
+                                console.log(userCredential);
+                                window.location.reload();
+                            })
+                            .catch((error) => {
+                                alert(
+                                    `An error occured, please send this to a developer:\n${error}`
+                                );
+                            });
+                    });
+            });
     }
 } else {
     const messageElement = document.createElement("div");
@@ -931,21 +1006,48 @@ gifIcon.addEventListener("click", async (e) => {
 // Edit user information
 
 editSettings.addEventListener("click", async (e) => {
-    let username = prompt(
-        "Please enter a username:\nTIP: Leave the form blank to not change that field"
-    );
-    let colour = prompt(
-        "Please enter a colour:\nTIP: Leave the form blank to not change that field"
-    );
+    overlayForm.style.display = "flex";
 
-    if (username) {
-        localStorage.setItem("name", username);
-    }
-    if (colour) {
-        localStorage.setItem("colour", colour);
-    }
+    const formElement = document.createElement("div");
+    formElement.className = "overlay-form";
+    formElement.innerHTML = `
+    <div class="overlay-form-content">
+        <h1>Settings</h1>
+        <p>TIP: Leave the form blank to not change that field</p>
+    </div>
+    <div class="overlay-form-questions">
+        <h2>Username</h2>
+        <input id="form-name" placeholder="${localStorage.getItem("name")}" />
+        <h2>Colour</h2>
+        <input id="form-colour" placeholder="${localStorage.getItem("colour")}" />
+    </div>
+    <div class="overlay-form-confirm">
+        <button id="button-exit">Cancel</button>
+        <button id="button-confirm">Confirm</button>
+    </div>
+    `;
+    overlayForm.appendChild(formElement);
 
-    window.location.reload();
+    document.querySelector("#button-exit").addEventListener("click", () => {
+        formElement.remove();
+        overlayForm.style.display = "none";
+    });
+
+    document.querySelector("#button-confirm").addEventListener("click", () => {
+        const name = document.querySelector("#form-name").value;
+        const colour = document.querySelector("#form-colour").value;
+
+        if (name) {
+            localStorage.setItem("name", name);
+        }
+        if (colour) {
+            localStorage.setItem("colour", colour.replace("#", ""));
+        }
+
+        formElement.remove();
+        overlayForm.style.display = "none";
+        window.location.reload();
+    });
 });
 
 // Show whos typing
@@ -1125,7 +1227,7 @@ form.addEventListener("submit", async (e) => {
                             },
                             message: {
                                 content: `${Math.floor(Math.random() * 100)}`,
-                                command: message
+                                command: message,
                             },
                             timestamp: new Date(),
                         });
@@ -1151,7 +1253,7 @@ form.addEventListener("submit", async (e) => {
                                 },
                                 message: {
                                     content: `embed:test`,
-                                    command: message
+                                    command: message,
                                 },
                                 timestamp: new Date(),
                             });
@@ -1182,7 +1284,7 @@ form.addEventListener("submit", async (e) => {
                                         ? "🪙 Heads"
                                         : "🪙 Tails"
                                 }`,
-                                command: message
+                                command: message,
                             },
                             timestamp: new Date(),
                         });
@@ -1240,7 +1342,7 @@ form.addEventListener("submit", async (e) => {
                                 },
                                 message: {
                                     content: `embed:${status}\\n${slots1} | ${slots2} | ${slots3}`,
-                                    command: message
+                                    command: message,
                                 },
                                 timestamp: new Date(),
                             });
@@ -1275,7 +1377,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     message: {
                                         content: `${data.joke}`,
-                                        command: message
+                                        command: message,
                                     },
                                     timestamp: new Date(),
                                 });
@@ -1299,7 +1401,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     message: {
                                         content: `Unable to fetch API: ${error}`,
-                                        command: message
+                                        command: message,
                                     },
                                     timestamp: new Date(),
                                 });
@@ -1335,7 +1437,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     message: {
                                         content: `${data.text.replace("`", "'")}`,
-                                        command: message
+                                        command: message,
                                     },
                                     timestamp: new Date(),
                                 });
@@ -1359,7 +1461,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     message: {
                                         content: `Unable to fetch API: ${error}`,
-                                        command: message
+                                        command: message,
                                     },
                                     timestamp: new Date(),
                                 });
