@@ -1,26 +1,14 @@
-require("dotenv").config();
 const firebaseConfig = {
-    apiKey: process.env.APIKEY,
-    authDomain: process.env.AUTHDOMAIN,
-    projectId: process.env.PROJECTID,
-    storageBucket: process.env.STORAGEBUCKET,
-    messagingSenderId: process.env.MESSAGESENDERID,
-    appId: process.env.APPID,
+    apiKey: "AIzaSyC3bVHFPlQlqFRVNpgACjEZnGoFlB5Dbjs",
+    authDomain: "chat-v2-654bb.firebaseapp.com",
+    projectId: "chat-v2-654bb",
+    storageBucket: "chat-v2-654bb.appspot.com",
+    messagingSenderId: "996020677176",
+    appId: "1:996020677176:web:753898bbd6fb1acc7014cd",
 };
 
 const { initializeApp } = require("firebase/app");
-const {
-    getFirestore,
-    collection,
-    query,
-    doc,
-    getDoc,
-    orderBy,
-    limit,
-    onSnapshot,
-    addDoc,
-    setDoc,
-} = require("firebase/firestore");
+const { getFirestore } = require("firebase/firestore");
 const prompt = require("prompt-sync")({ sigint: true });
 const Colours = require("./colours");
 

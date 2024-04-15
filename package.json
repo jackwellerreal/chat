@@ -1,20 +1,49 @@
 {
-    "name": "chat-v2",
-    "devDependencies": {
-        "electron": "^29.3.0",
-        "javascript-obfuscator": "^4.1.0"
-    },
-    "scripts": {
-        "compile": "node ./commands/compiler.js",
-        "create-user": "node ./commands/createUser.js",
-        "create-server": "node ./commands/createServer.js",
-        "compile-electron": "electron-packager ./ --platform=win32 --arch=x64 --overwrite --icon=assets/icon.ico --ignore=node_modules --out ./dist"
-    },
-    "dependencies": {
-        "@prettier/sync": "^0.5.1",
-        "dotenv": "^16.4.5",
-        "firebase": "^10.11.0",
-        "prettier": "^3.2.5",
-        "prompt-sync": "^4.2.0"
-    }
+  "name": "chat-v2",
+  "version": "2.0",
+  "description": "Lightweight chat client inspired by discord",
+  "main": "index.js",
+  "dependencies": {
+    "@prettier/sync": "^0.5.1",
+    "electron-squirrel-startup": "^1.0.0",
+    "firebase": "^10.11.0",
+    "prettier": "^3.2.5",
+    "prompt-sync": "^4.2.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.4.0",
+    "@electron-forge/maker-deb": "^7.4.0",
+    "@electron-forge/maker-rpm": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/maker-zip": "^7.4.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
+    "@electron-forge/plugin-fuses": "^7.4.0",
+    "@electron/fuses": "^1.8.0",
+    "electron": "^29.3.0",
+    "javascript-obfuscator": "^4.1.0"
+  },
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+
+
+    "compile": "node ./commands/compiler.js",
+    "create-user": "node ./commands/createUser.js",
+    "create-server": "node ./commands/createServer.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/What-Question-Mark/chat.git"
+  },
+  "keywords": [
+    "discord",
+    "clone"
+  ],
+  "author": "Jack Weller",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/What-Question-Mark/chat/issues"
+  },
+  "homepage": "https://github.com/What-Question-Mark/chat#readme"
 }
