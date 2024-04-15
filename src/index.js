@@ -1055,21 +1055,37 @@ editSettings.addEventListener("click", async (e) => {
         overlayForm.style.display = "none";
     });
 
-    document.querySelector("#button-confirm").addEventListener("click", () => {
-        const name = document.querySelector("#form-name").value;
-        const colour = document.querySelector("#form-colour").value;
+    document
+        .querySelector("#button-confirm")
+        .addEventListener("click", async () => {
+            const name = document.querySelector("#form-name").value;
+            const colour = document.querySelector("#form-colour").value;
 
-        if (name) {
-            localStorage.setItem("name", name);
-        }
-        if (colour) {
-            localStorage.setItem("colour", colour);
-        }
+            if (name) {
+                localStorage.setItem("name", name);
+            }
+            if (colour) {
+                localStorage.setItem("colour", colour);
+            }
 
-        formElement.remove();
-        overlayForm.style.display = "none";
-        window.location.reload();
-    });
+            const onlineDocSnapshot = await getDoc(onlineDocRef);
+            const onlineDocData = onlineDocSnapshot.exists()
+                ? onlineDocSnapshot.data()
+                : [];
+
+            if (onlineDocData.people && onlineDocData.people.includes(name)) {
+                const index = onlineDocData.people.indexOf(name);
+                if (index > -1) {
+                    onlineDocData.people.splice(index, 1);
+                }
+
+                await setDoc(onlineDocRef, { people: onlineDocData.people });
+            }
+
+            formElement.remove();
+            overlayForm.style.display = "none";
+            window.location.reload();
+        });
 });
 
 // Show whos typing
