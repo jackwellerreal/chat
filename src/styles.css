@@ -390,6 +390,7 @@ button:hover {
 
 .main-middle {
     display: grid;
+    height: calc(100vh - 24px);
 }
 
 .messages {
