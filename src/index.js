@@ -34,6 +34,21 @@ import {
     getAuth,
     signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+const { ipcRenderer } = require("electron");
+
+const ipc = ipcRenderer;
+
+document.querySelector("#taskbar-control-min").addEventListener("click", () => {
+    ipc.send("min");
+});
+document.querySelector("#taskbar-control-max").addEventListener("click", () => {
+    ipc.send("max");
+});
+document
+    .querySelector("#taskbar-control-close")
+    .addEventListener("click", () => {
+        ipc.send("close");
+    });
 
 const app = initializeApp(firebaseConfig);
 const slots = ["💯", "💀", "🧑‍🦼", "🍪", "😂"];
@@ -1041,7 +1056,7 @@ editSettings.addEventListener("click", async (e) => {
             localStorage.setItem("name", name);
         }
         if (colour) {
-            localStorage.setItem("colour", colour.replace("#", ""));
+            localStorage.setItem("colour", colour);
         }
 
         formElement.remove();

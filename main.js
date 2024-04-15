@@ -1,6 +1,13 @@
-const { app, BrowserWindow, globalShortcut } = require("electron");
+const {
+    app,
+    BrowserWindow,
+    globalShortcut,
+    shell,
+    ipcMain,
+} = require("electron");
 const firebase = require("firebase/compat/app");
 require("firebase/compat/firestore");
+const os = require("os");
 
 const firebaseConfig = {
     apiKey: "AIzaSyC3bVHFPlQlqFRVNpgACjEZnGoFlB5Dbjs",
@@ -16,33 +23,59 @@ const db = firebase.firestore();
 
 var name;
 
-app.whenReady().then(() => {
+const ipc = ipcMain;
+
+function createWindow() {
     const win = new BrowserWindow({
         minWidth: 1200,
         minHeight: 800,
         icon: __dirname + "/assets/icon.png",
         webPreferences: {
             nodeIntegration: true,
+            contextIsolation: false,
         },
+        frame: false,
         autoHideMenuBar: true,
     });
 
     win.loadFile("./src/index.html");
-    win.maximize();
+    win.maximize()
+    win.webContents.executeJavaScript(
+        `localStorage.setItem("name", "${os.hostname()}");`,
+        true
+    );
     win.webContents
         .executeJavaScript('localStorage.getItem("name");', true)
         .then((result) => {
             name = result;
         });
-});
+    win.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: "deny" };
+    });
+
+    ipc.on("min", () => {
+        win.minimize()
+    })
+    ipc.on("max", () => {
+        if (win.isMaximized()) {
+            win.restore()
+        } else {
+            win.maximize()
+        }
+    })
+    ipc.on("close", () => {
+        win.close()
+    })
+}
+
+app.whenReady().then(createWindow);
 
 app.on("window-all-closed", async () => {
     if (process.platform !== "darwin") {
         const onlineRef = db.collection("info").doc("online");
-        const onlineDoc = await onlineRef.get()
-        const onlineData = onlineDoc.exists
-            ? onlineDoc.data()
-            : {};
+        const onlineDoc = await onlineRef.get();
+        const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
 
         if (onlineData.people && onlineData.people.includes(name)) {
             const index = onlineData.people.indexOf(name);

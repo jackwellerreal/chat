@@ -9,11 +9,12 @@
 
 body {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-rows: 24px auto;
     width: 100%;
     height: 100vh;
     color-scheme: dark;
     background-color: #313338;
+    --webkit-user-select: none;
 }
 
 em-emoji-picker {
@@ -54,12 +55,64 @@ button:hover {
     background-color: #4752c4;
 }
 
+.main {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+}
+
+.taskbar {
+    display: flex;
+    justify-content:space-between;
+    width: 100%;
+    height: 24px;
+    background-color: #1e1f22;
+}
+
+.taskbar-title {
+    flex-grow: 1;
+    -webkit-app-region: drag;
+}
+
+.taskbar-title p {
+    padding: 4px 12px;
+    font-size: 12px;
+    color: #949ba4;
+    font-weight: 700;
+}
+
+.taskbar-controls {
+    display: flex;
+}
+
+.taskbar-control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 24px;
+}
+
+.taskbar-control svg {
+    width: 14px;
+    height: 14px;
+    fill: #b5bac1
+}
+
+.taskbar-control:hover {
+    background-color: #2c2e32;
+    cursor: pointer;
+}
+
+#taskbar-control-close:hover {
+    background-color: #f23f42;
+}
+
 .overlay {
     display: none;
     align-items: center;
     justify-content: center;
     width: 100vw;
-    height: 100vh;
+    height: calc(100vh - 24px);
     position: absolute;
     background-color: #000000b3;
     z-index: 100;
@@ -135,7 +188,6 @@ button:hover {
     grid-template-columns: 72px 240px;
     grid-template-rows: auto 53px;
     background-color: #2b2d31;
-    height: 100vh;
 }
 
 .server-sidebar {
@@ -336,9 +388,8 @@ button:hover {
 
 /* messages */
 
-.main {
+.main-middle {
     display: grid;
-    height: 100vh;
 }
 
 .messages {
@@ -375,6 +426,7 @@ button:hover {
     display: flex;
     width: 100%;
     padding: 4px 12px;
+    --webkit-user-select: text;
 }
 
 .messages:nth-child(1) {

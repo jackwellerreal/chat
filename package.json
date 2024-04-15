@@ -1,8 +1,8 @@
 {
   "name": "chat-v2",
-  "version": "2.0",
+  "version": "2.0.0",
   "description": "Lightweight chat client inspired by discord",
-  "main": "index.js",
+  "main": "main.js",
   "dependencies": {
     "@prettier/sync": "^0.5.1",
     "electron-squirrel-startup": "^1.0.0",
@@ -26,8 +26,6 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-
-
     "compile": "node ./commands/compiler.js",
     "create-user": "node ./commands/createUser.js",
     "create-server": "node ./commands/createServer.js"
@@ -41,7 +39,7 @@
     "clone"
   ],
   "author": "Jack Weller",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/What-Question-Mark/chat/issues"
   },
