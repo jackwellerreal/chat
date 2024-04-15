@@ -1,3 +1,8 @@
+const Store = require('electron-store');
+Store.initRenderer();
+
+// TODO: FIX THE ELECTRON STORE PELASE
+
 const {
     app,
     BrowserWindow,
@@ -5,8 +10,10 @@ const {
     shell,
     ipcMain,
 } = require("electron");
+
 const firebase = require("firebase/compat/app");
 require("firebase/compat/firestore");
+
 const os = require("os");
 
 const firebaseConfig = {
@@ -40,15 +47,8 @@ function createWindow() {
 
     win.loadFile("./src/index.html");
     win.maximize()
-    win.webContents.executeJavaScript(
-        `localStorage.setItem("name", "${os.hostname()}");`,
-        true
-    );
-    win.webContents
-        .executeJavaScript('localStorage.getItem("name");', true)
-        .then((result) => {
-            name = result;
-        });
+    Store.set("name", os.hostname())
+    name = Store.get("name")
     win.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url);
         return { action: "deny" };

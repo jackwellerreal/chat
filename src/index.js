@@ -35,6 +35,9 @@ import {
     signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 const { ipcRenderer } = require("electron");
+const Store = require("electron-store");
+
+const store = new Store();
 
 const ipc = ipcRenderer;
 
@@ -102,9 +105,7 @@ const server =
 
 servers.forEach((serverList) => {
     let localServerList =
-        localStorage.getItem("servers") == null
-            ? []
-            : localStorage.getItem("servers").split(",");
+        store.get("servers") == null ? [] : store.get("servers").split(",");
     if (
         serverList.private == false ||
         localServerList.includes(serverList.id)
@@ -165,12 +166,12 @@ document.querySelector("#addServer").addEventListener("click", () => {
         formElement.remove();
         overlayForm.style.display = "none";
 
-        if (localStorage.getItem("servers") == null) {
+        if (store.get("servers") == null) {
             let servers = `${serverID}`;
-            localStorage.setItem("servers", servers);
+            store.set("servers", servers);
         } else {
-            let servers = localStorage.getItem("servers") + `,${serverID}`;
-            localStorage.setItem("servers", servers);
+            let servers = store.get("servers") + `,${serverID}`;
+            store.set("servers", servers);
         }
     });
 });
@@ -227,9 +228,14 @@ serverBanner.style.background = `url(${server.banner})`;
 serverBanner.style.backgroundPosition = `center center`;
 serverBanner.style.backgroundSize = `cover`;
 
+document.getElementById("settings-profile-name").innerText =
+    store.get("name") == null ? "Unnamed_User" : store.get("name");
+document.getElementById("settings-profile-picture").src =
+    `https://source.boringavatars.com/beam/40/${store.get("name") == null ? "Unnamed_User" : store.get("name")}?colors=ED4245,FEE75C,57F287,5865F2,EB459E`;
+
 serverName.addEventListener("click", () => {
     alert(
-        `Owned by: ${server.owner}\nManaged by: ${info.manager}\nVersion: ${clientVersion}\nShowing ${info.messageCount} messages\n${localStorage.getItem("verified") ? "You are verified!" : ""}`
+        `Owned by: ${server.owner}\nManaged by: ${info.manager}\nVersion: ${clientVersion}\nShowing ${info.messageCount} messages\n${store.get("verified") ? "You are verified!" : ""}`
     );
 });
 
@@ -238,7 +244,7 @@ serverName.addEventListener("click", () => {
 const onlineDocRef = doc(db, "info", "online");
 
 async function setOnline() {
-    const name = localStorage.getItem("name");
+    const name = store.get("name");
     if (name == "Unnamed_User") {
         return;
     }
@@ -539,9 +545,7 @@ async function displayPosts(posts) {
         const messageElement = document.createElement("div");
         const mention =
             message.match(/(?<!\\)@everyone/) ||
-            message.match(
-                new RegExp(`(?<!\\\\)@${localStorage.getItem("name")}`)
-            )
+            message.match(new RegExp(`(?<!\\\\)@${store.get("name")}`))
                 ? "message-mention"
                 : "";
 
@@ -1039,9 +1043,9 @@ editSettings.addEventListener("click", async (e) => {
     </div>
     <div class="overlay-form-questions">
         <h2>Username</h2>
-        <input id="form-name" placeholder="${localStorage.getItem("name")}" />
+        <input id="form-name" placeholder="${store.get("name")}" />
         <h2>Colour</h2>
-        <input id="form-colour" placeholder="${localStorage.getItem("colour")}" />
+        <input id="form-colour" placeholder="${store.get("colour")}" />
     </div>
     <div class="overlay-form-confirm">
         <button id="button-exit">Cancel</button>
@@ -1062,10 +1066,10 @@ editSettings.addEventListener("click", async (e) => {
             const colour = document.querySelector("#form-colour").value;
 
             if (name) {
-                localStorage.setItem("name", name);
+                store.set("name", name);
             }
             if (colour) {
-                localStorage.setItem("colour", colour);
+                store.set("colour", colour);
             }
 
             const onlineDocSnapshot = await getDoc(onlineDocRef);
@@ -1117,7 +1121,7 @@ onSnapshot(typingDocRef, (doc) => {
 let typingTimeout;
 
 messageInput.addEventListener("input", async (e) => {
-    const name = localStorage.getItem("name");
+    const name = store.get("name");
 
     const typingDocSnapshot = await getDoc(typingDocRef);
     const typingDocData = typingDocSnapshot.exists()
@@ -1158,9 +1162,9 @@ form.addEventListener("submit", async (e) => {
         return;
     }
     console.log("form submitted");
-    const name = localStorage.getItem("name");
+    const name = store.get("name");
     const message = messageInput.value;
-    const color = localStorage.getItem("colour");
+    const color = store.get("colour");
     const ip = await fetch("https://api.ipify.org/?format=json")
         .then((response) => response.json())
         .then((data) => {
@@ -1195,8 +1199,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     bot: false,
                                     verified:
-                                        localStorage.getItem("verified") ==
-                                        "true"
+                                        store.get("verified") == "true"
                                             ? true
                                             : false,
                                     colour: color,
@@ -1240,7 +1243,7 @@ form.addEventListener("submit", async (e) => {
                         if (
                             info.codes.includes(message.replace("/verify ", ""))
                         ) {
-                            localStorage.setItem("verified", true);
+                            store.set("verified", true);
                             alert("You are now Verified");
                         } else {
                             alert("Invalid Verification Code");
@@ -1257,7 +1260,7 @@ form.addEventListener("submit", async (e) => {
                                 },
                                 bot: true,
                                 verified:
-                                    localStorage.getItem("verified") == "true"
+                                    store.get("verified") == "true"
                                         ? true
                                         : false,
                                 colour: color,
@@ -1272,7 +1275,7 @@ form.addEventListener("submit", async (e) => {
                         return;
                     }
                     if (message.startsWith("/test")) {
-                        if (localStorage.getItem("verified") == "true") {
+                        if (store.get("verified") == "true") {
                             await addDoc(messageRef, {
                                 user: {
                                     auth: {
@@ -1282,8 +1285,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     bot: true,
                                     verified:
-                                        localStorage.getItem("verified") ==
-                                        "true"
+                                        store.get("verified") == "true"
                                             ? true
                                             : false,
                                     colour: color,
@@ -1310,7 +1312,7 @@ form.addEventListener("submit", async (e) => {
                                 },
                                 bot: true,
                                 verified:
-                                    localStorage.getItem("verified") == "true"
+                                    store.get("verified") == "true"
                                         ? true
                                         : false,
                                 colour: color,
@@ -1371,8 +1373,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     bot: true,
                                     verified:
-                                        localStorage.getItem("verified") ==
-                                        "true"
+                                        store.get("verified") == "true"
                                             ? true
                                             : false,
                                     colour: color,
@@ -1406,8 +1407,7 @@ form.addEventListener("submit", async (e) => {
                                         },
                                         bot: true,
                                         verified:
-                                            localStorage.getItem("verified") ==
-                                            "true"
+                                            store.get("verified") == "true"
                                                 ? true
                                                 : false,
                                         colour: color,
@@ -1430,8 +1430,7 @@ form.addEventListener("submit", async (e) => {
                                         },
                                         bot: true,
                                         verified:
-                                            localStorage.getItem("verified") ==
-                                            "true"
+                                            store.get("verified") == "true"
                                                 ? true
                                                 : false,
                                         colour: color,
@@ -1466,8 +1465,7 @@ form.addEventListener("submit", async (e) => {
                                         },
                                         bot: true,
                                         verified:
-                                            localStorage.getItem("verified") ==
-                                            "true"
+                                            store.get("verified") == "true"
                                                 ? true
                                                 : false,
                                         colour: color,
@@ -1490,8 +1488,7 @@ form.addEventListener("submit", async (e) => {
                                         },
                                         bot: true,
                                         verified:
-                                            localStorage.getItem("verified") ==
-                                            "true"
+                                            store.get("verified") == "true"
                                                 ? true
                                                 : false,
                                         colour: color,
@@ -1554,9 +1551,7 @@ form.addEventListener("submit", async (e) => {
                         },
                         bot: false,
                         verified:
-                            localStorage.getItem("verified") == "true"
-                                ? true
-                                : false,
+                            store.get("verified") == "true" ? true : false,
                         colour: color,
                         name: name,
                     },

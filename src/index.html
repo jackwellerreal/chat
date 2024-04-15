@@ -141,11 +141,6 @@
                     : subString);
             };
 
-        localStorage.setItem("name", localStorage.getItem("name") ? localStorage.getItem("name") : "Unnamed_User")
-
-        document.getElementById("settings-profile-name").innerText = localStorage.getItem("name") == null ? "Unnamed_User" : localStorage.getItem("name");
-        document.getElementById("settings-profile-picture").src = `https://source.boringavatars.com/beam/40/${localStorage.getItem("name") == null ? "Unnamed_User" : localStorage.getItem("name")}?colors=ED4245,FEE75C,57F287,5865F2,EB459E`
-
         // dev tag here
     </script>
 </body>
