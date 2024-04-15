@@ -26,7 +26,6 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "compile": "node ./commands/compiler.js",
     "create-user": "node ./commands/createUser.js",
     "create-server": "node ./commands/createServer.js"
   },
