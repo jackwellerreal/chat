@@ -14,8 +14,6 @@ const {
 const firebase = require("firebase/compat/app");
 require("firebase/compat/firestore");
 
-const os = require("os");
-
 const firebaseConfig = {
     apiKey: "AIzaSyC3bVHFPlQlqFRVNpgACjEZnGoFlB5Dbjs",
     authDomain: "chat-v2-654bb.firebaseapp.com",
@@ -47,8 +45,6 @@ function createWindow() {
 
     win.loadFile("./src/index.html");
     win.maximize()
-    Store.set("name", os.hostname())
-    name = Store.get("name")
     win.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url);
         return { action: "deny" };

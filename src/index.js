@@ -36,6 +36,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 const { ipcRenderer } = require("electron");
 const Store = require("electron-store");
+const os = require("os");
 
 const store = new Store();
 
@@ -60,6 +61,9 @@ const db = getFirestore(app);
 const storage = getStorage();
 const auth = getAuth();
 const urlParams = new URLSearchParams(window.location.search);
+if (store.get("name")) {
+    store.set("name", os.hostname());
+}
 
 // Define elements
 
