@@ -7,13 +7,15 @@ const firebaseConfig = {
     appId: "1:996020677176:web:753898bbd6fb1acc7014cd",
 };
 
-const { initializeApp } = require("firebase/app");
-const { getAuth, createUserWithEmailAndPassword } = require("firebase/auth");
-const prompt = require("prompt-sync")({ sigint: true });
-const Colours = require("./colours");
+const firebase = require("firebase/compat/app");
+require("firebase/compat/auth");
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.firestore();
+
+const prompt = require("prompt-sync")({ sigint: true });
+
+const Colours = require("./colours");
 const colours = new Colours();
 
 console.log(
@@ -27,7 +29,9 @@ const password = prompt(
     `${colours.FgYellow}Please enter a ${colours.FgBlue}password${colours.FgYellow}: ${colours.Reset}`
 );
 
-createUserWithEmailAndPassword(auth, username + "@chat.com", password)
+firebase
+    .auth()
+    .createUserWithEmailAndPassword(username + "@chat.com", password)
     .then((userCredential) => {
         console.log(
             `${colours.FgGreen}✅ Successfully created a user account${colours.Reset}`

@@ -7,14 +7,28 @@ const firebaseConfig = {
     appId: "1:996020677176:web:753898bbd6fb1acc7014cd",
 };
 
-const { initializeApp } = require("firebase/app");
-const { getFirestore } = require("firebase/firestore");
-const prompt = require("prompt-sync")({ sigint: true });
-const Colours = require("./colours");
+const firebase = require("firebase/compat/app");
+require("firebase/compat/firestore");
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const prompt = require("prompt-sync")({ sigint: true });
+
+const Colours = require("./colours");
 const colours = new Colours();
+
+async function createServer(serverJSON) {
+    const serversRef = db.collection("info").doc("servers");
+    const serversDoc = await serversRef.get();
+    const serversData = serversDoc.exists ? serversDoc.data() : {};
+
+    const serversList = serversData.list ? serversData.list : [];
+
+    serversList.push(serverJSON);
+
+    await serversRef.set({ list: serversList });
+}
 
 try {
     console.log(
@@ -87,7 +101,7 @@ try {
         banner: banner,
         id: id,
         private:
-            privateserver.toLocaleLowerCase == "y" ||
+            privateserver.toLowerCase() == "y" ||
             privateserver.toLowerCase() == "yes" ||
             privateserver.toLowerCase() == "true"
                 ? true
@@ -98,14 +112,16 @@ try {
         channels: channels,
     };
 
-    // TODO: Make new server thing
-    console.log(serverJSON);
+    createServer(serverJSON);
+
     console.log(
         `${colours.FgGreen}✅ Successfully created a server${colours.Reset}`
     );
+    return
 } catch (error) {
     console.log(
         `${colours.FgRed}❌ Unsuccessfully created a server${colours.Reset}`
     );
     console.log(error);
+    return
 }

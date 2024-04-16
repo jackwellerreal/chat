@@ -61,9 +61,15 @@ const db = getFirestore(app);
 const storage = getStorage();
 const auth = getAuth();
 const urlParams = new URLSearchParams(window.location.search);
-if (store.get("name")) {
+
+if (!store.get("name")) {
     store.set("name", os.hostname());
 }
+if (!store.get("colour")) {
+    store.set("colour", "#ffffff");
+}
+
+ipc.send("name", store.get("name"));
 
 // Define elements
 
@@ -1070,24 +1076,31 @@ editSettings.addEventListener("click", async (e) => {
             const colour = document.querySelector("#form-colour").value;
 
             if (name) {
+                const onlineDocSnapshot = await getDoc(onlineDocRef);
+                const onlineDocData = onlineDocSnapshot.exists()
+                    ? onlineDocSnapshot.data()
+                    : [];
+
+                if (
+                    onlineDocData.people &&
+                    onlineDocData.people.includes(store.get("name"))
+                ) {
+                    const index = onlineDocData.people.indexOf(
+                        store.get("name")
+                    );
+                    if (index > -1) {
+                        onlineDocData.people.splice(index, 1);
+                    }
+
+                    await setDoc(onlineDocRef, {
+                        people: onlineDocData.people,
+                    });
+                }
+
                 store.set("name", name);
             }
             if (colour) {
                 store.set("colour", colour);
-            }
-
-            const onlineDocSnapshot = await getDoc(onlineDocRef);
-            const onlineDocData = onlineDocSnapshot.exists()
-                ? onlineDocSnapshot.data()
-                : [];
-
-            if (onlineDocData.people && onlineDocData.people.includes(name)) {
-                const index = onlineDocData.people.indexOf(name);
-                if (index > -1) {
-                    onlineDocData.people.splice(index, 1);
-                }
-
-                await setDoc(onlineDocRef, { people: onlineDocData.people });
             }
 
             formElement.remove();

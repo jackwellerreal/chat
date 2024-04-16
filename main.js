@@ -50,6 +50,10 @@ function createWindow() {
         return { action: "deny" };
     });
 
+    ipc.on("name", (event, arg) => {
+        name = arg
+    })
+
     ipc.on("min", () => {
         win.minimize()
     })
@@ -81,6 +85,7 @@ app.on("window-all-closed", async () => {
 
             await onlineRef.set({ people: onlineData.people });
         }
+        peopleList.push(name);
 
         app.quit();
     }
