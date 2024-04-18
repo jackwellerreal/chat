@@ -36,7 +36,6 @@ function createWindow() {
         minHeight: 800,
         icon: __dirname + "/assets/icon.png",
         webPreferences: {
-            devTools: false,
             nodeIntegration: true,
             contextIsolation: false,
         },
@@ -87,7 +86,6 @@ app.on("window-all-closed", async () => {
 
             await onlineRef.set({ people: onlineData.people });
         }
-        peopleList.push(name);
 
         app.quit();
     }

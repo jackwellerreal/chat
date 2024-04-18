@@ -34,7 +34,7 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "initialize_firebase": "node ./commands/initializeFirebase.js",
+    "initialize-firebase": "node ./commands/initializeFirebase.js",
     "create-user": "node ./commands/createUser.js",
     "create-server": "node ./commands/createServer.js"
   },
