@@ -1,8 +1,6 @@
 const Store = require('electron-store');
 Store.initRenderer();
 
-// TODO: FIX THE ELECTRON STORE PELASE
-
 const {
     app,
     BrowserWindow,
@@ -14,13 +12,14 @@ const {
 const firebase = require("firebase/compat/app");
 require("firebase/compat/firestore");
 
+require("dotenv").config()
 const firebaseConfig = {
-    apiKey: "AIzaSyC3bVHFPlQlqFRVNpgACjEZnGoFlB5Dbjs",
-    authDomain: "chat-v2-654bb.firebaseapp.com",
-    projectId: "chat-v2-654bb",
-    storageBucket: "chat-v2-654bb.appspot.com",
-    messagingSenderId: "996020677176",
-    appId: "1:996020677176:web:753898bbd6fb1acc7014cd",
+    apiKey: process.env.APIKEY,
+    authDomain: process.env.AUTHDOMAIN,
+    projectId: process.env.PROJECTID,
+    storageBucket: process.env.STORAGEBUCKET,
+    messagingSenderId: process.env.MESSAGESENDERID,
+    appId: process.env.APPID,
 };
 
 firebase.initializeApp(firebaseConfig);

@@ -5,6 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "@prettier/sync": "^0.5.1",
+    "dotenv": "^16.4.5",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.2.0",
     "firebase": "^10.11.0",

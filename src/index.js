@@ -1,16 +1,3 @@
-const clientVersion = "TR 2.0 1";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyC3bVHFPlQlqFRVNpgACjEZnGoFlB5Dbjs",
-    authDomain: "chat-v2-654bb.firebaseapp.com",
-    projectId: "chat-v2-654bb",
-    storageBucket: "chat-v2-654bb.appspot.com",
-    messagingSenderId: "996020677176",
-    appId: "1:996020677176:web:753898bbd6fb1acc7014cd",
-};
-
-// Make sure to remove the firebase config before compiling and pushing to github
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import {
     getFirestore,
@@ -35,11 +22,22 @@ import {
     signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 const { ipcRenderer } = require("electron");
-const Store = require("electron-store");
 const os = require("os");
+const config = require("../config");
+console.log(config);
 
+require("dotenv").config();
+const firebaseConfig = {
+    apiKey: process.env.APIKEY,
+    authDomain: process.env.AUTHDOMAIN,
+    projectId: process.env.PROJECTID,
+    storageBucket: process.env.STORAGEBUCKET,
+    messagingSenderId: process.env.MESSAGESENDERID,
+    appId: process.env.APPID,
+};
+
+const Store = require("electron-store");
 const store = new Store();
-
 const ipc = ipcRenderer;
 
 document.querySelector("#taskbar-control-min").addEventListener("click", () => {
@@ -885,9 +883,9 @@ async function loadVoice() {
     };
 }
 
-// Check for version, auth then show messsages/voice
+// Check for auth then show messsages/voice
 
-if (info.version == clientVersion) {
+if (config.userAccounts == true) {
     if (auth.currentUser) {
         if (urlParams.get("channel") == "voice") {
             loadVoice();
@@ -898,19 +896,19 @@ if (info.version == clientVersion) {
         const messageElement = document.createElement("div");
         messageElement.className = "message";
         messageElement.innerHTML = `
-        <div style="display: flex;">
-            <div style="height: 60px;display: flex;align-items: center;">
-                <img src="https://em-content.zobj.net/source/apple/391/robot_1f916.png" class="message-pfp">
-            </div>
-            <div>
-                <div class="message-sender">
-                    <span style="color: #ffff00">Bot <svg xmlns="http://www.w3.org/2000/svg" style="fill: #ffff00;" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
-                    <span class="message-time">00:00</span></span>
+                <div style="display: flex;">
+                    <div style="height: 60px;display: flex;align-items: center;">
+                        <img src="https://em-content.zobj.net/source/apple/391/robot_1f916.png" class="message-pfp">
+                    </div>
+                    <div>
+                        <div class="message-sender">
+                            <span style="color: #ffff00">Bot <svg xmlns="http://www.w3.org/2000/svg" style="fill: #ffff00;" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
+                            <span class="message-time">00:00</span></span>
+                        </div>
+                        <span class="message-content">You are not signed in. You will not be able to view, send, or interact with messages until you update.<br><button id="sign-in" class="sign-in">Sign in</button><br>Don't have an account? Contact a developer!</span>
+                    </div>
                 </div>
-                <span class="message-content">You are not signed in. You will not be able to view, send, or interact with messages until you update.<br><button id="sign-in" class="sign-in">Sign in</button><br>Don't have an account? Contact a developer!</span>
-            </div>
-        </div>
-        `;
+                `;
         messagesDiv.appendChild(messageElement);
 
         document
@@ -921,21 +919,21 @@ if (info.version == clientVersion) {
                 const formElement = document.createElement("div");
                 formElement.className = "overlay-form";
                 formElement.innerHTML = `
-                <div class="overlay-form-content">
-                    <h1>Sign In</h1>
-                    <p>Please enter your username and password</p>
-                </div>
-                <div class="overlay-form-questions">
-                    <h2>Username</h2>
-                    <input id="form-username" type="text" />
-                    <h2>Password</h2>
-                    <input id="form-password" type="password" />
-                </div>
-                <div class="overlay-form-confirm">
-                    <button id="button-exit">Cancel</button>
-                    <button id="button-confirm">Sign-In</button>
-                </div>
-                `;
+                        <div class="overlay-form-content">
+                            <h1>Sign In</h1>
+                            <p>Please enter your username and password</p>
+                        </div>
+                        <div class="overlay-form-questions">
+                            <h2>Username</h2>
+                            <input id="form-username" type="text" />
+                            <h2>Password</h2>
+                            <input id="form-password" type="password" />
+                        </div>
+                        <div class="overlay-form-confirm">
+                            <button id="button-exit">Cancel</button>
+                            <button id="button-confirm">Sign-In</button>
+                        </div>
+                        `;
                 overlayForm.appendChild(formElement);
 
                 document
@@ -974,23 +972,11 @@ if (info.version == clientVersion) {
             });
     }
 } else {
-    const messageElement = document.createElement("div");
-    messageElement.className = "message";
-    messageElement.innerHTML = `
-    <div style="display: flex;">
-        <div style="height: 60px;display: flex;align-items: center;">
-            <img src="https://em-content.zobj.net/source/apple/391/robot_1f916.png" class="message-pfp">
-        </div>
-        <div>
-            <div class="message-sender">
-                <span style="color: #ffff00">Bot <svg xmlns="http://www.w3.org/2000/svg" style="fill: #ffff00;" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>
-                <span class="message-time">00:00</span></span>
-            </div>
-            <span class="message-content">You are using an outdated client. You will not be able to view, send, or interact with messages until you update.</span>
-        </div>
-    </div>
-    `;
-    messagesDiv.appendChild(messageElement);
+    if (urlParams.get("channel") == "voice") {
+        loadVoice();
+    } else {
+        loadData();
+    }
 }
 
 // Change message input placeholder
