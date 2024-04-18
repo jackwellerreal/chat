@@ -2,6 +2,12 @@
   "name": "chat-v2",
   "version": "2.0.0",
   "description": "Lightweight chat client inspired by discord",
+  "author": "Jack Weller",
+  "keywords": [
+    "discord",
+    "clone"
+  ],
+  "license": "MIT",
   "main": "main.js",
   "dependencies": {
     "@prettier/sync": "^0.5.1",
@@ -28,6 +34,7 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "initialize_firebase": "node ./commands/initializeFirebase.js",
     "create-user": "node ./commands/createUser.js",
     "create-server": "node ./commands/createServer.js"
   },
@@ -35,12 +42,6 @@
     "type": "git",
     "url": "git+https://github.com/What-Question-Mark/chat.git"
   },
-  "keywords": [
-    "discord",
-    "clone"
-  ],
-  "author": "Jack Weller",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/What-Question-Mark/chat/issues"
   },
