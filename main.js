@@ -3,6 +3,7 @@ Store.initRenderer();
 
 const {
     app,
+    session,
     BrowserWindow,
     globalShortcut,
     shell,
@@ -43,6 +44,7 @@ function createWindow() {
     });
 
     win.loadFile("./src/index.html");
+    session.defaultSession.setProxy({ mode: 'system' });
     win.maximize()
     win.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url);
