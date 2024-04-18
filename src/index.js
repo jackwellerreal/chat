@@ -1015,7 +1015,7 @@ fileUpload.onchange = () => {
 
 gifIcon.addEventListener("click", async (e) => {
     fetch(
-        `https://tenor.googleapis.com/v2/search?q=${messageInput.value}&key=AIzaSyAA3cmMrIrv4T2QgdiyIsHF3lx8llmLy6U&client_key=my_test_app&limit=1`,
+        `https://tenor.googleapis.com/v2/search?q=${messageInput.value}&key=${process.env.TENORAPI}&client_key=my_test_app&limit=1`,
         { method: "GET" }
     )
         .then((response) => response.json())
