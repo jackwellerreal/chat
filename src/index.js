@@ -24,7 +24,6 @@ import {
 const { ipcRenderer } = require("electron");
 const os = require("os");
 const config = require("../config");
-console.log(config);
 
 require("dotenv").config();
 const firebaseConfig = {
