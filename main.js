@@ -1,4 +1,4 @@
-const Store = require('electron-store');
+const Store = require("electron-store");
 Store.initRenderer();
 
 const {
@@ -13,7 +13,7 @@ const {
 const firebase = require("firebase/compat/app");
 require("firebase/compat/firestore");
 
-require("dotenv").config()
+require("dotenv").config();
 const firebaseConfig = {
     apiKey: process.env.APIKEY,
     authDomain: process.env.AUTHDOMAIN,
@@ -34,7 +34,8 @@ function createWindow() {
     const win = new BrowserWindow({
         minWidth: 1200,
         minHeight: 800,
-        icon: __dirname + "/assets/icon.png",
+        title: "Chat V2",
+        icon: "./assets/icon.png",
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -44,55 +45,57 @@ function createWindow() {
     });
 
     win.loadFile("./src/index.html");
-    session.defaultSession.setProxy({ mode: 'system' });
-    win.maximize()
+    session.defaultSession.setProxy({ mode: "system" });
+    win.maximize();
     win.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url);
         return { action: "deny" };
     });
 
     ipc.on("name", (event, arg) => {
-        name = arg
-    })
+        name = arg;
+    });
 
     ipc.on("min", () => {
-        win.minimize()
-    })
+        win.minimize();
+    });
     ipc.on("max", () => {
         if (win.isMaximized()) {
-            win.restore()
+            win.restore();
         } else {
-            win.maximize()
+            win.maximize();
         }
-    })
+    });
     ipc.on("close", () => {
-        win.close()
-    })
+        win.close();
+    });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+    createWindow();
 
-app.on("window-all-closed", async () => {
-    if (process.platform !== "darwin") {
-        const onlineRef = db.collection("info").doc("online");
-        const onlineDoc = await onlineRef.get();
-        const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
+    app.dock.setIcon("./assets/icon.png");
 
-        if (onlineData.people && onlineData.people.includes(name)) {
-            const index = onlineData.people.indexOf(name);
-            if (index > -1) {
-                onlineData.people.splice(index, 1);
-            }
-
-            await onlineRef.set({ people: onlineData.people });
+    app.on("activate", () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
         }
-
-        app.quit();
-    }
+    });
 });
 
-app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
+app.on("window-all-closed", async () => {
+    const onlineRef = db.collection("info").doc("online");
+    const onlineDoc = await onlineRef.get();
+    const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
+
+    if (onlineData.people && onlineData.people.includes(name)) {
+        const index = onlineData.people.indexOf(name);
+        if (index > -1) {
+            onlineData.people.splice(index, 1);
+        }
+
+        await onlineRef.set({ people: onlineData.people });
     }
+
+    app.quit();
 });
