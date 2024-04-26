@@ -1,6 +1,7 @@
 /node_modules
 /dist
+/out
 .env
 test.js
 final.html
-out/
+.DS_Store
