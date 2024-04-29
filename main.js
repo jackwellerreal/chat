@@ -8,16 +8,20 @@ const {
     globalShortcut,
     shell,
     ipcMain,
+    dialog,
 } = require("electron");
 
 const firebase = require("firebase/compat/app");
 require("firebase/compat/firestore");
 
 require("dotenv").config();
+
+const fs = require("node:fs");
+
 const firebaseConfig = {
     apiKey: process.env.APIKEY,
     authDomain: process.env.AUTHDOMAIN,
-    projectId: process.env.PROJECTID,
+    projectId: process.env.PROJECTID2,
     storageBucket: process.env.STORAGEBUCKET,
     messagingSenderId: process.env.MESSAGESENDERID,
     appId: process.env.APPID,
@@ -33,7 +37,7 @@ const ipc = ipcMain;
 function createWindow() {
     const win = new BrowserWindow({
         minWidth: 1200,
-        minHeight: 800,
+        minHeight: 600,
         title: "Chat V2",
         icon: "./assets/icon.png",
         webPreferences: {
@@ -45,7 +49,7 @@ function createWindow() {
     });
 
     win.loadFile("./src/index.html");
-    session.defaultSession.setProxy({ mode: "system" });
+
     win.maximize();
     win.webContents.setWindowOpenHandler(({ url }) => {
         shell.openExternal(url);
@@ -67,7 +71,7 @@ function createWindow() {
         }
     });
     ipc.on("close", () => {
-        win.close();
+        app.quit();
     });
 }
 
@@ -81,6 +85,36 @@ app.whenReady().then(() => {
             createWindow();
         }
     });
+
+    const proxySettings = session.defaultSession.proxySettings;
+
+    if (proxySettings) {
+        const proxyConfig = `${proxySettings.proxyType}://${proxySettings.proxy}`;
+        if (proxySettings.proxyAuthorization) {
+            dialog
+                .showMessageBox(mainWindow, {
+                    type: "question",
+                    buttons: ["OK"],
+                    defaultId: 0,
+                    title: "Proxy Authentication",
+                    message: "Please enter your proxy credentials.",
+                })
+                .then(() => {
+                    session.defaultSession.setProxy({
+                        proxyRules: proxyConfig,
+                        proxyAuth: `${proxySettings.username}:${proxySettings.password}`,
+                    });
+
+                    mainWindow.reload();
+                })
+                .catch((error) => {
+                    console.error(
+                        "Error prompting for proxy credentials:",
+                        error
+                    );
+                });
+        }
+    }
 });
 
 app.on("window-all-closed", async () => {
