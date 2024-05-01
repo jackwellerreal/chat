@@ -1174,85 +1174,23 @@ form.addEventListener("submit", async (e) => {
         });
 
     messageInput.value = "";
-    if (info.version == clientVersion) {
-        if (auth.currentUser) {
-            if (name === "") {
-                name = "Unnamed_User";
-            }
+    if (auth.currentUser) {
+        if (name === "") {
+            name = "Unnamed_User";
+        }
 
-            // File Uploading
+        // File Uploading
 
-            if (fileUpload.files[0]) {
-                const file = fileUpload.files[0];
-                const fileName = `file_${Math.random()
-                    .toString(36)
-                    .replace("0.", "")}.jpg`;
-                const storageRef = ref(storage, fileName);
+        if (fileUpload.files[0]) {
+            const file = fileUpload.files[0];
+            const fileName = `file_${Math.random()
+                .toString(36)
+                .replace("0.", "")}.jpg`;
+            const storageRef = ref(storage, fileName);
 
-                uploadBytes(storageRef, file).then((snapshot) => {
-                    getDownloadURL(storageRef)
-                        .then(async (url) => {
-                            await addDoc(messageRef, {
-                                user: {
-                                    auth: {
-                                        id: auth.currentUser.uid,
-                                        ip: ip,
-                                        userAgent: navigator.userAgent,
-                                    },
-                                    bot: false,
-                                    verified:
-                                        store.get("verified") == "true"
-                                            ? true
-                                            : false,
-                                    colour: color,
-                                    name: name,
-                                },
-                                message: {
-                                    content: `image:${url}`,
-                                },
-                                timestamp: new Date(),
-                            });
-                        })
-                        .catch((error) => {
-                            console.log("Error getting image URL:", error);
-                        });
-                });
-
-                fileUpload.value = null;
-                return;
-            }
-
-            // Check Message
-
-            if (message === "" || color === "") {
-                alert("Messages cannot be empty!");
-                return;
-            }
-            if (message.length > 175) {
-                alert("Messages cannot be longer than 175 characters!");
-                return;
-            }
-            if (message.includes("<") || message.includes(">")) {
-                alert("Messages cannot include '<' or '>'!");
-                return;
-            }
-
-            // Bot Commands
-
-            if (message.startsWith("/")) {
-                if (channel.name.includes("bot")) {
-                    if (message.startsWith("/verify")) {
-                        if (
-                            info.codes.includes(message.replace("/verify ", ""))
-                        ) {
-                            store.set("verified", true);
-                            alert("You are now Verified");
-                        } else {
-                            alert("Invalid Verification Code");
-                        }
-                        return;
-                    }
-                    if (message.startsWith("/random")) {
+            uploadBytes(storageRef, file).then((snapshot) => {
+                getDownloadURL(storageRef)
+                    .then(async (url) => {
                         await addDoc(messageRef, {
                             user: {
                                 auth: {
@@ -1260,7 +1198,7 @@ form.addEventListener("submit", async (e) => {
                                     ip: ip,
                                     userAgent: navigator.userAgent,
                                 },
-                                bot: true,
+                                bot: false,
                                 verified:
                                     store.get("verified") == "true"
                                         ? true
@@ -1269,293 +1207,319 @@ form.addEventListener("submit", async (e) => {
                                 name: name,
                             },
                             message: {
-                                content: `${Math.floor(Math.random() * 100)}`,
-                                command: message,
+                                content: `image:${url}`,
                             },
                             timestamp: new Date(),
                         });
-                        return;
-                    }
-                    if (message.startsWith("/test")) {
-                        if (store.get("verified") == "true") {
-                            await addDoc(messageRef, {
-                                user: {
-                                    auth: {
-                                        id: auth.currentUser.uid,
-                                        ip: ip,
-                                        userAgent: navigator.userAgent,
-                                    },
-                                    bot: true,
-                                    verified:
-                                        store.get("verified") == "true"
-                                            ? true
-                                            : false,
-                                    colour: color,
-                                    name: name,
-                                },
-                                message: {
-                                    content: `embed:test`,
-                                    command: message,
-                                },
-                                timestamp: new Date(),
-                            });
-                        } else {
-                            alert("No permission");
-                        }
-                        return;
-                    }
-                    if (message.startsWith("/coinflip")) {
-                        await addDoc(messageRef, {
-                            user: {
-                                auth: {
-                                    id: auth.currentUser.uid,
-                                    ip: ip,
-                                    userAgent: navigator.userAgent,
-                                },
-                                bot: true,
-                                verified:
-                                    store.get("verified") == "true"
-                                        ? true
-                                        : false,
-                                colour: color,
-                                name: name,
-                            },
-                            message: {
-                                content: `embed:${
-                                    (Math.floor(Math.random() * 2) == 0) == true
-                                        ? "🪙 Heads"
-                                        : "🪙 Tails"
-                                }`,
-                                command: message,
-                            },
-                            timestamp: new Date(),
-                        });
-                    }
-                    if (message.startsWith("/slots")) {
-                        if (message.replace("/slots ", "") != "/slots") {
-                            let slots1 =
-                                slots[Math.floor(Math.random() * slots.length)];
-                            let slots2 =
-                                slots[Math.floor(Math.random() * slots.length)];
-                            let slots3 =
-                                slots[Math.floor(Math.random() * slots.length)];
-                            var status;
-                            if (
-                                slots1 == slots2 &&
-                                slots2 == slots3 &&
-                                slots3 == slots1
-                            ) {
-                                status =
-                                    "omg u made like " +
-                                    parseInt(message.replace("/slots ", "")) *
-                                        10 +
-                                    " moneys wow gg bro";
-                            } else if (
-                                slots1 == slots2 ||
-                                slots2 == slots3 ||
-                                slots3 == slots1
-                            ) {
-                                status =
-                                    "u made " +
-                                    parseInt(message.replace("/slots ", "")) *
-                                        3 +
-                                    " moneys gg";
-                            } else {
-                                status =
-                                    "u lost " +
-                                    message.replace("/slots ", "") +
-                                    " moneys lol";
-                            }
-                            await addDoc(messageRef, {
-                                user: {
-                                    auth: {
-                                        id: auth.currentUser.uid,
-                                        ip: ip,
-                                        userAgent: navigator.userAgent,
-                                    },
-                                    bot: true,
-                                    verified:
-                                        store.get("verified") == "true"
-                                            ? true
-                                            : false,
-                                    colour: color,
-                                    name: name,
-                                },
-                                message: {
-                                    content: `embed:${status}\\n${slots1} | ${slots2} | ${slots3}`,
-                                    command: message,
-                                },
-                                timestamp: new Date(),
-                            });
-                            return;
-                        } else {
-                            alert("Invalid Bet Amount");
-                        }
-                    }
-                    if (message.startsWith("/joke")) {
-                        await fetch("https://icanhazdadjoke.com/", {
-                            headers: {
-                                Accept: "application/json",
-                            },
-                        })
-                            .then((response) => response.json())
-                            .then(async (data) => {
-                                await addDoc(messageRef, {
-                                    user: {
-                                        auth: {
-                                            id: auth.currentUser.uid,
-                                            ip: ip,
-                                            userAgent: navigator.userAgent,
-                                        },
-                                        bot: true,
-                                        verified:
-                                            store.get("verified") == "true"
-                                                ? true
-                                                : false,
-                                        colour: color,
-                                        name: name,
-                                    },
-                                    message: {
-                                        content: `${data.joke}`,
-                                        command: message,
-                                    },
-                                    timestamp: new Date(),
-                                });
-                            })
-                            .catch(async (error) => {
-                                await addDoc(messageRef, {
-                                    user: {
-                                        auth: {
-                                            id: auth.currentUser.uid,
-                                            ip: ip,
-                                            userAgent: navigator.userAgent,
-                                        },
-                                        bot: true,
-                                        verified:
-                                            store.get("verified") == "true"
-                                                ? true
-                                                : false,
-                                        colour: color,
-                                        name: name,
-                                    },
-                                    message: {
-                                        content: `Unable to fetch API: ${error}`,
-                                        command: message,
-                                    },
-                                    timestamp: new Date(),
-                                });
-                            });
-                        return;
-                    }
-                    if (message.startsWith("/fact")) {
-                        await fetch(
-                            "https://uselessfacts.jsph.pl/api/v2/facts/random",
-                            {
-                                headers: {
-                                    Accept: "application/json",
-                                },
-                            }
-                        )
-                            .then((response) => response.json())
-                            .then(async (data) => {
-                                await addDoc(messageRef, {
-                                    user: {
-                                        auth: {
-                                            id: auth.currentUser.uid,
-                                            ip: ip,
-                                            userAgent: navigator.userAgent,
-                                        },
-                                        bot: true,
-                                        verified:
-                                            store.get("verified") == "true"
-                                                ? true
-                                                : false,
-                                        colour: color,
-                                        name: name,
-                                    },
-                                    message: {
-                                        content: `${data.text.replace("`", "'")}`,
-                                        command: message,
-                                    },
-                                    timestamp: new Date(),
-                                });
-                            })
-                            .catch(async (error) => {
-                                await addDoc(messageRef, {
-                                    user: {
-                                        auth: {
-                                            id: auth.currentUser.uid,
-                                            ip: ip,
-                                            userAgent: navigator.userAgent,
-                                        },
-                                        bot: true,
-                                        verified:
-                                            store.get("verified") == "true"
-                                                ? true
-                                                : false,
-                                        colour: color,
-                                        name: name,
-                                    },
-                                    message: {
-                                        content: `Unable to fetch API: ${error}`,
-                                        command: message,
-                                    },
-                                    timestamp: new Date(),
-                                });
-                            });
-                        return;
+                    })
+                    .catch((error) => {
+                        console.log("Error getting image URL:", error);
+                    });
+            });
+
+            fileUpload.value = null;
+            return;
+        }
+
+        // Check Message
+
+        if (message === "" || color === "") {
+            alert("Messages cannot be empty!");
+            return;
+        }
+        if (message.length > 175) {
+            alert("Messages cannot be longer than 175 characters!");
+            return;
+        }
+        if (message.includes("<") || message.includes(">")) {
+            alert("Messages cannot include '<' or '>'!");
+            return;
+        }
+
+        // Bot Commands
+
+        if (message.startsWith("/")) {
+            if (channel.name.includes("bot")) {
+                if (message.startsWith("/verify")) {
+                    if (info.codes.includes(message.replace("/verify ", ""))) {
+                        store.set("verified", true);
+                        alert("You are now Verified");
                     } else {
-                        return;
+                        alert("Invalid Verification Code");
                     }
-                } else {
-                    alert("Please use #bot-spam");
+                    return;
                 }
-            }
-
-            // Anonymous Channel
-
-            if (channel == "anonymous") {
-                try {
+                if (message.startsWith("/random")) {
                     await addDoc(messageRef, {
                         user: {
                             auth: {
-                                id: null,
-                                ip: null,
-                                userAgent: null,
+                                id: auth.currentUser.uid,
+                                ip: ip,
+                                userAgent: navigator.userAgent,
                             },
-                            bot: false,
-                            verified: false,
-                            colour: `#${Math.floor(
-                                Math.random() * 16777215
-                            ).toString(16)}`,
-                            name: "Anonymous",
+                            bot: true,
+                            verified:
+                                store.get("verified") == "true" ? true : false,
+                            colour: color,
+                            name: name,
                         },
                         message: {
-                            content: message,
+                            content: `${Math.floor(Math.random() * 100)}`,
+                            command: message,
                         },
                         timestamp: new Date(),
                     });
-                } catch (error) {
-                    console.error("Error adding document: ", error);
+                    return;
                 }
-                return;
+                if (message.startsWith("/test")) {
+                    if (store.get("verified") == "true") {
+                        await addDoc(messageRef, {
+                            user: {
+                                auth: {
+                                    id: auth.currentUser.uid,
+                                    ip: ip,
+                                    userAgent: navigator.userAgent,
+                                },
+                                bot: true,
+                                verified:
+                                    store.get("verified") == "true"
+                                        ? true
+                                        : false,
+                                colour: color,
+                                name: name,
+                            },
+                            message: {
+                                content: `embed:test`,
+                                command: message,
+                            },
+                            timestamp: new Date(),
+                        });
+                    } else {
+                        alert("No permission");
+                    }
+                    return;
+                }
+                if (message.startsWith("/coinflip")) {
+                    await addDoc(messageRef, {
+                        user: {
+                            auth: {
+                                id: auth.currentUser.uid,
+                                ip: ip,
+                                userAgent: navigator.userAgent,
+                            },
+                            bot: true,
+                            verified:
+                                store.get("verified") == "true" ? true : false,
+                            colour: color,
+                            name: name,
+                        },
+                        message: {
+                            content: `embed:${
+                                (Math.floor(Math.random() * 2) == 0) == true
+                                    ? "🪙 Heads"
+                                    : "🪙 Tails"
+                            }`,
+                            command: message,
+                        },
+                        timestamp: new Date(),
+                    });
+                }
+                if (message.startsWith("/slots")) {
+                    if (message.replace("/slots ", "") != "/slots") {
+                        let slots1 =
+                            slots[Math.floor(Math.random() * slots.length)];
+                        let slots2 =
+                            slots[Math.floor(Math.random() * slots.length)];
+                        let slots3 =
+                            slots[Math.floor(Math.random() * slots.length)];
+                        var status;
+                        if (
+                            slots1 == slots2 &&
+                            slots2 == slots3 &&
+                            slots3 == slots1
+                        ) {
+                            status =
+                                "omg u made like " +
+                                parseInt(message.replace("/slots ", "")) * 10 +
+                                " moneys wow gg bro";
+                        } else if (
+                            slots1 == slots2 ||
+                            slots2 == slots3 ||
+                            slots3 == slots1
+                        ) {
+                            status =
+                                "u made " +
+                                parseInt(message.replace("/slots ", "")) * 3 +
+                                " moneys gg";
+                        } else {
+                            status =
+                                "u lost " +
+                                message.replace("/slots ", "") +
+                                " moneys lol";
+                        }
+                        await addDoc(messageRef, {
+                            user: {
+                                auth: {
+                                    id: auth.currentUser.uid,
+                                    ip: ip,
+                                    userAgent: navigator.userAgent,
+                                },
+                                bot: true,
+                                verified:
+                                    store.get("verified") == "true"
+                                        ? true
+                                        : false,
+                                colour: color,
+                                name: name,
+                            },
+                            message: {
+                                content: `embed:${status}\\n${slots1} | ${slots2} | ${slots3}`,
+                                command: message,
+                            },
+                            timestamp: new Date(),
+                        });
+                        return;
+                    } else {
+                        alert("Invalid Bet Amount");
+                    }
+                }
+                if (message.startsWith("/joke")) {
+                    await fetch("https://icanhazdadjoke.com/", {
+                        headers: {
+                            Accept: "application/json",
+                        },
+                    })
+                        .then((response) => response.json())
+                        .then(async (data) => {
+                            await addDoc(messageRef, {
+                                user: {
+                                    auth: {
+                                        id: auth.currentUser.uid,
+                                        ip: ip,
+                                        userAgent: navigator.userAgent,
+                                    },
+                                    bot: true,
+                                    verified:
+                                        store.get("verified") == "true"
+                                            ? true
+                                            : false,
+                                    colour: color,
+                                    name: name,
+                                },
+                                message: {
+                                    content: `${data.joke}`,
+                                    command: message,
+                                },
+                                timestamp: new Date(),
+                            });
+                        })
+                        .catch(async (error) => {
+                            await addDoc(messageRef, {
+                                user: {
+                                    auth: {
+                                        id: auth.currentUser.uid,
+                                        ip: ip,
+                                        userAgent: navigator.userAgent,
+                                    },
+                                    bot: true,
+                                    verified:
+                                        store.get("verified") == "true"
+                                            ? true
+                                            : false,
+                                    colour: color,
+                                    name: name,
+                                },
+                                message: {
+                                    content: `Unable to fetch API: ${error}`,
+                                    command: message,
+                                },
+                                timestamp: new Date(),
+                            });
+                        });
+                    return;
+                }
+                if (message.startsWith("/fact")) {
+                    await fetch(
+                        "https://uselessfacts.jsph.pl/api/v2/facts/random",
+                        {
+                            headers: {
+                                Accept: "application/json",
+                            },
+                        }
+                    )
+                        .then((response) => response.json())
+                        .then(async (data) => {
+                            await addDoc(messageRef, {
+                                user: {
+                                    auth: {
+                                        id: auth.currentUser.uid,
+                                        ip: ip,
+                                        userAgent: navigator.userAgent,
+                                    },
+                                    bot: true,
+                                    verified:
+                                        store.get("verified") == "true"
+                                            ? true
+                                            : false,
+                                    colour: color,
+                                    name: name,
+                                },
+                                message: {
+                                    content: `${data.text.replace("`", "'")}`,
+                                    command: message,
+                                },
+                                timestamp: new Date(),
+                            });
+                        })
+                        .catch(async (error) => {
+                            await addDoc(messageRef, {
+                                user: {
+                                    auth: {
+                                        id: auth.currentUser.uid,
+                                        ip: ip,
+                                        userAgent: navigator.userAgent,
+                                    },
+                                    bot: true,
+                                    verified:
+                                        store.get("verified") == "true"
+                                            ? true
+                                            : false,
+                                    colour: color,
+                                    name: name,
+                                },
+                                message: {
+                                    content: `Unable to fetch API: ${error}`,
+                                    command: message,
+                                },
+                                timestamp: new Date(),
+                            });
+                        });
+                    return;
+                } else {
+                    return;
+                }
+            } else {
+                alert("Please use #bot-spam");
             }
+        }
 
-            // Main
+        // Anonymous Channel
 
+        if (channel == "anonymous") {
             try {
                 await addDoc(messageRef, {
                     user: {
                         auth: {
-                            id: auth.currentUser.uid,
-                            ip: ip,
-                            userAgent: navigator.userAgent,
+                            id: null,
+                            ip: null,
+                            userAgent: null,
                         },
                         bot: false,
-                        verified:
-                            store.get("verified") == "true" ? true : false,
-                        colour: color,
-                        name: name,
+                        verified: false,
+                        colour: `#${Math.floor(
+                            Math.random() * 16777215
+                        ).toString(16)}`,
+                        name: "Anonymous",
                     },
                     message: {
                         content: message,
@@ -1565,6 +1529,31 @@ form.addEventListener("submit", async (e) => {
             } catch (error) {
                 console.error("Error adding document: ", error);
             }
+            return;
+        }
+
+        // Main
+
+        try {
+            await addDoc(messageRef, {
+                user: {
+                    auth: {
+                        id: auth.currentUser.uid,
+                        ip: ip,
+                        userAgent: navigator.userAgent,
+                    },
+                    bot: false,
+                    verified: store.get("verified") == "true" ? true : false,
+                    colour: color,
+                    name: name,
+                },
+                message: {
+                    content: message,
+                },
+                timestamp: new Date(),
+            });
+        } catch (error) {
+            console.error("Error adding document: ", error);
         }
     }
     const currentDocSnapshot = await getDoc(typingDocRef);

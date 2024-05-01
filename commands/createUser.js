@@ -12,7 +12,7 @@ const firebase = require("firebase/compat/app");
 require("firebase/compat/auth");
 
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.firestore();
+const auth = firebase.auth();
 
 const prompt = require("prompt-sync")({ sigint: true });
 
@@ -37,7 +37,6 @@ firebase
         console.log(
             `${colours.FgGreen}✅ Successfully created a user account${colours.Reset}`
         );
-        console.log(userCredential.user);
     })
     .catch((error) => {
         console.log(
