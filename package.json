@@ -15,8 +15,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.2.0",
     "firebase": "^10.11.0",
-    "prettier": "^3.2.5",
-    "prompt-sync": "^4.2.0"
+    "prettier": "^3.2.5"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",

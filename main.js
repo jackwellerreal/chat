@@ -29,18 +29,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 var name;
-var proxyconfig;
-
-const proxyfile = "proxyconfig.json";
-if (fs.existsSync(proxyfile)) {
-    proxyconfig = JSON.parse(fs.readFileSync(proxyfile, "utf8"));
-} else {
-    fs.writeFileSync(proxyfile, `{"username":"","password":""}`);
-}
 
 const ipc = ipcMain;
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     const win = new BrowserWindow({
         minWidth: 1000,
         minHeight: 600,
@@ -76,6 +68,7 @@ app.whenReady().then(() => {
             win.maximize();
         }
     });
+
     ipc.on("close", async () => {
         const onlineRef = db.collection("info").doc("online");
         const onlineDoc = await onlineRef.get();
@@ -87,18 +80,22 @@ app.whenReady().then(() => {
                 onlineData.people.splice(index, 1);
             }
 
-            await onlineRef.set({ list: onlineData.people });
+            await onlineRef.set({ people: onlineData.people });
         }
         app.quit();
     });
 
     app.dock.setIcon("./assets/icon.png");
 
-    app.on("login", async (event, webContents, request, authInfo, callback) => {
-        event.preventDefault();
+    const onlineRef = db.collection("info").doc("online");
+    const onlineDoc = await onlineRef.get();
+    const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
 
-        callback(proxyconfig.username, proxyconfig.password);
-    });
+    const peopleList = onlineData.people ? onlineData.people : [];
+    if (peopleList.includes(name)) return;
+
+    peopleList.push(name);
+    await onlineRef.set({ people: peopleList });
 });
 
 app.on("window-all-closed", async () => {
@@ -112,7 +109,7 @@ app.on("window-all-closed", async () => {
             onlineData.people.splice(index, 1);
         }
 
-        await onlineRef.set({ list: onlineData.people });
+        await onlineRef.set({ people: onlineData.people });
     }
     app.quit();
 });

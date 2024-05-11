@@ -23,7 +23,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 const { ipcRenderer } = require("electron");
 const os = require("os");
-const config = require("../config");
 
 require("dotenv").config();
 const firebaseConfig = {
@@ -242,31 +241,13 @@ document.getElementById("settings-profile-picture").src =
 
 serverName.addEventListener("click", () => {
     alert(
-        `Owned by: ${server.owner}\nManaged by: ${info.manager}\nVersion: ${clientVersion}\nShowing ${info.messageCount} messages\n${store.get("verified") ? "You are verified!" : ""}`
+        `Owned by: ${server.owner}\nManaged by: ${info.manager}\nShowing ${info.messageCount} messages\n${store.get("verified") ? "You are verified!" : ""}`
     );
 });
 
 // Show online users
 
 const onlineDocRef = doc(db, "info", "online");
-
-async function setOnline() {
-    const name = store.get("name");
-    if (name == "Unnamed_User") {
-        return;
-    }
-
-    const onlineDocSnapshot = await getDoc(onlineDocRef);
-    const onlineDocData = onlineDocSnapshot.exists()
-        ? onlineDocSnapshot.data()
-        : [];
-
-    const peopleList = onlineDocData.people ? onlineDocData.people : [];
-    if (peopleList.includes(name)) return;
-    peopleList.push(name);
-
-    await setDoc(onlineDocRef, { people: peopleList });
-}
 
 onSnapshot(onlineDocRef, async () => {
     onlineList.innerHTML = "";
@@ -275,6 +256,8 @@ onSnapshot(onlineDocRef, async () => {
     const onlineDocData = onlineDocSnapshot.exists()
         ? onlineDocSnapshot.data()
         : [];
+
+    console.log(onlineDocData);
 
     onlineDocData.people.forEach((user) => {
         const userElement = document.createElement("div");
@@ -310,8 +293,6 @@ onSnapshot(onlineDocRef, async () => {
     document.querySelector("#online-title").innerText =
         `Online - ${onlineDocData.people.length}`;
 });
-
-setOnline();
 
 // Get the refrence to the messages
 
@@ -884,17 +865,16 @@ async function loadVoice() {
 
 // Check for auth then show messsages/voice
 
-if (config.userAccounts == true) {
-    if (auth.currentUser) {
-        if (urlParams.get("channel") == "voice") {
-            loadVoice();
-        } else {
-            loadData();
-        }
+if (auth.currentUser) {
+    if (urlParams.get("channel") == "voice") {
+        loadVoice();
     } else {
-        const messageElement = document.createElement("div");
-        messageElement.className = "message";
-        messageElement.innerHTML = `
+        loadData();
+    }
+} else {
+    const messageElement = document.createElement("div");
+    messageElement.className = "message";
+    messageElement.innerHTML = `
                 <div style="display: flex;">
                     <div style="height: 60px;display: flex;align-items: center;">
                         <img src="https://em-content.zobj.net/source/apple/391/robot_1f916.png" class="message-pfp">
@@ -908,16 +888,16 @@ if (config.userAccounts == true) {
                     </div>
                 </div>
                 `;
-        messagesDiv.appendChild(messageElement);
+    messagesDiv.appendChild(messageElement);
 
-        document
-            .querySelector("#sign-in")
-            .addEventListener("click", function (event) {
-                overlayForm.style.display = "flex";
+    document
+        .querySelector("#sign-in")
+        .addEventListener("click", function (event) {
+            overlayForm.style.display = "flex";
 
-                const formElement = document.createElement("div");
-                formElement.className = "overlay-form";
-                formElement.innerHTML = `
+            const formElement = document.createElement("div");
+            formElement.className = "overlay-form";
+            formElement.innerHTML = `
                         <div class="overlay-form-content">
                             <h1>Sign In</h1>
                             <p>Please enter your username and password</p>
@@ -933,49 +913,42 @@ if (config.userAccounts == true) {
                             <button id="button-confirm">Sign-In</button>
                         </div>
                         `;
-                overlayForm.appendChild(formElement);
+            overlayForm.appendChild(formElement);
 
-                document
-                    .querySelector("#button-exit")
-                    .addEventListener("click", () => {
-                        formElement.remove();
-                        overlayForm.style.display = "none";
-                    });
+            document
+                .querySelector("#button-exit")
+                .addEventListener("click", () => {
+                    formElement.remove();
+                    overlayForm.style.display = "none";
+                });
 
-                document
-                    .querySelector("#button-confirm")
-                    .addEventListener("click", () => {
-                        const username =
-                            document.querySelector("#form-username").value;
-                        const password =
-                            document.querySelector("#form-password").value;
+            document
+                .querySelector("#button-confirm")
+                .addEventListener("click", () => {
+                    const username =
+                        document.querySelector("#form-username").value;
+                    const password =
+                        document.querySelector("#form-password").value;
 
-                        formElement.remove();
-                        overlayForm.style.display = "none";
+                    formElement.remove();
+                    overlayForm.style.display = "none";
 
-                        signInWithEmailAndPassword(
-                            auth,
-                            username + "@chat.com",
-                            password
-                        )
-                            .then((userCredential) => {
-                                console.log(userCredential);
-                                window.location.reload();
-                            })
-                            .catch((error) => {
-                                alert(
-                                    `An error occured, please send this to a developer:\n${error}`
-                                );
-                            });
-                    });
-            });
-    }
-} else {
-    if (urlParams.get("channel") == "voice") {
-        loadVoice();
-    } else {
-        loadData();
-    }
+                    signInWithEmailAndPassword(
+                        auth,
+                        username + "@chat.com",
+                        password
+                    )
+                        .then((userCredential) => {
+                            console.log(userCredential);
+                            window.location.reload();
+                        })
+                        .catch((error) => {
+                            alert(
+                                `An error occured, please send this to a developer:\n${error}`
+                            );
+                        });
+                });
+        });
 }
 
 // Change message input placeholder
