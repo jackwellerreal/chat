@@ -6,3 +6,7 @@ Chat app version 2.0 rewrite
 
 > [!NOTE]  
 > Most features that are in v1.9 are documented [here](https://jack-weller.gitbook.io/chat/)
+
+Basically a clone of discord
+
+![exmaple](./assets/example.png)
