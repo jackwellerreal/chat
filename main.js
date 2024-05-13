@@ -11,6 +11,7 @@ const {
     dialog,
 } = require("electron");
 const fs = require("node:fs");
+const prompt = require('electron-prompt');
 
 require("dotenv").config();
 const firebaseConfig = {
@@ -67,6 +68,36 @@ app.whenReady().then(async () => {
         } else {
             win.maximize();
         }
+    });
+
+    // ! Proxy auth security
+    // ! I understand getting proxy auth is unsecure and I plan on fixing in the future.
+    // ! If you can make it more secure please make a pull request or post an answer here:
+    // ! https://stackoverflow.com/questions/78416735/getting-user-authentication-for-a-network-proxy-in-electron-29-3
+
+    // todo Make proxy sign in more secure
+
+    app.on("login", async (event, webContents, request, authInfo, callback) => {
+        event.preventDefault();
+        const proxyUser = prompt({
+            title: 'Proxy Sign-In',
+            label: 'Username:',
+            value: '',
+            inputAttrs: {
+                type: 'username'
+            },
+            type: 'input'
+        })
+        const proxyPass = prompt({
+            title: 'Proxy Sign-In',
+            label: 'Password:',
+            value: '',
+            inputAttrs: {
+                type: 'password'
+            },
+            type: 'input'
+        })
+        callback(proxyUser, proxyPass);
     });
 
     ipc.on("close", async () => {
