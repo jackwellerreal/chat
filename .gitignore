@@ -2,7 +2,7 @@
 /dist
 /out
 .env
+.DS_Store
+package-lock.json
 test.js
 final.html
-.DS_Store
-proxyconfig.json

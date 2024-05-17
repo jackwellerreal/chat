@@ -584,7 +584,7 @@ async function displayPosts(posts) {
         messagesDiv.appendChild(messageElement);
 
         const previousMessage = messagesDiv.children[i - 1];
-        if (previousMessage) {
+        if (previousMessage && channel != "anonymous") {
             const previousMessageName =
                 previousMessage.children[1].children[0].children[0].innerHTML.split(
                     " "
