@@ -50,6 +50,22 @@ document
         ipc.send("close");
     });
 
+
+// Check for proxy
+
+fetch("https://api.ipify.org/?format=json")
+    .then((response) => {
+        if (response.status === 200) {
+            console.log("Proxy not detected");
+        } else {
+            alert("You don't have internet access (or you are behind a proxy)");
+            ipc.send("close");
+        }
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
+
 const app = initializeApp(firebaseConfig);
 const slots = ["💯", "💀", "🧑‍🦼", "🍪", "😂"];
 
@@ -256,8 +272,6 @@ onSnapshot(onlineDocRef, async () => {
     const onlineDocData = onlineDocSnapshot.exists()
         ? onlineDocSnapshot.data()
         : [];
-
-    console.log(onlineDocData);
 
     onlineDocData.people.forEach((user) => {
         const userElement = document.createElement("div");

@@ -11,7 +11,6 @@ const {
     dialog,
 } = require("electron");
 const fs = require("node:fs");
-const prompt = require('electron-prompt');
 
 require("dotenv").config();
 const firebaseConfig = {
@@ -77,26 +76,10 @@ app.whenReady().then(async () => {
 
     // todo Make proxy sign in more secure
 
+    const proxyUser = "user";
+    const proxyPass = "pass";
+
     app.on("login", async (event, webContents, request, authInfo, callback) => {
-        event.preventDefault();
-        const proxyUser = prompt({
-            title: 'Proxy Sign-In',
-            label: 'Username:',
-            value: '',
-            inputAttrs: {
-                type: 'username'
-            },
-            type: 'input'
-        })
-        const proxyPass = prompt({
-            title: 'Proxy Sign-In',
-            label: 'Password:',
-            value: '',
-            inputAttrs: {
-                type: 'password'
-            },
-            type: 'input'
-        })
         callback(proxyUser, proxyPass);
     });
 

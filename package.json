@@ -26,9 +26,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron/fuses": "^1.8.0",
-    "electron": "^29.3.0",
-    "electron-prompt": "^1.7.0",
-    "javascript-obfuscator": "^4.1.0"
+    "electron": "^29.3.0"
   },
   "scripts": {
     "start": "electron-forge start",
