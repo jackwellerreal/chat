@@ -50,7 +50,6 @@ document
         ipc.send("close");
     });
 
-
 // Check for proxy
 
 fetch("https://api.ipify.org/?format=json")
@@ -284,7 +283,7 @@ onSnapshot(onlineDocRef, async () => {
                 </mask>
                 <foreignObject x="0" y="0" width="32" height="32" mask="url(#:r4:)">
                     <div>
-                        <img src="https://api.dicebear.com/9.x/identicon/svg?seed=${user}&backgroundColor=transparent />
+                        <img src="https://api.dicebear.com/9.x/identicon/svg?seed=${user}&backgroundColor=transparent" />
                     </div>
                 </foreignObject>
                 <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
@@ -322,7 +321,7 @@ const q = query(
 function checkMessage(string) {
     if (string.startsWith("raw:")) {
         if (string.startsWith("raw:embed:")) {
-            return `<div class="message-content-embed" style="border-color: var(--blue);">${string
+            return `<div class="message-content-embed" style="border-color: #5865f2;">${string
                 .replace(/raw\:embed\:/, "")
                 .replace("\\n", "<br>")}</div>`;
         } else {
@@ -530,17 +529,22 @@ async function displayPosts(posts) {
         var name = post.user.name;
         const verified = post.user.verified;
         const bot = post.user.bot;
-        const message = twemoji.parse(
-            checkMessage(
-                bot === true
-                    ? "raw:" + post.message.content
-                    : post.message.content
-            ),
-            {
-                size: "svg",
-                ext: ".svg",
-            }
-        );
+        const message = twemoji
+            .parse(
+                checkMessage(
+                    bot === true
+                        ? "raw:" + post.message.content
+                        : post.message.content
+                ),
+                {
+                    size: "svg",
+                    ext: ".svg",
+                }
+            )
+            .replaceAll(
+                "https://twemoji.maxcdn.com/v/14.0.2/svg/",
+                "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/"
+            );
         const color = post.user.colour;
         const command = post.message.command;
 
@@ -598,7 +602,7 @@ async function displayPosts(posts) {
         messagesDiv.appendChild(messageElement);
 
         const previousMessage = messagesDiv.children[i - 1];
-        if (previousMessage && channel != "anonymous") {
+        if (previousMessage && channel.name != "anonymous") {
             const previousMessageName =
                 previousMessage.children[1].children[0].children[0].innerHTML.split(
                     " "
@@ -627,6 +631,7 @@ async function displayPosts(posts) {
             }
         }
     });
+
     const messageElement = document.createElement("div");
     messageElement.className = "greating";
     messageElement.innerHTML = `<p class="greeting-title">You are in #${channel.name}</p><p class="greeting-desc">${channel.description}</p>`;
@@ -1025,9 +1030,9 @@ editSettings.addEventListener("click", async (e) => {
     </div>
     <div class="overlay-form-questions">
         <h2>Username</h2>
-        <input id="form-name" placeholder="${store.get("name")}" />
+        <input id="form-name" type="text" placeholder="${store.get("name")}" />
         <h2>Colour</h2>
-        <input id="form-colour" placeholder="${store.get("colour")}" />
+        <input id="form-colour" type="color" value="${store.get("colour")}" />
     </div>
     <div class="overlay-form-confirm">
         <button id="button-exit">Cancel</button>
@@ -1121,6 +1126,7 @@ messageInput.addEventListener("input", async (e) => {
     if (peopleList.includes(name)) return;
     peopleList.push(name);
 
+    if (channel.name == "anonymous") return;
     await setDoc(typingDocRef, { people: peopleList });
 
     // Reset the timeout
@@ -1234,6 +1240,25 @@ form.addEventListener("submit", async (e) => {
                     } else {
                         alert("Invalid Verification Code");
                     }
+
+                    const currentDocSnapshot = await getDoc(typingDocRef);
+                    const currentDocData = currentDocSnapshot.exists()
+                        ? currentDocSnapshot.data()
+                        : {};
+
+                    if (
+                        currentDocData.people &&
+                        currentDocData.people.includes(name)
+                    ) {
+                        const index = currentDocData.people.indexOf(name);
+                        if (index > -1) {
+                            currentDocData.people.splice(index, 1);
+                        }
+
+                        await setDoc(typingDocRef, {
+                            people: currentDocData.people,
+                        });
+                    }
                     return;
                 }
                 if (message.startsWith("/random")) {
@@ -1256,6 +1281,25 @@ form.addEventListener("submit", async (e) => {
                         },
                         timestamp: new Date(),
                     });
+
+                    const currentDocSnapshot = await getDoc(typingDocRef);
+                    const currentDocData = currentDocSnapshot.exists()
+                        ? currentDocSnapshot.data()
+                        : {};
+
+                    if (
+                        currentDocData.people &&
+                        currentDocData.people.includes(name)
+                    ) {
+                        const index = currentDocData.people.indexOf(name);
+                        if (index > -1) {
+                            currentDocData.people.splice(index, 1);
+                        }
+
+                        await setDoc(typingDocRef, {
+                            people: currentDocData.people,
+                        });
+                    }
                     return;
                 }
                 if (message.startsWith("/test")) {
@@ -1281,6 +1325,26 @@ form.addEventListener("submit", async (e) => {
                             },
                             timestamp: new Date(),
                         });
+
+                        const currentDocSnapshot = await getDoc(typingDocRef);
+                        const currentDocData = currentDocSnapshot.exists()
+                            ? currentDocSnapshot.data()
+                            : {};
+
+                        if (
+                            currentDocData.people &&
+                            currentDocData.people.includes(name)
+                        ) {
+                            const index = currentDocData.people.indexOf(name);
+                            if (index > -1) {
+                                currentDocData.people.splice(index, 1);
+                            }
+
+                            await setDoc(typingDocRef, {
+                                people: currentDocData.people,
+                            });
+                        }
+                        return;
                     } else {
                         alert("No permission");
                     }
@@ -1310,6 +1374,26 @@ form.addEventListener("submit", async (e) => {
                         },
                         timestamp: new Date(),
                     });
+
+                    const currentDocSnapshot = await getDoc(typingDocRef);
+                    const currentDocData = currentDocSnapshot.exists()
+                        ? currentDocSnapshot.data()
+                        : {};
+
+                    if (
+                        currentDocData.people &&
+                        currentDocData.people.includes(name)
+                    ) {
+                        const index = currentDocData.people.indexOf(name);
+                        if (index > -1) {
+                            currentDocData.people.splice(index, 1);
+                        }
+
+                        await setDoc(typingDocRef, {
+                            people: currentDocData.people,
+                        });
+                    }
+                    return;
                 }
                 if (message.startsWith("/slots")) {
                     if (message.replace("/slots ", "") != "/slots") {
@@ -1365,6 +1449,25 @@ form.addEventListener("submit", async (e) => {
                             },
                             timestamp: new Date(),
                         });
+
+                        const currentDocSnapshot = await getDoc(typingDocRef);
+                        const currentDocData = currentDocSnapshot.exists()
+                            ? currentDocSnapshot.data()
+                            : {};
+
+                        if (
+                            currentDocData.people &&
+                            currentDocData.people.includes(name)
+                        ) {
+                            const index = currentDocData.people.indexOf(name);
+                            if (index > -1) {
+                                currentDocData.people.splice(index, 1);
+                            }
+
+                            await setDoc(typingDocRef, {
+                                people: currentDocData.people,
+                            });
+                        }
                         return;
                     } else {
                         alert("Invalid Bet Amount");
@@ -1423,6 +1526,25 @@ form.addEventListener("submit", async (e) => {
                                 timestamp: new Date(),
                             });
                         });
+
+                    const currentDocSnapshot = await getDoc(typingDocRef);
+                    const currentDocData = currentDocSnapshot.exists()
+                        ? currentDocSnapshot.data()
+                        : {};
+
+                    if (
+                        currentDocData.people &&
+                        currentDocData.people.includes(name)
+                    ) {
+                        const index = currentDocData.people.indexOf(name);
+                        if (index > -1) {
+                            currentDocData.people.splice(index, 1);
+                        }
+
+                        await setDoc(typingDocRef, {
+                            people: currentDocData.people,
+                        });
+                    }
                     return;
                 }
                 if (message.startsWith("/fact")) {
@@ -1481,6 +1603,25 @@ form.addEventListener("submit", async (e) => {
                                 timestamp: new Date(),
                             });
                         });
+
+                    const currentDocSnapshot = await getDoc(typingDocRef);
+                    const currentDocData = currentDocSnapshot.exists()
+                        ? currentDocSnapshot.data()
+                        : {};
+
+                    if (
+                        currentDocData.people &&
+                        currentDocData.people.includes(name)
+                    ) {
+                        const index = currentDocData.people.indexOf(name);
+                        if (index > -1) {
+                            currentDocData.people.splice(index, 1);
+                        }
+
+                        await setDoc(typingDocRef, {
+                            people: currentDocData.people,
+                        });
+                    }
                     return;
                 } else {
                     return;
@@ -1492,7 +1633,7 @@ form.addEventListener("submit", async (e) => {
 
         // Anonymous Channel
 
-        if (channel == "anonymous") {
+        if (channel.name == "anonymous") {
             try {
                 await addDoc(messageRef, {
                     user: {

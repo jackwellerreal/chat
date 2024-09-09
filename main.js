@@ -11,8 +11,12 @@ const {
     dialog,
 } = require("electron");
 const fs = require("node:fs");
+const axios = require('axios'); 
+const firebase = require("firebase/compat/app");
+require("firebase/compat/firestore");
 
 require("dotenv").config();
+
 const firebaseConfig = {
     apiKey: process.env.APIKEY,
     authDomain: process.env.AUTHDOMAIN,
@@ -22,69 +26,50 @@ const firebaseConfig = {
     appId: process.env.APPID,
 };
 
-const firebase = require("firebase/compat/app");
-require("firebase/compat/firestore");
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-var name;
+let mainWindow;
 
-const ipc = ipcMain;
+async function isBehindProxy() {
+    try {
+        await axios.get('https://example.org/');
+        return false;
+    } catch (error) {
+        return true;
+    }
+}
 
 app.whenReady().then(async () => {
-    const win = new BrowserWindow({
-        minWidth: 1000,
-        minHeight: 600,
-        title: "Chat V2",
-        icon: "./assets/icon.png",
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        },
-        frame: false,
-        autoHideMenuBar: true,
-    });
+    const createMainWindow = () => {
+        mainWindow = new BrowserWindow({
+            minWidth: 1000,
+            minHeight: 600,
+            title: "Chat V2",
+            icon: "./assets/icon.png",
+            webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false,
+            },
+            frame: false,
+            autoHideMenuBar: true,
+        });
+    
+        mainWindow.loadFile('./src/index.html');
+        mainWindow.maximize();
+    
+        mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+            shell.openExternal(url);
+            return { action: "deny" };
+        });
+    };
 
-    win.loadFile("./src/index.html");
+    createMainWindow();
+});
 
-    win.maximize();
-    win.webContents.setWindowOpenHandler(({ url }) => {
-        shell.openExternal(url);
-        return { action: "deny" };
-    });
-
-    ipc.on("name", (event, arg) => {
-        name = arg;
-    });
-
-    ipc.on("min", () => {
-        win.minimize();
-    });
-    ipc.on("max", () => {
-        if (win.isMaximized()) {
-            win.restore();
-        } else {
-            win.maximize();
-        }
-    });
-
-    // ! Proxy auth security
-    // ! I understand getting proxy auth is unsecure and I plan on fixing in the future.
-    // ! If you can make it more secure please make a pull request or post an answer here:
-    // ! https://stackoverflow.com/questions/78416735/getting-user-authentication-for-a-network-proxy-in-electron-29-3
-
-    // todo Make proxy sign in more secure
-
-    const proxyUser = "user";
-    const proxyPass = "pass";
-
-    app.on("login", async (event, webContents, request, authInfo, callback) => {
-        callback(proxyUser, proxyPass);
-    });
-
-    ipc.on("close", async () => {
-        const onlineRef = db.collection("info").doc("online");
+app.on('window-all-closed', async () => {
+    if (mainWindow) {
+        const onlineRef = db.collection('info').doc('online');
         const onlineDoc = await onlineRef.get();
         const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
 
@@ -93,37 +78,45 @@ app.whenReady().then(async () => {
             if (index > -1) {
                 onlineData.people.splice(index, 1);
             }
-
             await onlineRef.set({ people: onlineData.people });
         }
-        app.quit();
-    });
-
-    app.dock.setIcon("./assets/icon.png");
-
-    const onlineRef = db.collection("info").doc("online");
-    const onlineDoc = await onlineRef.get();
-    const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
-
-    const peopleList = onlineData.people ? onlineData.people : [];
-    if (peopleList.includes(name)) return;
-
-    peopleList.push(name);
-    await onlineRef.set({ people: peopleList });
-});
-
-app.on("window-all-closed", async () => {
-    const onlineRef = db.collection("info").doc("online");
-    const onlineDoc = await onlineRef.get();
-    const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
-
-    if (onlineData.people && onlineData.people.includes(name)) {
-        const index = onlineData.people.indexOf(name);
-        if (index > -1) {
-            onlineData.people.splice(index, 1);
-        }
-
-        await onlineRef.set({ people: onlineData.people });
     }
     app.quit();
 });
+
+ipcMain.on('name', (event, arg) => {
+    name = arg;
+});
+
+ipcMain.on('min', () => {
+    if (mainWindow) mainWindow.minimize();
+});
+
+ipcMain.on('max', () => {
+    if (mainWindow) {
+        if (mainWindow.isMaximized()) {
+            mainWindow.restore();
+        } else {
+            mainWindow.maximize();
+        }
+    }
+});
+
+ipcMain.on('close', async () => {
+    if (mainWindow) {
+        const onlineRef = db.collection('info').doc('online');
+        const onlineDoc = await onlineRef.get();
+        const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
+
+        if (onlineData.people && onlineData.people.includes(name)) {
+            const index = onlineData.people.indexOf(name);
+            if (index > -1) {
+                onlineData.people.splice(index, 1);
+            }
+            await onlineRef.set({ people: onlineData.people });
+        }
+    }
+    app.quit();
+});
+
+app.dock.setIcon('./assets/icon.png');
