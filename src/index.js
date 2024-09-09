@@ -253,7 +253,7 @@ serverBanner.style.backgroundSize = `cover`;
 document.getElementById("settings-profile-name").innerText =
     store.get("name") == null ? "Unnamed_User" : store.get("name");
 document.getElementById("settings-profile-picture").src =
-    `https://source.boringavatars.com/beam/40/${store.get("name") == null ? "Unnamed_User" : store.get("name")}?colors=ED4245,FEE75C,57F287,5865F2,EB459E`;
+    `https://api.dicebear.com/9.x/identicon/svg?seed=a${store.get("name") == null ? "Unnamed_User" : store.get("name")}&backgroundColor=transparent`;
 
 serverName.addEventListener("click", () => {
     alert(
@@ -284,7 +284,7 @@ onSnapshot(onlineDocRef, async () => {
                 </mask>
                 <foreignObject x="0" y="0" width="32" height="32" mask="url(#:r4:)">
                     <div>
-                        <img src="https://source.boringavatars.com/beam/40/${user}?colors=ED4245,FEE75C,57F287,5865F2,EB459E" />
+                        <img src="https://api.dicebear.com/9.x/identicon/svg?seed=${user}&backgroundColor=transparent />
                     </div>
                 </foreignObject>
                 <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
@@ -568,7 +568,7 @@ async function displayPosts(posts) {
 
         messageElement.innerHTML = `
             <div style="height: 60px;display: flex;align-items: center;">
-                <img src="https://source.boringavatars.com/beam/120/${post.user.name}?colors=ED4245,FEE75C,57F287,5865F2,EB459E" class="message-pfp">
+                <img src="https://api.dicebear.com/9.x/identicon/svg?seed=${post.user.name}&backgroundColor=transparent" class="message-pfp">
             </div>
             <div>
                 <div class="message-sender">

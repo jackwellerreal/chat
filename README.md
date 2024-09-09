@@ -1,14 +1,10 @@
 # Chat App
-Chat app version 2.0 rewrite
-
-> [!IMPORTANT]  
-> When editing make sure all code is formatted using [prettier](https://prettier.io/) using this [formatting](https://github.com/What-Question-Mark/chat/blob/main/.prettierrc.yml)
+A simple discord clone made using nodejs and electron
 
 > [!NOTE]  
 > Most features that are in v1.9 are documented [here](https://jack-weller.gitbook.io/chat/)
 
-Basically a clone of discord
-
+## Example
 ![exmaple](./assets/example.png)
 
 ## Setup
