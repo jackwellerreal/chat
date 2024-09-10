@@ -1,21 +1,12 @@
-const Store = require("electron-store");
-Store.initRenderer();
+// Imports and packages
 
-const {
-    app,
-    session,
-    BrowserWindow,
-    globalShortcut,
-    shell,
-    ipcMain,
-    dialog,
-} = require("electron");
-const fs = require("node:fs");
-const axios = require('axios'); 
+const { app, session, BrowserWindow, shell, ipcMain } = require("electron");
+const axios = require("axios");
 const firebase = require("firebase/compat/app");
 require("firebase/compat/firestore");
-
 require("dotenv").config();
+
+// Firebase Config
 
 const firebaseConfig = {
     apiKey: process.env.APIKEY,
@@ -29,47 +20,115 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-let mainWindow;
+let name;
+
+// Check if behind proxy or no internet
 
 async function isBehindProxy() {
     try {
-        await axios.get('https://example.org/');
+        await axios.get("https://example.org/", { timeout: 2000 });
         return false;
     } catch (error) {
         return true;
     }
 }
 
+// Load Windows
+
 app.whenReady().then(async () => {
-    const createMainWindow = () => {
-        mainWindow = new BrowserWindow({
+    // Check if behind proxy.
+
+    if (await isBehindProxy()) {
+        // Make window to prompt for password
+
+        const authWindow = new BrowserWindow({
+            width: 300,
+            height: 250,
+            resizable: false,
+            title: "Proxy Authentication",
+            modal: true,
+            parent: null,
+            webPreferences: {
+                devTools: false,
+                nodeIntegration: true,
+                contextIsolation: false,
+            },
+            autoHideMenuBar: true,
+        });
+
+        authWindow.loadFile("./src/proxy-login.html");
+
+        // Wait for response
+
+        ipcMain.once("proxy-auth", (event, args) => {
+            // Make main window
+
+            const mainWindow = new BrowserWindow({
+                minWidth: 1000,
+                minHeight: 600,
+                title: "Chat V2",
+                icon: "./assets/icon.png",
+                webPreferences: {
+                    devTools: false,
+                    nodeIntegration: true,
+                    contextIsolation: false,
+                },
+                frame: false,
+                autoHideMenuBar: true,
+            });
+
+            mainWindow.loadFile("./src/index.html");
+            mainWindow.maximize();
+
+            // Open links in default browser
+
+            mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+                shell.openExternal(url);
+                return { action: "deny" };
+            });
+
+            // Set the proxy authentication
+
+            app.on("login", async (event, webContents, request, authInfo, callback) => {
+                callback(args.username, args.password);
+            });
+
+            mainWindow.reload();
+        });
+    } else {
+        // Make main window
+
+        const mainWindow = new BrowserWindow({
             minWidth: 1000,
             minHeight: 600,
             title: "Chat V2",
             icon: "./assets/icon.png",
             webPreferences: {
+                devTools: false,
                 nodeIntegration: true,
                 contextIsolation: false,
             },
             frame: false,
             autoHideMenuBar: true,
         });
-    
-        mainWindow.loadFile('./src/index.html');
+
+        mainWindow.loadFile("./src/index.html");
         mainWindow.maximize();
-    
+
+        // Open links in default browser
+
         mainWindow.webContents.setWindowOpenHandler(({ url }) => {
             shell.openExternal(url);
             return { action: "deny" };
         });
-    };
-
-    createMainWindow();
+    }
 });
 
-app.on('window-all-closed', async () => {
+// Make user offline when app is quit
+
+app.on("window-all-closed", async () => {
     if (mainWindow) {
-        const onlineRef = db.collection('info').doc('online');
+        const onlineRef = db.collection("info").doc("online");
         const onlineDoc = await onlineRef.get();
         const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
 
@@ -84,15 +143,19 @@ app.on('window-all-closed', async () => {
     app.quit();
 });
 
-ipcMain.on('name', (event, arg) => {
+// Get name form client
+
+ipcMain.on("name", (event, arg) => {
     name = arg;
 });
 
-ipcMain.on('min', () => {
+// Window Controls
+
+ipcMain.on("min", () => {
     if (mainWindow) mainWindow.minimize();
 });
 
-ipcMain.on('max', () => {
+ipcMain.on("max", () => {
     if (mainWindow) {
         if (mainWindow.isMaximized()) {
             mainWindow.restore();
@@ -102,9 +165,9 @@ ipcMain.on('max', () => {
     }
 });
 
-ipcMain.on('close', async () => {
+ipcMain.on("close", async () => {
     if (mainWindow) {
-        const onlineRef = db.collection('info').doc('online');
+        const onlineRef = db.collection("info").doc("online");
         const onlineDoc = await onlineRef.get();
         const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
 
@@ -119,4 +182,6 @@ ipcMain.on('close', async () => {
     app.quit();
 });
 
-app.dock.setIcon('./assets/icon.png');
+// Set dock icon
+
+app.dock.setIcon("./assets/icon.png");
