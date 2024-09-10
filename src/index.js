@@ -51,6 +51,21 @@ document
     .addEventListener("click", () => {
         ipc.send("close");
     });
+    
+// Check for proxy
+
+fetch("https://api.ipify.org/?format=json")
+    .then((response) => {
+        if (response.status === 200) {
+            console.log("Proxy not detected");
+        } else {
+            alert("You don't have internet access (or you are behind a proxy)");
+            ipc.send("close");
+        }
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
 
 const app = initializeApp(firebaseConfig);
 const slots = ["💯", "💀", "🧑‍🦼", "🍪", "😂"];
@@ -68,25 +83,6 @@ if (!store.get("colour")) {
 }
 
 ipc.send("name", store.get("name"));
-
-// Check for internet
-
-async function isBehindProxy() {
-    try {
-        await axios.get('https://example.org/', { timeout: 2000 });
-        return false;
-    } catch (error) {
-        return true;
-    }
-}
-
-isBehindProxy().then((res) => {
-    if (res) {
-        alert("You don't have internet access (or you are behind a proxy)");
-    } else {
-        return
-    }
-})
 
 // Define elements
 

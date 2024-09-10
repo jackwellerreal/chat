@@ -1,10 +1,15 @@
 // Imports and packages
 
-const { app, session, BrowserWindow, shell, ipcMain } = require("electron");
+const Store = require("electron-store");
+Store.initRenderer();
+
+const { app, BrowserWindow, shell, ipcMain } = require("electron");
+const fs = require("node:fs");
 const axios = require("axios");
+require("dotenv").config();
+
 const firebase = require("firebase/compat/app");
 require("firebase/compat/firestore");
-require("dotenv").config();
 
 // Firebase Config
 
@@ -26,7 +31,9 @@ let name;
 
 async function isBehindProxy() {
     try {
-        await axios.get("https://example.org/", { timeout: 2000 });
+        await axios.get("https://api.ipify.org/?format=json", {
+            timeout: 3000,
+        });
         return false;
     } catch (error) {
         return true;
@@ -49,7 +56,7 @@ app.whenReady().then(async () => {
             modal: true,
             parent: null,
             webPreferences: {
-                devTools: false,
+                devTools: true,
                 nodeIntegration: true,
                 contextIsolation: false,
             },
@@ -69,7 +76,7 @@ app.whenReady().then(async () => {
                 title: "Chat V2",
                 icon: "./assets/icon.png",
                 webPreferences: {
-                    devTools: false,
+                    devTools: true,
                     nodeIntegration: true,
                     contextIsolation: false,
                 },
@@ -107,7 +114,7 @@ app.whenReady().then(async () => {
             title: "Chat V2",
             icon: "./assets/icon.png",
             webPreferences: {
-                devTools: false,
+                devTools: true,
                 nodeIntegration: true,
                 contextIsolation: false,
             },
