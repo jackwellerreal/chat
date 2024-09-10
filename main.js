@@ -89,9 +89,12 @@ app.whenReady().then(async () => {
 
             // Set the proxy authentication
 
-            app.on("login", async (event, webContents, request, authInfo, callback) => {
-                callback(args.username, args.password);
-            });
+            app.on(
+                "login",
+                async (event, webContents, request, authInfo, callback) => {
+                    callback(args.username, args.password);
+                }
+            );
 
             mainWindow.reload();
         });
