@@ -1,4 +1,4 @@
-require("dotenv").config()
+require("dotenv").config();
 const firebaseConfig = {
     apiKey: process.env.APIKEY,
     authDomain: process.env.AUTHDOMAIN,
@@ -118,11 +118,11 @@ try {
     console.log(
         `${colours.FgGreen}✅ Successfully created a server${colours.Reset}`
     );
-    return
+    return;
 } catch (error) {
     console.log(
         `${colours.FgRed}❌ Unsuccessfully created a server${colours.Reset}`
     );
     console.log(error);
-    return
+    return;
 }

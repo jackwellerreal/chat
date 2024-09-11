@@ -86,7 +86,7 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             if (username && password) {
-                ipcRenderer.send('proxy-auth', {username: username, password: password});
+                ipcRenderer.send('proxy-auth', { username: username, password: password });
             } else {
                 alert('Please fill in both fields.');
             }

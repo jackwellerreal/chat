@@ -1,4 +1,4 @@
-require("dotenv").config()
+require("dotenv").config();
 const firebaseConfig = {
     apiKey: process.env.APIKEY,
     authDomain: process.env.AUTHDOMAIN,
@@ -31,9 +31,7 @@ async function initializeFirebase() {
     await infoRef.set({
         manager: manager,
         messageCount: messageCount,
-        codes: [
-            "add codes for the verification in this array"
-        ]
+        codes: ["add codes for the verification in this array"],
     });
 }
 
@@ -42,16 +40,16 @@ try {
         `${colours.FgYellow}Welcome to the ${colours.FgBlue}initialize firebase${colours.FgYellow} wizard!${colours.Reset}`
     );
 
-    initializeFirebase()
+    initializeFirebase();
 
     console.log(
         `${colours.FgGreen}✅ Successfully initialized firebase${colours.Reset}`
     );
-    return
+    return;
 } catch (error) {
     console.log(
         `${colours.FgRed}❌ Unsuccessfully initialized firebase${colours.Reset}`
     );
     console.log(error);
-    return
+    return;
 }
