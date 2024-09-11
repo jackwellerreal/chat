@@ -429,6 +429,7 @@ button:hover {
     background-color: #313338;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    margin-bottom: 100px;
 }
 
 .channel-sidebar::-webkit-scrollbar {
@@ -457,10 +458,6 @@ button:hover {
     width: 100%;
     padding: 4px 12px;
     --webkit-user-select: text;
-}
-
-.messages:nth-child(1) {
-    margin-bottom: 100px;
 }
 
 .message-pfp {

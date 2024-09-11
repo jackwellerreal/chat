@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import {
     getFirestore,
     collection,
@@ -10,17 +10,17 @@ import {
     onSnapshot,
     addDoc,
     setDoc,
-} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 import {
     getStorage,
     ref,
     uploadBytes,
     getDownloadURL,
-} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
 import {
     getAuth,
     signInWithEmailAndPassword,
-} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 const { ipcRenderer } = require("electron");
 const os = require("os");
 
@@ -51,7 +51,7 @@ document
     .addEventListener("click", () => {
         ipc.send("close");
     });
-    
+
 // Check for proxy
 
 fetch("https://api.ipify.org/?format=json")
@@ -169,7 +169,7 @@ document.querySelector("#addServer").addEventListener("click", () => {
     </div>
     <div class="overlay-form-questions">
         <h2>Server ID</h2>
-        <input id="form-id" placeholder="40a2eee5" />
+        <input id="form-id" type="text" placeholder="40a2eee5" />
     </div>
     <div class="overlay-form-confirm">
         <button id="button-exit">Cancel</button>
@@ -1180,7 +1180,8 @@ form.addEventListener("submit", async (e) => {
             const file = fileUpload.files[0];
             const fileName = `file_${Math.random()
                 .toString(36)
-                .replace("0.", "")}.jpg`;
+                .replace("0.", "")}.${file.name.split(".")[1]}`;
+
             const storageRef = ref(storage, fileName);
 
             uploadBytes(storageRef, file).then((snapshot) => {

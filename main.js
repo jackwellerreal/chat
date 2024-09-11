@@ -6,6 +6,8 @@ Store.initRenderer();
 const { app, BrowserWindow, shell, ipcMain } = require("electron");
 const fs = require("node:fs");
 const axios = require("axios");
+const globalTunnel = require("global-tunnel-ng");
+
 require("dotenv").config();
 
 const firebase = require("firebase/compat/app");
@@ -25,9 +27,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+let mainWindow;
 let name;
 
 // Check if behind proxy or no internet
+
+let proxy = false;
+let proxyAuth = [];
 
 async function isBehindProxy() {
     try {
@@ -68,9 +74,11 @@ app.whenReady().then(async () => {
         // Wait for response
 
         ipcMain.once("proxy-auth", (event, args) => {
+            proxyAuth = [args.username, args.password];
+
             // Make main window
 
-            const mainWindow = new BrowserWindow({
+            mainWindow = new BrowserWindow({
                 minWidth: 1000,
                 minHeight: 600,
                 title: "Chat V2",
@@ -108,7 +116,7 @@ app.whenReady().then(async () => {
     } else {
         // Make main window
 
-        const mainWindow = new BrowserWindow({
+        mainWindow = new BrowserWindow({
             minWidth: 1000,
             minHeight: 600,
             title: "Chat V2",
@@ -138,6 +146,14 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", async () => {
     if (mainWindow) {
+        if (await isBehindProxy()) {
+            globalTunnel.initialize({
+                host: process.env.PROXY.split(":")[0],
+                port: process.env.PROXY.split(":")[1],
+                proxyAuth: proxyAuth[0]+":"+proxyAuth[1],
+            });
+        }
+
         const onlineRef = db.collection("info").doc("online");
         const onlineDoc = await onlineRef.get();
         const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
@@ -149,6 +165,8 @@ app.on("window-all-closed", async () => {
             }
             await onlineRef.set({ people: onlineData.people });
         }
+
+        globalTunnel.end();
     }
     app.quit();
 });
@@ -176,20 +194,7 @@ ipcMain.on("max", () => {
 });
 
 ipcMain.on("close", async () => {
-    if (mainWindow) {
-        const onlineRef = db.collection("info").doc("online");
-        const onlineDoc = await onlineRef.get();
-        const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
-
-        if (onlineData.people && onlineData.people.includes(name)) {
-            const index = onlineData.people.indexOf(name);
-            if (index > -1) {
-                onlineData.people.splice(index, 1);
-            }
-            await onlineRef.set({ people: onlineData.people });
-        }
-    }
-    app.quit();
+    mainWindow.close();
 });
 
 // Set dock icon
