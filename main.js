@@ -79,8 +79,10 @@ app.whenReady().then(async () => {
             // Make main window
 
             mainWindow = new BrowserWindow({
-                minWidth: 1000,
-                minHeight: 600,
+                width: 1200,
+                height: 800,
+                minWidth: 1200,
+                minHeight: 800,
                 title: "Chat V2",
                 icon: "./assets/icon.png",
                 webPreferences: {
@@ -93,7 +95,6 @@ app.whenReady().then(async () => {
             });
 
             mainWindow.loadFile("./src/index.html");
-            mainWindow.maximize();
 
             // Open links in default browser
 
@@ -117,8 +118,10 @@ app.whenReady().then(async () => {
         // Make main window
 
         mainWindow = new BrowserWindow({
-            minWidth: 1000,
-            minHeight: 600,
+            width: 1200,
+            height: 800,
+            minWidth: 1200,
+            minHeight: 800,
             title: "Chat V2",
             icon: "./assets/icon.png",
             webPreferences: {
@@ -131,7 +134,6 @@ app.whenReady().then(async () => {
         });
 
         mainWindow.loadFile("./src/index.html");
-        mainWindow.maximize();
 
         // Open links in default browser
 
@@ -150,7 +152,7 @@ app.on("window-all-closed", async () => {
             globalTunnel.initialize({
                 host: process.env.PROXY.split(":")[0],
                 port: process.env.PROXY.split(":")[1],
-                proxyAuth: proxyAuth[0]+":"+proxyAuth[1],
+                proxyAuth: proxyAuth[0] + ":" + proxyAuth[1],
             });
         }
 
@@ -184,11 +186,21 @@ ipcMain.on("min", () => {
 });
 
 ipcMain.on("max", () => {
-    if (mainWindow) {
-        if (mainWindow.isMaximized()) {
-            mainWindow.restore();
-        } else {
-            mainWindow.maximize();
+    if (process.platform === "darwin") {
+        if (mainWindow) {
+            if (mainWindow.isFullScreen()) {
+                mainWindow.setFullScreen(false);
+            } else {
+                mainWindow.setFullScreen(true);
+            }
+        }
+    } else {
+        if (mainWindow) {
+            if (mainWindow.isMaximized()) {
+                mainWindow.restore();
+            } else {
+                mainWindow.maximize();
+            }
         }
     }
 });

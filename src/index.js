@@ -254,7 +254,16 @@ serverBanner.style.backgroundSize = `cover`;
 document.getElementById("settings-profile-name").innerText =
     store.get("name") == null ? "Unnamed_User" : store.get("name");
 document.getElementById("settings-profile-picture").src =
-    `https://api.dicebear.com/9.x/identicon/svg?seed=a${store.get("name") == null ? "Unnamed_User" : store.get("name")}&backgroundColor=transparent`;
+    process.env.PROFILEPICAPI.replace(
+        "{NAME}",
+        store.get("name") == null ? "Unnamed_User" : store.get("name")
+    ).replace(
+        "{COLOR}",
+        (store.get("colour") == null ? "#ffffff" : store.get("colour")).replace(
+            "#",
+            ""
+        )
+    );
 
 serverName.addEventListener("click", () => {
     alert(
@@ -285,7 +294,18 @@ onSnapshot(onlineDocRef, async () => {
                 </mask>
                 <foreignObject x="0" y="0" width="32" height="32" mask="url(#:r4:)">
                     <div>
-                        <img src="https://api.dicebear.com/9.x/identicon/svg?seed=${user}&backgroundColor=transparent" />
+                        <img src="${process.env.PROFILEPICAPI.replace(
+                            "{NAME}",
+                            store.get("name") == null
+                                ? "Unnamed_User"
+                                : store.get("name")
+                        ).replace(
+                            "{COLOR}",
+                            (store.get("colour") == null
+                                ? "#ffffff"
+                                : store.get("colour")
+                            ).replace("#", "")
+                        )}" />
                     </div>
                 </foreignObject>
                 <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
@@ -574,7 +594,18 @@ async function displayPosts(posts) {
 
         messageElement.innerHTML = `
             <div style="height: 60px;display: flex;align-items: center;">
-                <img src="https://api.dicebear.com/9.x/identicon/svg?seed=${post.user.name}&backgroundColor=transparent" class="message-pfp">
+                <img src="${process.env.PROFILEPICAPI.replace(
+                    "{NAME}",
+                    store.get("name") == null
+                        ? "Unnamed_User"
+                        : store.get("name")
+                ).replace(
+                    "{COLOR}",
+                    (store.get("colour") == null
+                        ? "#ffffff"
+                        : store.get("colour")
+                    ).replace("#", "")
+                )}" class="message-pfp">
             </div>
             <div>
                 <div class="message-sender">

@@ -389,7 +389,6 @@ button:hover {
 .settings-profile img {
     height: 32px;
     border-radius: 10px;
-    background: white;
 }
 
 .settings-profile:hover {
@@ -464,7 +463,6 @@ button:hover {
     height: 50px;
     margin-right: 12px;
     border-radius: 50%;
-    background: white;
 }
 
 .message-sender * {
@@ -717,7 +715,6 @@ button:hover {
 
 .online-user img {
     height: 32px;
-    background: white;
 }
 
 .online-user svg {
