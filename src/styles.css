@@ -251,10 +251,6 @@ button:hover {
     width: calc(100% + 16px);
     aspect-ratio: 16/9;
     overflow: hidden;
-    box-shadow:
-        inset 0 1px 0 hsl(0 0% 0.8% / 0.2),
-        0 1.5px 0 hsl(0 0% 0.8% / 0.05),
-        0 2px 0 hsl(0 0% 0.8% / 0.05);
 }
 
 .server-sidebar-icon {
@@ -558,6 +554,17 @@ button:hover {
     opacity: 1;
 }
 
+.message-raw-text {
+    width: fit-content;
+    background-color: hsl(0 0% 100% / 0.1);
+    padding: 2px;
+    margin-top: 2px;
+    border-radius: 5px;
+    text-decoration: none;
+    white-space: pre-wrap;
+    font-family: consolas, monospace;
+}
+
 .message-content img {
     max-width: 400px;
     border-radius: 10px;
@@ -671,6 +678,14 @@ button:hover {
     grid-template-columns: repeat(2, 1fr);
     gap: 1em;
     padding: 1em;
+    
+}
+
+@media screen and  (max-width: 1352px) {
+    .video {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(2, 1fr);
+    }   
 }
 
 .video video {
@@ -679,7 +694,25 @@ button:hover {
     border-radius: 10px;
     align-self: center;
     width: 100%;
+    border-radius: 3px;
     transform: scaleX(-1);
+}
+
+#voice-call button {
+    width: fit-content;
+    height: 100%;
+    border-radius: 3px;
+}
+
+#voice-call input {
+    padding: 10px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    border-radius: 3px;
+    background-color: #1e1f22;
+    border: 0;
+    outline: 0;
+    text-rendering: optimizeLegibility;
 }
 
 /* Sidebar Right */

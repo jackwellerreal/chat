@@ -275,6 +275,24 @@ serverName.addEventListener("click", () => {
 
 const onlineDocRef = doc(db, "info", "online");
 
+async function setOnline() {
+    const name = store.get("name");
+    if (name == "Unnamed_User") {
+        return;
+    }
+
+    const onlineDocSnapshot = await getDoc(onlineDocRef);
+    const onlineDocData = onlineDocSnapshot.exists()
+        ? onlineDocSnapshot.data()
+        : [];
+
+    const peopleList = onlineDocData.people ? onlineDocData.people : [];
+    if (peopleList.includes(name)) return;
+    peopleList.push(name);
+
+    await setDoc(onlineDocRef, { people: peopleList });
+}
+
 onSnapshot(onlineDocRef, async () => {
     onlineList.innerHTML = "";
 
@@ -296,15 +314,10 @@ onSnapshot(onlineDocRef, async () => {
                     <div>
                         <img src="${process.env.PROFILEPICAPI.replace(
                             "{NAME}",
-                            store.get("name") == null
-                                ? "Unnamed_User"
-                                : store.get("name")
+                            user.trim()
                         ).replace(
                             "{COLOR}",
-                            (store.get("colour") == null
-                                ? "#ffffff"
-                                : store.get("colour")
-                            ).replace("#", "")
+                            "ffffff"
                         )}" />
                     </div>
                 </foreignObject>
@@ -328,6 +341,8 @@ onSnapshot(onlineDocRef, async () => {
     document.querySelector("#online-title").innerText =
         `Online - ${onlineDocData.people.length}`;
 });
+
+setOnline();
 
 // Get the refrence to the messages
 
@@ -483,12 +498,6 @@ function checkMessage(string) {
                 ""
             )}</span>`;
         }
-    }
-    if (string.startsWith("spoiler:")) {
-        return `<div class="message-spoiler"><span class="message-spoiler-text">${string.replace(
-            "spoiler:",
-            ""
-        )}</span></div>`;
     } else {
         var replaced = string
             .replace(/\\n/g, "<br>")
@@ -525,7 +534,12 @@ function checkMessage(string) {
           document.getElementById('created-message').value = 
           '${string}'.match(/(?<![^ ^])\\/([^ ^\!^\#^\$^\^]+)/g)
         ">$&</span>`
-            );
+            )
+            .replace(
+                /\|\|(.*?)\|\|/g,
+                '<div class="message-spoiler"><span class="message-spoiler-text">$1</span></div>'
+            )
+            .replace(/`(.*?)`/g, '<span class="message-raw-text">$1</span>');
         return replaced;
     }
 }
@@ -596,15 +610,10 @@ async function displayPosts(posts) {
             <div style="height: 60px;display: flex;align-items: center;">
                 <img src="${process.env.PROFILEPICAPI.replace(
                     "{NAME}",
-                    store.get("name") == null
-                        ? "Unnamed_User"
-                        : store.get("name")
+                    name.trim()
                 ).replace(
                     "{COLOR}",
-                    (store.get("colour") == null
-                        ? "#ffffff"
-                        : store.get("colour")
-                    ).replace("#", "")
+                    color.replace("#", "")
                 )}" class="message-pfp">
             </div>
             <div>
@@ -712,7 +721,7 @@ async function loadVoice() {
     document.getElementById("videoDiv").appendChild(localVideo);
     document.getElementById("videoDiv").appendChild(remoteVideo);
     document.getElementById("create").innerHTML = `
-  <div style="display: flex;justify-content: space-evenly;width:100%;">
+  <div style="display: flex;justify-content: space-evenly;width:100%;" id="voice-call">
     <button class="message-create-button" id="start-video" style="margin: 0;" title="Start Video">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="fill: white;">
         <path d="M448 96h-72l-8.457-22.51C358.2 48.51 334.3 32 307.6 32H204.4C177.7 32 153.9 48.51 144.5 73.45L136 96H64C28.65 96 0 124.7 0 160v256c0 35.35 28.65 64 64 64h384c35.35 0 64-28.65 64-64V160C512 124.7 483.3 96 448 96zM464 416c0 8.822-7.178 16-16 16H64c-8.822 0-16-7.178-16-16V160c0-8.822 7.178-16 16-16h105.2l20.19-53.64C191.7 84.16 197.8 80 204.4 80h103.3c6.631 0 12.65 4.172 14.98 10.38L342.7 144H448c8.822 0 16 7.178 16 16V416zM256 176C194.1 176 144 226.1 144 288c0 61.86 50.14 112 112 112s112-50.14 112-112C368 226.1 317.9 176 256 176zM256 352c-35.29 0-64-28.71-64-64c0-35.29 28.71-64 64-64s64 28.71 64 64C320 323.3 291.3 352 256 352z"/>
@@ -751,12 +760,10 @@ async function loadVoice() {
         iceServers: [
             {
                 urls: [
-                    "stun:stun.services.mozilla.com",
                     "stun:stun.l.google.com:19302",
                     "stun:stun1.l.google.com:19302",
                     "stun:stun3.l.google.com:19302",
                     "stun:stun4.l.google.com:19302",
-                    "stun:stun.ekiga.net",
                 ],
             },
         ],
@@ -1443,24 +1450,15 @@ form.addEventListener("submit", async (e) => {
                             slots2 == slots3 &&
                             slots3 == slots1
                         ) {
-                            status =
-                                "omg u made like " +
-                                parseInt(message.replace("/slots ", "")) * 10 +
-                                " moneys wow gg bro";
+                            status = `You made ${process.env.ECONOMYCURRENCY}${parseInt(message.replace("/slots ", "")) * 10}`;
                         } else if (
                             slots1 == slots2 ||
                             slots2 == slots3 ||
                             slots3 == slots1
                         ) {
-                            status =
-                                "u made " +
-                                parseInt(message.replace("/slots ", "")) * 3 +
-                                " moneys gg";
+                            status = `You made ${process.env.ECONOMYCURRENCY}${parseInt(message.replace("/slots ", "")) * 3}`;
                         } else {
-                            status =
-                                "u lost " +
-                                message.replace("/slots ", "") +
-                                " moneys lol";
+                            status = `You lost ${process.env.ECONOMYCURRENCY}${message.replace("/slots ", "")}`;
                         }
                         await addDoc(messageRef, {
                             user: {

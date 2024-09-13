@@ -113,6 +113,7 @@ app.whenReady().then(async () => {
             );
 
             mainWindow.reload();
+            authWindow.close()
         });
     } else {
         // Make main window

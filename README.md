@@ -21,3 +21,26 @@ The chat client is easy to setup
 8. Enter the contents of "firebaseConfig" into the corresponding fields
 9. In terminal type `npm i`
 10. Then run `npm start`
+
+## Running
+
+To initialize the firestore db, run
+```bash
+npm run initialize-firebase
+```
+To start the app locally, run
+```bash
+npm start
+```
+To build the app, run
+```bash
+npm run build
+```
+To create a user, run
+```bash
+npm run create-user
+```
+To create a server, run
+```bash
+npm run create-server
+```
