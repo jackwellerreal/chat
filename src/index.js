@@ -287,8 +287,12 @@ async function setOnline() {
         : [];
 
     const peopleList = onlineDocData.people ? onlineDocData.people : [];
-    if (peopleList.includes(name)) return;
-    peopleList.push(name);
+    if (peopleList.some((item) => item.name == name)) return;
+    peopleList.push({
+        name: name,
+        verified: store.get("verified"),
+        color: store.get("colour"),
+    });
 
     await setDoc(onlineDocRef, { people: peopleList });
 }
@@ -303,6 +307,7 @@ onSnapshot(onlineDocRef, async () => {
 
     onlineDocData.people.forEach((user) => {
         const userElement = document.createElement("div");
+        console.log(user);
         userElement.className = "online-user";
         userElement.innerHTML = `
             <svg width="32" height="32" viewBox="0 0 32 32">
@@ -314,11 +319,8 @@ onSnapshot(onlineDocRef, async () => {
                     <div>
                         <img src="${process.env.PROFILEPICAPI.replace(
                             "{NAME}",
-                            user.trim()
-                        ).replace(
-                            "{COLOR}",
-                            "ffffff"
-                        )}" />
+                            user.name.trim()
+                        ).replace("{COLOR}", user.color.replace("#", ""))}" />
                     </div>
                 </foreignObject>
                 <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
@@ -333,7 +335,15 @@ onSnapshot(onlineDocRef, async () => {
                 </svg>
             </svg>
 
-            <p >${user}</p>
+            <p style="color: ${user.color}">${user.name}</p>
+
+            ${
+                user.verified
+                    ? '<svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
+                      user.color +
+                      ';" class="online-user-verified" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
+                    : ""
+            }
         `;
         onlineList.appendChild(userElement);
     });
@@ -595,14 +605,6 @@ async function displayPosts(posts) {
             ? "message-important"
             : "";
 
-        name += ` ${
-            verified === true
-                ? '<svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
-                  color +
-                  ';" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
-                : ""
-        }`;
-
         messageElement.className = `message${" " + mention}${" " + important}`;
         messageElement.id = post.id;
 
@@ -618,23 +620,25 @@ async function displayPosts(posts) {
             </div>
             <div>
                 <div class="message-sender">
+                    <span style="color: ${color};">
+                        ${name}
+                    </span>
+                ${
+                    verified
+                        ? '<svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
+                          color +
+                          ';" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
+                        : ""
+                }
                     ${
                         bot === true
-                            ? '<span style="color: ' +
-                              color +
-                              ';">' +
-                              name +
-                              '</span> <span style="font-weight: 400;">used</span> <span class="message-highlight" style="font-weight: 400;" onclick="document.getElementById(\'created-message\').value = \'' +
+                            ? '<span style="font-weight: 400;">used</span> <span class="message-highlight" style="font-weight: 400;" onclick="document.getElementById(\'created-message\').value = \'' +
                               command +
                               "'.match(/\\/([^ ^!^@^#^$]+)/g) \">" +
-                              command +
-                              "</span>"
-                            : '<span id="message-name" style="color: ' +
-                              color +
-                              '">' +
-                              name +
-                              "</span>"
+                              command
+                            : ""
                     }
+                    </span>
                     <span class="message-time">${time}</span>
                 </div>
                 <span class="message-content">${message}</span>
@@ -646,14 +650,13 @@ async function displayPosts(posts) {
         const previousMessage = messagesDiv.children[i - 1];
         if (previousMessage && channel.name != "anonymous") {
             const previousMessageName =
-                previousMessage.children[1].children[0].children[0].innerHTML.split(
-                    " "
-                )[0];
+                previousMessage.children[1].children[0].children[0].innerHTML.trim();
             if (
                 previousMessageName == post.user.name &&
                 !bot &&
                 previousMessage.getAttribute("bot") == "false"
             ) {
+                console.log(previousMessage);
                 previousMessage.children[1].children[0].remove();
                 previousMessage.children[0].remove();
 
@@ -1233,10 +1236,7 @@ form.addEventListener("submit", async (e) => {
                                     userAgent: navigator.userAgent,
                                 },
                                 bot: false,
-                                verified:
-                                    store.get("verified") == "true"
-                                        ? true
-                                        : false,
+                                verified: store.get("verified"),
                                 colour: color,
                                 name: name,
                             },
@@ -1311,8 +1311,7 @@ form.addEventListener("submit", async (e) => {
                                 userAgent: navigator.userAgent,
                             },
                             bot: true,
-                            verified:
-                                store.get("verified") == "true" ? true : false,
+                            verified: store.get("verified"),
                             colour: color,
                             name: name,
                         },
@@ -1353,10 +1352,7 @@ form.addEventListener("submit", async (e) => {
                                     userAgent: navigator.userAgent,
                                 },
                                 bot: true,
-                                verified:
-                                    store.get("verified") == "true"
-                                        ? true
-                                        : false,
+                                verified: store.get("verified"),
                                 colour: color,
                                 name: name,
                             },
@@ -1400,8 +1396,7 @@ form.addEventListener("submit", async (e) => {
                                 userAgent: navigator.userAgent,
                             },
                             bot: true,
-                            verified:
-                                store.get("verified") == "true" ? true : false,
+                            verified: store.get("verified"),
                             colour: color,
                             name: name,
                         },
@@ -1468,10 +1463,7 @@ form.addEventListener("submit", async (e) => {
                                     userAgent: navigator.userAgent,
                                 },
                                 bot: true,
-                                verified:
-                                    store.get("verified") == "true"
-                                        ? true
-                                        : false,
+                                verified: store.get("verified"),
                                 colour: color,
                                 name: name,
                             },
@@ -1656,6 +1648,24 @@ form.addEventListener("submit", async (e) => {
                     }
                     return;
                 } else {
+                    const currentDocSnapshot = await getDoc(typingDocRef);
+                    const currentDocData = currentDocSnapshot.exists()
+                        ? currentDocSnapshot.data()
+                        : {};
+
+                    if (
+                        currentDocData.people &&
+                        currentDocData.people.includes(name)
+                    ) {
+                        const index = currentDocData.people.indexOf(name);
+                        if (index > -1) {
+                            currentDocData.people.splice(index, 1);
+                        }
+
+                        await setDoc(typingDocRef, {
+                            people: currentDocData.people,
+                        });
+                    }
                     return;
                 }
             } else {
@@ -1695,6 +1705,7 @@ form.addEventListener("submit", async (e) => {
         // Main
 
         try {
+            console.log(store.get("verified"));
             await addDoc(messageRef, {
                 user: {
                     auth: {
@@ -1703,7 +1714,7 @@ form.addEventListener("submit", async (e) => {
                         userAgent: navigator.userAgent,
                     },
                     bot: false,
-                    verified: store.get("verified") == "true" ? true : false,
+                    verified: store.get("verified"),
                     colour: color,
                     name: name,
                 },

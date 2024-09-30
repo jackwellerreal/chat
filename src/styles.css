@@ -469,7 +469,7 @@ button:hover {
 .message-sender svg {
     fill: #ffffff;
     height: 24px;
-    vertical-align: middle;
+    vertical-align: -0.25em;
 }
 
 .message-sender span {
@@ -756,9 +756,17 @@ button:hover {
 
 .online-user p {
     height: min-content;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 600;
     color: #949ba4;
+}
+
+.online-user-verified {
+    fill: #ffffff;
+    height: 20px;
+    vertical-align: -0.25em;
+    margin-left: 6px;
+    margin-right: 0px;
 }
 
 /* Animations */
