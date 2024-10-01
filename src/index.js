@@ -1274,6 +1274,47 @@ form.addEventListener("submit", async (e) => {
 
         if (message.startsWith("/")) {
             if (channel.name.includes("bot")) {
+                const helpCommand = 'embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact'
+                if (message.startsWith("/help")) {
+                    await addDoc(messageRef, {
+                        user: {
+                            auth: {
+                                id: auth.currentUser.uid,
+                                ip: ip,
+                                userAgent: navigator.userAgent,
+                            },
+                            bot: true,
+                            verified: store.get("verified"),
+                            colour: color,
+                            name: name,
+                        },
+                        message: {
+                            content: helpCommand,
+                            command: message,
+                        },
+                        timestamp: new Date(),
+                    });
+
+                    const currentDocSnapshot = await getDoc(typingDocRef);
+                    const currentDocData = currentDocSnapshot.exists()
+                        ? currentDocSnapshot.data()
+                        : {};
+
+                    if (
+                        currentDocData.people &&
+                        currentDocData.people.includes(name)
+                    ) {
+                        const index = currentDocData.people.indexOf(name);
+                        if (index > -1) {
+                            currentDocData.people.splice(index, 1);
+                        }
+
+                        await setDoc(typingDocRef, {
+                            people: currentDocData.people,
+                        });
+                    }
+                    return;
+                }
                 if (message.startsWith("/verify")) {
                     if (info.codes.includes(message.replace("/verify ", ""))) {
                         store.set("verified", true);
@@ -1339,51 +1380,6 @@ form.addEventListener("submit", async (e) => {
                         await setDoc(typingDocRef, {
                             people: currentDocData.people,
                         });
-                    }
-                    return;
-                }
-                if (message.startsWith("/test")) {
-                    if (store.get("verified") == "true") {
-                        await addDoc(messageRef, {
-                            user: {
-                                auth: {
-                                    id: auth.currentUser.uid,
-                                    ip: ip,
-                                    userAgent: navigator.userAgent,
-                                },
-                                bot: true,
-                                verified: store.get("verified"),
-                                colour: color,
-                                name: name,
-                            },
-                            message: {
-                                content: `embed:test`,
-                                command: message,
-                            },
-                            timestamp: new Date(),
-                        });
-
-                        const currentDocSnapshot = await getDoc(typingDocRef);
-                        const currentDocData = currentDocSnapshot.exists()
-                            ? currentDocSnapshot.data()
-                            : {};
-
-                        if (
-                            currentDocData.people &&
-                            currentDocData.people.includes(name)
-                        ) {
-                            const index = currentDocData.people.indexOf(name);
-                            if (index > -1) {
-                                currentDocData.people.splice(index, 1);
-                            }
-
-                            await setDoc(typingDocRef, {
-                                people: currentDocData.people,
-                            });
-                        }
-                        return;
-                    } else {
-                        alert("No permission");
                     }
                     return;
                 }
