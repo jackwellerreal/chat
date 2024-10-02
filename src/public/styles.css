@@ -480,6 +480,7 @@ button:hover {
     font-weight: normal;
     font-size: 16px;
     color: gray;
+    margin-left: 4px;
 }
 
 .message-time-multi {

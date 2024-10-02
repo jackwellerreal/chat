@@ -307,7 +307,6 @@ onSnapshot(onlineDocRef, async () => {
 
     onlineDocData.people.forEach((user) => {
         const userElement = document.createElement("div");
-        console.log(user);
         userElement.className = "online-user";
         userElement.innerHTML = `
             <svg width="32" height="32" viewBox="0 0 32 32">
@@ -367,13 +366,12 @@ const q = query(
 
 function checkMessage(string) {
     if (string.startsWith("raw:")) {
-        if (string.startsWith("raw:embed:")) {
-            return `<div class="message-content-embed" style="border-color: #5865f2;">${string
-                .replace(/raw\:embed\:/, "")
-                .replace("\\n", "<br>")}</div>`;
-        } else {
-            return string.replace(/raw\:/, "");
-        }
+        return string.replace(/raw\:/, "");
+    }
+    if (string.startsWith("embed:")) {
+        return `<div class="message-content-embed" style="border-color: #5865f2;">${string
+            .replace(/embed\:/, "")
+            .replace("\\n", "<br>")}</div>`;
     }
     if (string.startsWith("image:")) {
         const url = string.replace(/image\:/, "");
@@ -576,17 +574,10 @@ async function displayPosts(posts) {
         const verified = post.user.verified;
         const bot = post.user.bot;
         const message = twemoji
-            .parse(
-                checkMessage(
-                    bot === true
-                        ? "raw:" + post.message.content
-                        : post.message.content
-                ),
-                {
-                    size: "svg",
-                    ext: ".svg",
-                }
-            )
+            .parse(checkMessage(post.message.content), {
+                size: "svg",
+                ext: ".svg",
+            })
             .replaceAll(
                 "https://twemoji.maxcdn.com/v/14.0.2/svg/",
                 "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/"
@@ -633,9 +624,9 @@ async function displayPosts(posts) {
                     ${
                         bot === true
                             ? '<span style="font-weight: 400;">used</span> <span class="message-highlight" style="font-weight: 400;" onclick="document.getElementById(\'created-message\').value = \'' +
-                              command +
+                              command.split(" ")[0] +
                               "'.match(/\\/([^ ^!^@^#^$]+)/g) \">" +
-                              command
+                              command.split(" ")[0]
                             : ""
                     }
                     </span>
@@ -656,7 +647,6 @@ async function displayPosts(posts) {
                 !bot &&
                 previousMessage.getAttribute("bot") == "false"
             ) {
-                console.log(previousMessage);
                 previousMessage.children[1].children[0].remove();
                 previousMessage.children[0].remove();
 
@@ -801,7 +791,6 @@ async function loadVoice() {
 
     async function createCall() {
         const id = Math.floor(100000 + Math.random() * 900000);
-        console.log(id);
         const callDoc = doc(collection(db, "calls"), `${id}`);
 
         const offerCandidates = collection(callDoc, "offerCandidates");
@@ -1001,7 +990,6 @@ if (auth.currentUser) {
                         password
                     )
                         .then((userCredential) => {
-                            console.log(userCredential);
                             window.location.reload();
                         })
                         .catch((error) => {
@@ -1199,7 +1187,6 @@ form.addEventListener("submit", async (e) => {
     if (urlParams.get("voice-channel")) {
         return;
     }
-    console.log("form submitted");
     const name = store.get("name");
     const message = messageInput.value;
     const color = store.get("colour");
@@ -1258,23 +1245,21 @@ form.addEventListener("submit", async (e) => {
         // Check Message
 
         if (message === "" || color === "") {
-            alert("Messages cannot be empty!");
             return;
         }
-        if (message.length > 175) {
-            alert("Messages cannot be longer than 175 characters!");
+        if (message.length > process.env.MESSAGELENGTH) {
             return;
         }
         if (message.includes("<") || message.includes(">")) {
-            alert("Messages cannot include '<' or '>'!");
-            return;
+            message.replace("<", "&lt;").replace(">", "&gt;");
         }
 
         // Bot Commands
 
         if (message.startsWith("/")) {
             if (channel.name.includes("bot")) {
-                const helpCommand = 'embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact'
+                const helpCommand =
+                    'embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact';
                 if (message.startsWith("/help")) {
                     await addDoc(messageRef, {
                         user: {
@@ -1569,7 +1554,7 @@ form.addEventListener("submit", async (e) => {
                 }
                 if (message.startsWith("/fact")) {
                     await fetch(
-                        "https://uselessfacts.jsph.pl/api/v2/facts/random",
+                        "https://api.allorigins.win/raw?url=https://uselessfacts.jsph.pl/api/v2/facts/random",
                         {
                             headers: {
                                 Accept: "application/json",
@@ -1623,6 +1608,256 @@ form.addEventListener("submit", async (e) => {
                                 timestamp: new Date(),
                             });
                         });
+
+                    const currentDocSnapshot = await getDoc(typingDocRef);
+                    const currentDocData = currentDocSnapshot.exists()
+                        ? currentDocSnapshot.data()
+                        : {};
+
+                    if (
+                        currentDocData.people &&
+                        currentDocData.people.includes(name)
+                    ) {
+                        const index = currentDocData.people.indexOf(name);
+                        if (index > -1) {
+                            currentDocData.people.splice(index, 1);
+                        }
+
+                        await setDoc(typingDocRef, {
+                            people: currentDocData.people,
+                        });
+                    }
+                    return;
+                }
+                if (message.startsWith("/aichat")) {
+                    if (process.env.AIBOT) {
+                        await fetch(
+                            process.env.AIURL.replace(
+                                "{MODEL}",
+                                "@cf/meta/llama-3-8b-instruct"
+                            ),
+                            {
+                                headers: {
+                                    Authorization: process.env.AITOKEN,
+                                },
+                                method: "POST",
+                                body: JSON.stringify({
+                                    messages: [
+                                        {
+                                            role: "system",
+                                            content:
+                                                "You are a friendly assistant that messages in a chat room. Make sure to respond with short answers, don't write paragraphs.",
+                                        },
+                                        {
+                                            role: "user",
+                                            content: message.replace(
+                                                "/ai ",
+                                                ""
+                                            ),
+                                        },
+                                    ],
+                                }),
+                            }
+                        )
+                            .then((response) => response.json())
+                            .then(async (data) => {
+                                await addDoc(messageRef, {
+                                    user: {
+                                        auth: {
+                                            id: auth.currentUser.uid,
+                                            ip: ip,
+                                            userAgent: navigator.userAgent,
+                                        },
+                                        bot: true,
+                                        verified:
+                                            store.get("verified") == "true"
+                                                ? true
+                                                : false,
+                                        colour: color,
+                                        name: name,
+                                    },
+                                    message: {
+                                        content: data.result.response,
+                                        command: message,
+                                    },
+                                    timestamp: new Date(),
+                                });
+                            })
+                            .catch(async (error) => {
+                                await addDoc(messageRef, {
+                                    user: {
+                                        auth: {
+                                            id: auth.currentUser.uid,
+                                            ip: ip,
+                                            userAgent: navigator.userAgent,
+                                        },
+                                        bot: true,
+                                        verified:
+                                            store.get("verified") == "true"
+                                                ? true
+                                                : false,
+                                        colour: color,
+                                        name: name,
+                                    },
+                                    message: {
+                                        content: `Unable to fetch API: ${error}`,
+                                        command: message,
+                                    },
+                                    timestamp: new Date(),
+                                });
+                            });
+                    } else {
+                        await addDoc(messageRef, {
+                            user: {
+                                auth: {
+                                    id: auth.currentUser.uid,
+                                    ip: ip,
+                                    userAgent: navigator.userAgent,
+                                },
+                                bot: true,
+                                verified:
+                                    store.get("verified") == "true"
+                                        ? true
+                                        : false,
+                                colour: color,
+                                name: name,
+                            },
+                            message: {
+                                content: `AI is disabled`,
+                                command: message,
+                            },
+                            timestamp: new Date(),
+                        });
+                    }
+
+                    const currentDocSnapshot = await getDoc(typingDocRef);
+                    const currentDocData = currentDocSnapshot.exists()
+                        ? currentDocSnapshot.data()
+                        : {};
+
+                    if (
+                        currentDocData.people &&
+                        currentDocData.people.includes(name)
+                    ) {
+                        const index = currentDocData.people.indexOf(name);
+                        if (index > -1) {
+                            currentDocData.people.splice(index, 1);
+                        }
+
+                        await setDoc(typingDocRef, {
+                            people: currentDocData.people,
+                        });
+                    }
+                    return;
+                }
+                if (message.startsWith("/aipic")) {
+                    if (process.env.AIBOT) {
+                        await fetch(
+                            process.env.AIURL.replace(
+                                "{MODEL}",
+                                "@cf/bytedance/stable-diffusion-xl-lightning"
+                            ),
+                            {
+                                headers: {
+                                    Authorization: process.env.AITOKEN,
+                                },
+                                method: "POST",
+                                body: JSON.stringify({
+                                    prompt: message.replace("/ai ", ""),
+                                }),
+                            }
+                        )
+                            .then((response) => response.blob())
+                            .then(async (data) => {
+                                const fileName = `file_${Math.random()
+                                    .toString(36)
+                                    .replace("0.", "")}.jfif`;
+
+                                const storageRef = ref(storage, fileName);
+
+                                uploadBytes(storageRef, data).then(
+                                    (snapshot) => {
+                                        getDownloadURL(storageRef)
+                                            .then(async (url) => {
+                                                await addDoc(messageRef, {
+                                                    user: {
+                                                        auth: {
+                                                            id: auth.currentUser
+                                                                .uid,
+                                                            ip: ip,
+                                                            userAgent:
+                                                                navigator.userAgent,
+                                                        },
+                                                        bot: true,
+                                                        verified:
+                                                            store.get(
+                                                                "verified"
+                                                            ),
+                                                        colour: color,
+                                                        name: name,
+                                                    },
+                                                    message: {
+                                                        content: `image:${url}`,
+                                                        command: message,
+                                                    },
+                                                    timestamp: new Date(),
+                                                });
+                                            })
+                                            .catch((error) => {
+                                                console.log(
+                                                    "Error getting image URL:",
+                                                    error
+                                                );
+                                            });
+                                    }
+                                );
+                            })
+                            .catch(async (error) => {
+                                await addDoc(messageRef, {
+                                    user: {
+                                        auth: {
+                                            id: auth.currentUser.uid,
+                                            ip: ip,
+                                            userAgent: navigator.userAgent,
+                                        },
+                                        bot: true,
+                                        verified:
+                                            store.get("verified") == "true"
+                                                ? true
+                                                : false,
+                                        colour: color,
+                                        name: name,
+                                    },
+                                    message: {
+                                        content: `Unable to fetch API: ${error}`,
+                                        command: message,
+                                    },
+                                    timestamp: new Date(),
+                                });
+                            });
+                    } else {
+                        await addDoc(messageRef, {
+                            user: {
+                                auth: {
+                                    id: auth.currentUser.uid,
+                                    ip: ip,
+                                    userAgent: navigator.userAgent,
+                                },
+                                bot: true,
+                                verified:
+                                    store.get("verified") == "true"
+                                        ? true
+                                        : false,
+                                colour: color,
+                                name: name,
+                            },
+                            message: {
+                                content: `AI is disabled`,
+                                command: message,
+                            },
+                            timestamp: new Date(),
+                        });
+                    }
 
                     const currentDocSnapshot = await getDoc(typingDocRef);
                     const currentDocData = currentDocSnapshot.exists()
@@ -1701,7 +1936,6 @@ form.addEventListener("submit", async (e) => {
         // Main
 
         try {
-            console.log(store.get("verified"));
             await addDoc(messageRef, {
                 user: {
                     auth: {
