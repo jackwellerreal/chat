@@ -10,6 +10,8 @@ import {
     onSnapshot,
     addDoc,
     setDoc,
+    getDocs,
+    deleteDoc,
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 import {
     getStorage,
@@ -1179,6 +1181,29 @@ messageInput.addEventListener("input", async (e) => {
     }, 10000);
 });
 
+// Remove typing indicator
+
+async function removeTypingIndicator() {
+    const name = store.get("name");
+    const currentDocSnapshot = await getDoc(typingDocRef);
+    const currentDocData = currentDocSnapshot.exists()
+        ? currentDocSnapshot.data()
+        : {};
+
+    if (currentDocData.people && currentDocData.people.includes(name)) {
+        const index = currentDocData.people.indexOf(name);
+        if (index > -1) {
+            currentDocData.people.splice(index, 1);
+        }
+
+        await setDoc(typingDocRef, {
+            people: currentDocData.people,
+        });
+    }
+
+    console.log('removeTypingIndicator')
+}
+
 // Send Message
 
 form.addEventListener("submit", async (e) => {
@@ -1257,10 +1282,21 @@ form.addEventListener("submit", async (e) => {
         // Bot Commands
 
         if (message.startsWith("/")) {
-            if (channel.name.includes("bot")) {
-                const helpCommand =
-                    'embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact';
+            if (channel.name.includes("bot") || message.startsWith("/purge")) {
+                const helpCommand = `embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact${
+                    process.env.AIBOT
+                        ? '<br><span class="message-raw-text">/aichat &lt;prompt&gt;</span><br>This command allows you to talk to ai<br><span class="message-raw-text">/aipic &lt;prompt&gt;</span><br>This command allows you to make images using ai'
+                        : ""
+                }
+                ${
+                    store.get("verified")
+                        ? '<br><span class="message-raw-text">/purge</span><br>This command deletes all messages in a channel'
+                        : ""
+                }
+                `;
                 if (message.startsWith("/help")) {
+                    await removeTypingIndicator();
+
                     await addDoc(messageRef, {
                         user: {
                             auth: {
@@ -1280,27 +1316,11 @@ form.addEventListener("submit", async (e) => {
                         timestamp: new Date(),
                     });
 
-                    const currentDocSnapshot = await getDoc(typingDocRef);
-                    const currentDocData = currentDocSnapshot.exists()
-                        ? currentDocSnapshot.data()
-                        : {};
-
-                    if (
-                        currentDocData.people &&
-                        currentDocData.people.includes(name)
-                    ) {
-                        const index = currentDocData.people.indexOf(name);
-                        if (index > -1) {
-                            currentDocData.people.splice(index, 1);
-                        }
-
-                        await setDoc(typingDocRef, {
-                            people: currentDocData.people,
-                        });
-                    }
                     return;
                 }
                 if (message.startsWith("/verify")) {
+                    await removeTypingIndicator();
+
                     if (info.codes.includes(message.replace("/verify ", ""))) {
                         store.set("verified", true);
                         alert("You are now Verified");
@@ -1308,27 +1328,11 @@ form.addEventListener("submit", async (e) => {
                         alert("Invalid Verification Code");
                     }
 
-                    const currentDocSnapshot = await getDoc(typingDocRef);
-                    const currentDocData = currentDocSnapshot.exists()
-                        ? currentDocSnapshot.data()
-                        : {};
-
-                    if (
-                        currentDocData.people &&
-                        currentDocData.people.includes(name)
-                    ) {
-                        const index = currentDocData.people.indexOf(name);
-                        if (index > -1) {
-                            currentDocData.people.splice(index, 1);
-                        }
-
-                        await setDoc(typingDocRef, {
-                            people: currentDocData.people,
-                        });
-                    }
                     return;
                 }
                 if (message.startsWith("/random")) {
+                    await removeTypingIndicator();
+
                     await addDoc(messageRef, {
                         user: {
                             auth: {
@@ -1348,27 +1352,11 @@ form.addEventListener("submit", async (e) => {
                         timestamp: new Date(),
                     });
 
-                    const currentDocSnapshot = await getDoc(typingDocRef);
-                    const currentDocData = currentDocSnapshot.exists()
-                        ? currentDocSnapshot.data()
-                        : {};
-
-                    if (
-                        currentDocData.people &&
-                        currentDocData.people.includes(name)
-                    ) {
-                        const index = currentDocData.people.indexOf(name);
-                        if (index > -1) {
-                            currentDocData.people.splice(index, 1);
-                        }
-
-                        await setDoc(typingDocRef, {
-                            people: currentDocData.people,
-                        });
-                    }
                     return;
                 }
                 if (message.startsWith("/coinflip")) {
+                    await removeTypingIndicator();
+
                     await addDoc(messageRef, {
                         user: {
                             auth: {
@@ -1392,28 +1380,12 @@ form.addEventListener("submit", async (e) => {
                         timestamp: new Date(),
                     });
 
-                    const currentDocSnapshot = await getDoc(typingDocRef);
-                    const currentDocData = currentDocSnapshot.exists()
-                        ? currentDocSnapshot.data()
-                        : {};
-
-                    if (
-                        currentDocData.people &&
-                        currentDocData.people.includes(name)
-                    ) {
-                        const index = currentDocData.people.indexOf(name);
-                        if (index > -1) {
-                            currentDocData.people.splice(index, 1);
-                        }
-
-                        await setDoc(typingDocRef, {
-                            people: currentDocData.people,
-                        });
-                    }
                     return;
                 }
                 if (message.startsWith("/slots")) {
                     if (message.replace("/slots ", "") != "/slots") {
+                        await removeTypingIndicator();
+
                         let slots1 =
                             slots[Math.floor(Math.random() * slots.length)];
                         let slots2 =
@@ -1455,30 +1427,14 @@ form.addEventListener("submit", async (e) => {
                             timestamp: new Date(),
                         });
 
-                        const currentDocSnapshot = await getDoc(typingDocRef);
-                        const currentDocData = currentDocSnapshot.exists()
-                            ? currentDocSnapshot.data()
-                            : {};
-
-                        if (
-                            currentDocData.people &&
-                            currentDocData.people.includes(name)
-                        ) {
-                            const index = currentDocData.people.indexOf(name);
-                            if (index > -1) {
-                                currentDocData.people.splice(index, 1);
-                            }
-
-                            await setDoc(typingDocRef, {
-                                people: currentDocData.people,
-                            });
-                        }
                         return;
                     } else {
                         alert("Invalid Bet Amount");
                     }
                 }
                 if (message.startsWith("/joke")) {
+                    await removeTypingIndicator();
+
                     await fetch("https://icanhazdadjoke.com/", {
                         headers: {
                             Accept: "application/json",
@@ -1532,27 +1488,11 @@ form.addEventListener("submit", async (e) => {
                             });
                         });
 
-                    const currentDocSnapshot = await getDoc(typingDocRef);
-                    const currentDocData = currentDocSnapshot.exists()
-                        ? currentDocSnapshot.data()
-                        : {};
-
-                    if (
-                        currentDocData.people &&
-                        currentDocData.people.includes(name)
-                    ) {
-                        const index = currentDocData.people.indexOf(name);
-                        if (index > -1) {
-                            currentDocData.people.splice(index, 1);
-                        }
-
-                        await setDoc(typingDocRef, {
-                            people: currentDocData.people,
-                        });
-                    }
                     return;
                 }
                 if (message.startsWith("/fact")) {
+                    await removeTypingIndicator();
+
                     await fetch(
                         "https://api.allorigins.win/raw?url=https://uselessfacts.jsph.pl/api/v2/facts/random",
                         {
@@ -1609,28 +1549,12 @@ form.addEventListener("submit", async (e) => {
                             });
                         });
 
-                    const currentDocSnapshot = await getDoc(typingDocRef);
-                    const currentDocData = currentDocSnapshot.exists()
-                        ? currentDocSnapshot.data()
-                        : {};
-
-                    if (
-                        currentDocData.people &&
-                        currentDocData.people.includes(name)
-                    ) {
-                        const index = currentDocData.people.indexOf(name);
-                        if (index > -1) {
-                            currentDocData.people.splice(index, 1);
-                        }
-
-                        await setDoc(typingDocRef, {
-                            people: currentDocData.people,
-                        });
-                    }
                     return;
                 }
                 if (message.startsWith("/aichat")) {
                     if (process.env.AIBOT) {
+                        await removeTypingIndicator();
+
                         await fetch(
                             process.env.AIURL.replace(
                                 "{MODEL}",
@@ -1730,28 +1654,11 @@ form.addEventListener("submit", async (e) => {
                         });
                     }
 
-                    const currentDocSnapshot = await getDoc(typingDocRef);
-                    const currentDocData = currentDocSnapshot.exists()
-                        ? currentDocSnapshot.data()
-                        : {};
-
-                    if (
-                        currentDocData.people &&
-                        currentDocData.people.includes(name)
-                    ) {
-                        const index = currentDocData.people.indexOf(name);
-                        if (index > -1) {
-                            currentDocData.people.splice(index, 1);
-                        }
-
-                        await setDoc(typingDocRef, {
-                            people: currentDocData.people,
-                        });
-                    }
                     return;
                 }
                 if (message.startsWith("/aipic")) {
                     if (process.env.AIBOT) {
+                        await removeTypingIndicator();
                         await fetch(
                             process.env.AIURL.replace(
                                 "{MODEL}",
@@ -1859,48 +1766,36 @@ form.addEventListener("submit", async (e) => {
                         });
                     }
 
-                    const currentDocSnapshot = await getDoc(typingDocRef);
-                    const currentDocData = currentDocSnapshot.exists()
-                        ? currentDocSnapshot.data()
-                        : {};
+                    return;
+                }
+                if (message.startsWith("/purge")) {
+                    if (store.get("verified")) {
+                        await removeTypingIndicator();
 
-                    if (
-                        currentDocData.people &&
-                        currentDocData.people.includes(name)
-                    ) {
-                        const index = currentDocData.people.indexOf(name);
-                        if (index > -1) {
-                            currentDocData.people.splice(index, 1);
-                        }
+                        const querySnapshot = await getDocs(messageRef);
 
-                        await setDoc(typingDocRef, {
-                            people: currentDocData.people,
+                        const deletePromises = [];
+
+                        querySnapshot.forEach(doc => {
+                            if (doc.id !== "typing") {
+                                deletePromises.push(deleteDoc(doc.ref));
+                            }
                         });
+                
+                        // Execute all deletions
+                        await Promise.all(deletePromises);
+
+                        return;
+                    } else {
+                        alert("No permission");
                     }
                     return;
                 } else {
-                    const currentDocSnapshot = await getDoc(typingDocRef);
-                    const currentDocData = currentDocSnapshot.exists()
-                        ? currentDocSnapshot.data()
-                        : {};
-
-                    if (
-                        currentDocData.people &&
-                        currentDocData.people.includes(name)
-                    ) {
-                        const index = currentDocData.people.indexOf(name);
-                        if (index > -1) {
-                            currentDocData.people.splice(index, 1);
-                        }
-
-                        await setDoc(typingDocRef, {
-                            people: currentDocData.people,
-                        });
-                    }
+                    await removeTypingIndicator();
                     return;
                 }
             } else {
-                alert("Please use #bot-spam");
+                
             }
         }
 
@@ -1957,17 +1852,6 @@ form.addEventListener("submit", async (e) => {
             console.error("Error adding document: ", error);
         }
     }
-    const currentDocSnapshot = await getDoc(typingDocRef);
-    const currentDocData = currentDocSnapshot.exists()
-        ? currentDocSnapshot.data()
-        : {};
 
-    if (currentDocData.people && currentDocData.people.includes(name)) {
-        const index = currentDocData.people.indexOf(name);
-        if (index > -1) {
-            currentDocData.people.splice(index, 1);
-        }
-
-        await setDoc(typingDocRef, { people: currentDocData.people });
-    }
+    await removeTypingIndicator();
 });
