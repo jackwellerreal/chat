@@ -1201,7 +1201,7 @@ async function removeTypingIndicator() {
         });
     }
 
-    console.log('removeTypingIndicator')
+    console.log("removeTypingIndicator");
 }
 
 // Send Message
@@ -1283,8 +1283,8 @@ form.addEventListener("submit", async (e) => {
 
         if (message.startsWith("/")) {
             if (channel.name.includes("bot") || message.startsWith("/purge")) {
-                const helpCommand = `embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact${
-                    process.env.AIBOT
+                const helpCommand = `embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact<br><span class="message-raw-text">/wordle</span><br>Get today's wordle answer${
+                    process.env.AIBOT === "true"
                         ? '<br><span class="message-raw-text">/aichat &lt;prompt&gt;</span><br>This command allows you to talk to ai<br><span class="message-raw-text">/aipic &lt;prompt&gt;</span><br>This command allows you to make images using ai'
                         : ""
                 }
@@ -1294,6 +1294,7 @@ form.addEventListener("submit", async (e) => {
                         : ""
                 }
                 `;
+                console.log(process.env.AIBOT === "true");
                 if (message.startsWith("/help")) {
                     await removeTypingIndicator();
 
@@ -1551,8 +1552,71 @@ form.addEventListener("submit", async (e) => {
 
                     return;
                 }
+                if (message.startsWith("/wordle")) {
+                    await removeTypingIndicator();
+
+                    const today = new Date();
+
+                    await fetch(
+                        `https://www.nytimes.com/svc/wordle/v2/${today.toISOString().split("T")[0]}.json`,
+                        {
+                            headers: {
+                                Accept: "application/json",
+                            },
+                        }
+                    )
+                        .then((response) => response.json())
+                        .then(async (data) => {
+                            await addDoc(messageRef, {
+                                user: {
+                                    auth: {
+                                        id: auth.currentUser.uid,
+                                        ip: ip,
+                                        userAgent: navigator.userAgent,
+                                    },
+                                    bot: true,
+                                    verified:
+                                        store.get("verified") == "true"
+                                            ? true
+                                            : false,
+                                    colour: color,
+                                    name: name,
+                                },
+                                message: {
+                                    content: `embed:Wordle answer today:\\n<b>${data.solution}</b>`,
+                                    command: message,
+                                },
+                                timestamp: new Date(),
+                            });
+                        })
+                        .catch(async (error) => {
+                            await addDoc(messageRef, {
+                                user: {
+                                    auth: {
+                                        id: auth.currentUser.uid,
+                                        ip: ip,
+                                        userAgent: navigator.userAgent,
+                                    },
+                                    bot: true,
+                                    verified:
+                                        store.get("verified") == "true"
+                                            ? true
+                                            : false,
+                                    colour: color,
+                                    name: name,
+                                },
+                                message: {
+                                    content: `Unable to fetch API: ${error}`,
+                                    command: message,
+                                },
+                                timestamp: new Date(),
+                            });
+                        });
+
+                    return;
+                }
                 if (message.startsWith("/aichat")) {
-                    if (process.env.AIBOT) {
+                    if (process.env.AIBOT === "true") {
                         await removeTypingIndicator();
 
                         await fetch(
@@ -1631,6 +1695,8 @@ form.addEventListener("submit", async (e) => {
                                 });
                             });
                     } else {
+                        await removeTypingIndicator();
+
                         await addDoc(messageRef, {
                             user: {
                                 auth: {
@@ -1657,7 +1723,7 @@ form.addEventListener("submit", async (e) => {
                     return;
                 }
                 if (message.startsWith("/aipic")) {
-                    if (process.env.AIBOT) {
+                    if (process.env.AIBOT === "true") {
                         await removeTypingIndicator();
                         await fetch(
                             process.env.AIURL.replace(
@@ -1743,6 +1809,8 @@ form.addEventListener("submit", async (e) => {
                                 });
                             });
                     } else {
+                        await removeTypingIndicator();
+
                         await addDoc(messageRef, {
                             user: {
                                 auth: {
@@ -1776,12 +1844,12 @@ form.addEventListener("submit", async (e) => {
 
                         const deletePromises = [];
 
-                        querySnapshot.forEach(doc => {
+                        querySnapshot.forEach((doc) => {
                             if (doc.id !== "typing") {
                                 deletePromises.push(deleteDoc(doc.ref));
                             }
                         });
-                
+
                         // Execute all deletions
                         await Promise.all(deletePromises);
 
@@ -1795,7 +1863,6 @@ form.addEventListener("submit", async (e) => {
                     return;
                 }
             } else {
-                
             }
         }
 
