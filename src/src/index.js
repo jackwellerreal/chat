@@ -77,15 +77,6 @@ const storage = getStorage();
 const auth = getAuth();
 const urlParams = new URLSearchParams(window.location.search);
 
-if (!store.get("name")) {
-    store.set("name", os.hostname());
-}
-if (!store.get("colour")) {
-    store.set("colour", "#ffffff");
-}
-
-ipc.send("name", store.get("name"));
-
 // Define elements
 
 const overlayForm = document.querySelector("#overlay");
@@ -113,13 +104,31 @@ const form = document.querySelector("#create");
 
 // Get info on chat
 
-const infoRef = await getDoc(doc(db, "info", "info"));
-const info = infoRef.data();
+const info = (await getDoc(doc(db, "info", "info"))).data();
+
+// Get users from database
+
+async function getAllUsers() {
+    const users = {};
+    const querySnapshot = await getDocs(collection(db, `info/users/users`));
+    querySnapshot.forEach((doc) => {
+        users[doc.id] = doc.data();
+    });
+    return users;
+}
+
+const users = await getAllUsers();
+
+const currentUserRef = doc(db, "info/users/users", auth.currentUser.uid);
+const currentUser = (await getDoc(currentUserRef)).data();
+
+// Send name to main process
+
+ipc.send("name", currentUser.profile.displayname);
 
 // Get info on server
 
-const serversRef = await getDoc(doc(db, "info", "servers"));
-const servers = serversRef.data().list;
+const servers = (await getDoc(doc(db, "info", "servers"))).data().list;
 
 const server =
     urlParams.get("server-id") == null
@@ -130,7 +139,7 @@ const server =
 
 servers.forEach((serverList) => {
     let localServerList =
-        store.get("servers") == null ? [] : store.get("servers").split(",");
+        currentUser.servers == null ? [] : currentUser.servers;
     if (
         serverList.private == false ||
         localServerList.includes(serverList.id)
@@ -185,20 +194,24 @@ document.querySelector("#addServer").addEventListener("click", () => {
         overlayForm.style.display = "none";
     });
 
-    document.querySelector("#button-confirm").addEventListener("click", () => {
-        const serverID = document.querySelector("#form-id").value;
+    document
+        .querySelector("#button-confirm")
+        .addEventListener("click", async () => {
+            const serverID = document.querySelector("#form-id").value;
 
-        formElement.remove();
-        overlayForm.style.display = "none";
+            formElement.remove();
+            overlayForm.style.display = "none";
 
-        if (store.get("servers") == null) {
-            let servers = `${serverID}`;
-            store.set("servers", servers);
-        } else {
-            let servers = store.get("servers") + `,${serverID}`;
-            store.set("servers", servers);
-        }
-    });
+            if (currentUser.servers == null) {
+                currentUser.servers = [serverID];
+
+                await setDoc(currentUserRef, currentUser);
+            } else {
+                currentUser.servers.push(serverID);
+
+                await setDoc(currentUserRef, currentUser);
+            }
+        });
 });
 
 document.querySelector("#findServer").addEventListener("click", () => {
@@ -254,22 +267,26 @@ serverBanner.style.backgroundPosition = `center center`;
 serverBanner.style.backgroundSize = `cover`;
 
 document.getElementById("settings-profile-name").innerText =
-    store.get("name") == null ? "Unnamed_User" : store.get("name");
+    currentUser.profile.displayname == null
+        ? "Unnamed_User"
+        : currentUser.profile.displayname;
 document.getElementById("settings-profile-picture").src =
     process.env.PROFILEPICAPI.replace(
         "{NAME}",
-        store.get("name") == null ? "Unnamed_User" : store.get("name")
+        currentUser.profile.displayname == null
+            ? "Unnamed_User"
+            : currentUser.profile.displayname
     ).replace(
         "{COLOR}",
-        (store.get("colour") == null ? "#ffffff" : store.get("colour")).replace(
-            "#",
-            ""
-        )
+        (currentUser.profile.color == null
+            ? "#ffffff"
+            : currentUser.profile.color
+        ).replace("#", "")
     );
 
 serverName.addEventListener("click", () => {
     alert(
-        `Owned by: ${server.owner}\nManaged by: ${info.manager}\nShowing ${info.messageCount} messages\n${store.get("verified") ? "You are verified!" : ""}`
+        `Owned by: ${server.owner}\nManaged by: ${info.manager}\nShowing ${info.messageCount} messages\n${currentUser.profile.verified ? "You are verified!" : ""}`
     );
 });
 
@@ -278,7 +295,7 @@ serverName.addEventListener("click", () => {
 const onlineDocRef = doc(db, "info", "online");
 
 async function setOnline() {
-    const name = store.get("name");
+    const name = currentUser.profile.displayname;
     if (name == "Unnamed_User") {
         return;
     }
@@ -292,8 +309,8 @@ async function setOnline() {
     if (peopleList.some((item) => item.name == name)) return;
     peopleList.push({
         name: name,
-        verified: store.get("verified"),
-        color: store.get("colour"),
+        verified: currentUser.profile.verified,
+        color: currentUser.profile.color,
     });
 
     await setDoc(onlineDocRef, { people: peopleList });
@@ -572,9 +589,11 @@ async function displayPosts(posts) {
             time = momentObj.format("DD/MM/YYYY HH:mm");
         }
 
-        var name = post.user.name;
-        const verified = post.user.verified;
-        const bot = post.user.bot;
+        const author = users[post.uid];
+        const name = author.profile.displayname;
+        const verified = author.profile.verified;
+        const color = author.profile.color;
+
         const message = twemoji
             .parse(checkMessage(post.message.content), {
                 size: "svg",
@@ -584,13 +603,16 @@ async function displayPosts(posts) {
                 "https://twemoji.maxcdn.com/v/14.0.2/svg/",
                 "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/"
             );
-        const color = post.user.colour;
+
+        const bot = post.bot;
         const command = post.message.command;
 
         const messageElement = document.createElement("div");
         const mention =
             message.match(/(?<!\\)@everyone/) ||
-            message.match(new RegExp(`(?<!\\\\)@${store.get("name")}`))
+            message.match(
+                new RegExp(`(?<!\\\\)@${currentUser.profile.displayname}`)
+            )
                 ? "message-mention"
                 : "";
 
@@ -641,11 +663,11 @@ async function displayPosts(posts) {
         messagesDiv.appendChild(messageElement);
 
         const previousMessage = messagesDiv.children[i - 1];
-        if (previousMessage && channel.name != "anonymous") {
+        if (previousMessage) {
             const previousMessageName =
                 previousMessage.children[1].children[0].children[0].innerHTML.trim();
             if (
-                previousMessageName == post.user.name &&
+                previousMessageName == name &&
                 !bot &&
                 previousMessage.getAttribute("bot") == "false"
             ) {
@@ -1063,9 +1085,9 @@ editSettings.addEventListener("click", async (e) => {
     </div>
     <div class="overlay-form-questions">
         <h2>Username</h2>
-        <input id="form-name" type="text" placeholder="${store.get("name")}" />
+        <input id="form-name" type="text" placeholder="${currentUser.profile.displayname}" />
         <h2>Colour</h2>
-        <input id="form-colour" type="color" value="${store.get("colour")}" />
+        <input id="form-colour" type="color" value="${currentUser.profile.color}" />
     </div>
     <div class="overlay-form-confirm">
         <button id="button-exit">Cancel</button>
@@ -1093,24 +1115,27 @@ editSettings.addEventListener("click", async (e) => {
 
                 if (
                     onlineDocData.people &&
-                    onlineDocData.people.includes(store.get("name"))
+                    onlineDocData.people.includes(
+                        currentUser.profile.displayname
+                    )
                 ) {
                     const index = onlineDocData.people.indexOf(
-                        store.get("name")
+                        currentUser.profile.displayname
                     );
                     if (index > -1) {
                         onlineDocData.people.splice(index, 1);
                     }
 
-                    await setDoc(onlineDocRef, {
-                        people: onlineDocData.people,
-                    });
+                    currentUser.profile.displayname = name;
+                    await setDoc(currentUserRef, currentUser);
                 }
 
-                store.set("name", name);
+                currentUser.profile.displayname = name;
+                await setDoc(currentUserRef, currentUser);
             }
             if (colour) {
-                store.set("colour", colour);
+                currentUser.profile.color = colour;
+                await setDoc(currentUserRef, currentUser);
             }
 
             formElement.remove();
@@ -1148,7 +1173,7 @@ onSnapshot(typingDocRef, (doc) => {
 let typingTimeout;
 
 messageInput.addEventListener("input", async (e) => {
-    const name = store.get("name");
+    const name = currentUser.profile.displayname;
 
     const typingDocSnapshot = await getDoc(typingDocRef);
     const typingDocData = typingDocSnapshot.exists()
@@ -1159,7 +1184,6 @@ messageInput.addEventListener("input", async (e) => {
     if (peopleList.includes(name)) return;
     peopleList.push(name);
 
-    if (channel.name == "anonymous") return;
     await setDoc(typingDocRef, { people: peopleList });
 
     // Reset the timeout
@@ -1184,7 +1208,7 @@ messageInput.addEventListener("input", async (e) => {
 // Remove typing indicator
 
 async function removeTypingIndicator() {
-    const name = store.get("name");
+    const name = currentUser.profile.displayname;
     const currentDocSnapshot = await getDoc(typingDocRef);
     const currentDocData = currentDocSnapshot.exists()
         ? currentDocSnapshot.data()
@@ -1212,14 +1236,11 @@ form.addEventListener("submit", async (e) => {
     if (urlParams.get("voice-channel")) {
         return;
     }
-    const name = store.get("name");
+    const name = currentUser.profile.displayname;
+    const color = currentUser.profile.color;
+    const verified = currentUser.profile.verified;
+
     const message = messageInput.value;
-    const color = store.get("colour");
-    const ip = await fetch("https://api.ipify.org/?format=json")
-        .then((response) => response.json())
-        .then((data) => {
-            return data.ip;
-        });
 
     messageInput.value = "";
     if (auth.currentUser) {
@@ -1241,21 +1262,12 @@ form.addEventListener("submit", async (e) => {
                 getDownloadURL(storageRef)
                     .then(async (url) => {
                         await addDoc(messageRef, {
-                            user: {
-                                auth: {
-                                    id: auth.currentUser.uid,
-                                    ip: ip,
-                                    userAgent: navigator.userAgent,
-                                },
-                                bot: false,
-                                verified: store.get("verified"),
-                                colour: color,
-                                name: name,
-                            },
+                            bot: false,
                             message: {
                                 content: `image:${url}`,
                             },
                             timestamp: new Date(),
+                            uid: auth.currentUser.uid,
                         });
                     })
                     .catch((error) => {
@@ -1289,32 +1301,22 @@ form.addEventListener("submit", async (e) => {
                         : ""
                 }
                 ${
-                    store.get("verified")
+                    verified
                         ? '<br><span class="message-raw-text">/purge</span><br>This command deletes all messages in a channel'
                         : ""
                 }
                 `;
-                console.log(process.env.AIBOT === "true");
                 if (message.startsWith("/help")) {
                     await removeTypingIndicator();
 
                     await addDoc(messageRef, {
-                        user: {
-                            auth: {
-                                id: auth.currentUser.uid,
-                                ip: ip,
-                                userAgent: navigator.userAgent,
-                            },
-                            bot: true,
-                            verified: store.get("verified"),
-                            colour: color,
-                            name: name,
-                        },
+                        bot: true,
                         message: {
                             content: helpCommand,
                             command: message,
                         },
                         timestamp: new Date(),
+                        uid: auth.currentUser.uid,
                     });
 
                     return;
@@ -1323,7 +1325,9 @@ form.addEventListener("submit", async (e) => {
                     await removeTypingIndicator();
 
                     if (info.codes.includes(message.replace("/verify ", ""))) {
-                        store.set("verified", true);
+                        currentUser.profile.verified = true;
+                        await setDoc(currentUserRef, currentUser);
+
                         alert("You are now Verified");
                     } else {
                         alert("Invalid Verification Code");
@@ -1335,22 +1339,13 @@ form.addEventListener("submit", async (e) => {
                     await removeTypingIndicator();
 
                     await addDoc(messageRef, {
-                        user: {
-                            auth: {
-                                id: auth.currentUser.uid,
-                                ip: ip,
-                                userAgent: navigator.userAgent,
-                            },
-                            bot: true,
-                            verified: store.get("verified"),
-                            colour: color,
-                            name: name,
-                        },
+                        bot: true,
                         message: {
                             content: `${Math.floor(Math.random() * 100)}`,
                             command: message,
                         },
                         timestamp: new Date(),
+                        uid: auth.currentUser.uid,
                     });
 
                     return;
@@ -1359,17 +1354,7 @@ form.addEventListener("submit", async (e) => {
                     await removeTypingIndicator();
 
                     await addDoc(messageRef, {
-                        user: {
-                            auth: {
-                                id: auth.currentUser.uid,
-                                ip: ip,
-                                userAgent: navigator.userAgent,
-                            },
-                            bot: true,
-                            verified: store.get("verified"),
-                            colour: color,
-                            name: name,
-                        },
+                        bot: true,
                         message: {
                             content: `embed:${
                                 (Math.floor(Math.random() * 2) == 0) == true
@@ -1379,6 +1364,7 @@ form.addEventListener("submit", async (e) => {
                             command: message,
                         },
                         timestamp: new Date(),
+                        uid: auth.currentUser.uid,
                     });
 
                     return;
@@ -1410,22 +1396,13 @@ form.addEventListener("submit", async (e) => {
                             status = `You lost ${process.env.ECONOMYCURRENCY}${message.replace("/slots ", "")}`;
                         }
                         await addDoc(messageRef, {
-                            user: {
-                                auth: {
-                                    id: auth.currentUser.uid,
-                                    ip: ip,
-                                    userAgent: navigator.userAgent,
-                                },
-                                bot: true,
-                                verified: store.get("verified"),
-                                colour: color,
-                                name: name,
-                            },
+                            bot: true,
                             message: {
                                 content: `embed:${status}\\n${slots1} | ${slots2} | ${slots3}`,
                                 command: message,
                             },
                             timestamp: new Date(),
+                            uid: auth.currentUser.uid,
                         });
 
                         return;
@@ -1444,48 +1421,24 @@ form.addEventListener("submit", async (e) => {
                         .then((response) => response.json())
                         .then(async (data) => {
                             await addDoc(messageRef, {
-                                user: {
-                                    auth: {
-                                        id: auth.currentUser.uid,
-                                        ip: ip,
-                                        userAgent: navigator.userAgent,
-                                    },
-                                    bot: true,
-                                    verified:
-                                        store.get("verified") == "true"
-                                            ? true
-                                            : false,
-                                    colour: color,
-                                    name: name,
-                                },
+                                bot: true,
                                 message: {
                                     content: `${data.joke}`,
                                     command: message,
                                 },
                                 timestamp: new Date(),
+                                uid: auth.currentUser.uid,
                             });
                         })
                         .catch(async (error) => {
                             await addDoc(messageRef, {
-                                user: {
-                                    auth: {
-                                        id: auth.currentUser.uid,
-                                        ip: ip,
-                                        userAgent: navigator.userAgent,
-                                    },
-                                    bot: true,
-                                    verified:
-                                        store.get("verified") == "true"
-                                            ? true
-                                            : false,
-                                    colour: color,
-                                    name: name,
-                                },
+                                bot: true,
                                 message: {
                                     content: `Unable to fetch API: ${error}`,
                                     command: message,
                                 },
                                 timestamp: new Date(),
+                                uid: auth.currentUser.uid,
                             });
                         });
 
@@ -1505,48 +1458,24 @@ form.addEventListener("submit", async (e) => {
                         .then((response) => response.json())
                         .then(async (data) => {
                             await addDoc(messageRef, {
-                                user: {
-                                    auth: {
-                                        id: auth.currentUser.uid,
-                                        ip: ip,
-                                        userAgent: navigator.userAgent,
-                                    },
-                                    bot: true,
-                                    verified:
-                                        store.get("verified") == "true"
-                                            ? true
-                                            : false,
-                                    colour: color,
-                                    name: name,
-                                },
+                                bot: true,
                                 message: {
                                     content: `${data.text.replace("`", "'")}`,
                                     command: message,
                                 },
                                 timestamp: new Date(),
+                                uid: auth.currentUser.uid,
                             });
                         })
                         .catch(async (error) => {
                             await addDoc(messageRef, {
-                                user: {
-                                    auth: {
-                                        id: auth.currentUser.uid,
-                                        ip: ip,
-                                        userAgent: navigator.userAgent,
-                                    },
-                                    bot: true,
-                                    verified:
-                                        store.get("verified") == "true"
-                                            ? true
-                                            : false,
-                                    colour: color,
-                                    name: name,
-                                },
+                                bot: true,
                                 message: {
                                     content: `Unable to fetch API: ${error}`,
                                     command: message,
                                 },
                                 timestamp: new Date(),
+                                uid: auth.currentUser.uid,
                             });
                         });
 
@@ -1568,48 +1497,24 @@ form.addEventListener("submit", async (e) => {
                         .then((response) => response.json())
                         .then(async (data) => {
                             await addDoc(messageRef, {
-                                user: {
-                                    auth: {
-                                        id: auth.currentUser.uid,
-                                        ip: ip,
-                                        userAgent: navigator.userAgent,
-                                    },
-                                    bot: true,
-                                    verified:
-                                        store.get("verified") == "true"
-                                            ? true
-                                            : false,
-                                    colour: color,
-                                    name: name,
-                                },
+                                bot: true,
                                 message: {
                                     content: `embed:Wordle answer today:\\n<b>${data.solution}</b>`,
                                     command: message,
                                 },
                                 timestamp: new Date(),
+                                uid: auth.currentUser.uid,
                             });
                         })
                         .catch(async (error) => {
                             await addDoc(messageRef, {
-                                user: {
-                                    auth: {
-                                        id: auth.currentUser.uid,
-                                        ip: ip,
-                                        userAgent: navigator.userAgent,
-                                    },
-                                    bot: true,
-                                    verified:
-                                        store.get("verified") == "true"
-                                            ? true
-                                            : false,
-                                    colour: color,
-                                    name: name,
-                                },
+                                bot: true,
                                 message: {
                                     content: `Unable to fetch API: ${error}`,
                                     command: message,
                                 },
                                 timestamp: new Date(),
+                                uid: auth.currentUser.uid,
                             });
                         });
 
@@ -1650,73 +1555,37 @@ form.addEventListener("submit", async (e) => {
                             .then((response) => response.json())
                             .then(async (data) => {
                                 await addDoc(messageRef, {
-                                    user: {
-                                        auth: {
-                                            id: auth.currentUser.uid,
-                                            ip: ip,
-                                            userAgent: navigator.userAgent,
-                                        },
-                                        bot: true,
-                                        verified:
-                                            store.get("verified") == "true"
-                                                ? true
-                                                : false,
-                                        colour: color,
-                                        name: name,
-                                    },
+                                    bot: true,
                                     message: {
                                         content: data.result.response,
                                         command: message,
                                     },
                                     timestamp: new Date(),
+                                    uid: auth.currentUser.uid,
                                 });
                             })
                             .catch(async (error) => {
                                 await addDoc(messageRef, {
-                                    user: {
-                                        auth: {
-                                            id: auth.currentUser.uid,
-                                            ip: ip,
-                                            userAgent: navigator.userAgent,
-                                        },
-                                        bot: true,
-                                        verified:
-                                            store.get("verified") == "true"
-                                                ? true
-                                                : false,
-                                        colour: color,
-                                        name: name,
-                                    },
+                                    bot: true,
                                     message: {
                                         content: `Unable to fetch API: ${error}`,
                                         command: message,
                                     },
                                     timestamp: new Date(),
+                                    uid: auth.currentUser.uid,
                                 });
                             });
                     } else {
                         await removeTypingIndicator();
 
                         await addDoc(messageRef, {
-                            user: {
-                                auth: {
-                                    id: auth.currentUser.uid,
-                                    ip: ip,
-                                    userAgent: navigator.userAgent,
-                                },
-                                bot: true,
-                                verified:
-                                    store.get("verified") == "true"
-                                        ? true
-                                        : false,
-                                colour: color,
-                                name: name,
-                            },
+                            bot: true,
                             message: {
                                 content: `AI is disabled`,
                                 command: message,
                             },
                             timestamp: new Date(),
+                            uid: auth.currentUser.uid,
                         });
                     }
 
@@ -1753,27 +1622,13 @@ form.addEventListener("submit", async (e) => {
                                         getDownloadURL(storageRef)
                                             .then(async (url) => {
                                                 await addDoc(messageRef, {
-                                                    user: {
-                                                        auth: {
-                                                            id: auth.currentUser
-                                                                .uid,
-                                                            ip: ip,
-                                                            userAgent:
-                                                                navigator.userAgent,
-                                                        },
-                                                        bot: true,
-                                                        verified:
-                                                            store.get(
-                                                                "verified"
-                                                            ),
-                                                        colour: color,
-                                                        name: name,
-                                                    },
+                                                    bot: true,
                                                     message: {
                                                         content: `image:${url}`,
                                                         command: message,
                                                     },
                                                     timestamp: new Date(),
+                                                    uid: auth.currentUser.uid,
                                                 });
                                             })
                                             .catch((error) => {
@@ -1787,57 +1642,33 @@ form.addEventListener("submit", async (e) => {
                             })
                             .catch(async (error) => {
                                 await addDoc(messageRef, {
-                                    user: {
-                                        auth: {
-                                            id: auth.currentUser.uid,
-                                            ip: ip,
-                                            userAgent: navigator.userAgent,
-                                        },
-                                        bot: true,
-                                        verified:
-                                            store.get("verified") == "true"
-                                                ? true
-                                                : false,
-                                        colour: color,
-                                        name: name,
-                                    },
+                                    bot: true,
                                     message: {
                                         content: `Unable to fetch API: ${error}`,
                                         command: message,
                                     },
                                     timestamp: new Date(),
+                                    uid: auth.currentUser.uid,
                                 });
                             });
                     } else {
                         await removeTypingIndicator();
 
                         await addDoc(messageRef, {
-                            user: {
-                                auth: {
-                                    id: auth.currentUser.uid,
-                                    ip: ip,
-                                    userAgent: navigator.userAgent,
-                                },
-                                bot: true,
-                                verified:
-                                    store.get("verified") == "true"
-                                        ? true
-                                        : false,
-                                colour: color,
-                                name: name,
-                            },
+                            bot: true,
                             message: {
                                 content: `AI is disabled`,
                                 command: message,
                             },
                             timestamp: new Date(),
+                            uid: auth.currentUser.uid,
                         });
                     }
 
                     return;
                 }
                 if (message.startsWith("/purge")) {
-                    if (store.get("verified")) {
+                    if (verified) {
                         await removeTypingIndicator();
 
                         const querySnapshot = await getDocs(messageRef);
@@ -1866,54 +1697,16 @@ form.addEventListener("submit", async (e) => {
             }
         }
 
-        // Anonymous Channel
-
-        if (channel.name == "anonymous") {
-            try {
-                await addDoc(messageRef, {
-                    user: {
-                        auth: {
-                            id: null,
-                            ip: null,
-                            userAgent: null,
-                        },
-                        bot: false,
-                        verified: false,
-                        colour: `#${Math.floor(
-                            Math.random() * 16777215
-                        ).toString(16)}`,
-                        name: "Anonymous",
-                    },
-                    message: {
-                        content: message,
-                    },
-                    timestamp: new Date(),
-                });
-            } catch (error) {
-                console.error("Error adding document: ", error);
-            }
-            return;
-        }
-
         // Main
 
         try {
             await addDoc(messageRef, {
-                user: {
-                    auth: {
-                        id: auth.currentUser.uid,
-                        ip: ip,
-                        userAgent: navigator.userAgent,
-                    },
-                    bot: false,
-                    verified: store.get("verified"),
-                    colour: color,
-                    name: name,
-                },
+                bot: false,
                 message: {
                     content: message,
                 },
                 timestamp: new Date(),
+                uid: auth.currentUser.uid,
             });
         } catch (error) {
             console.error("Error adding document: ", error);

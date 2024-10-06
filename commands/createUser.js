@@ -10,12 +10,13 @@ const firebaseConfig = {
 
 const firebase = require("firebase/compat/app");
 require("firebase/compat/auth");
+require("firebase/compat/firestore");
 
 firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 const auth = firebase.auth();
 
 const prompt = require("prompt-sync")({ sigint: true });
-
 const Colours = require("./colours");
 const colours = new Colours();
 
@@ -30,19 +31,35 @@ const password = prompt(
     `${colours.FgYellow}Please enter a ${colours.FgBlue}password${colours.FgYellow}: ${colours.Reset}`
 );
 
-firebase
-    .auth()
-    .createUserWithEmailAndPassword(username + "@chat.com", password)
-    .then((userCredential) => {
-        console.log(
-            `${colours.FgGreen}✅ Successfully created a user account${colours.Reset}`
-        );
-    })
-    .catch((error) => {
-        console.log(
-            `${colours.FgRed}❌ Unsuccessfully created a user account${colours.Reset}`
-        );
-        console.log(`${error.code}: ${error.message}`);
-    });
+async function createUser() {
+    try {
+        const userCredential = await auth.createUserWithEmailAndPassword(username + "@chat.com", password);
+        const user = userCredential.user;
+        console.log(`${colours.FgGreen}✅ Successfully created user auth${colours.Reset}`);
 
-// TODO: make document that has username colour verified etc, for multi device support
+        const usersRef = db.collection("info/users/users").doc(user.uid);
+        const data = {
+            account: {
+                uid: user.uid,
+                username: username,
+            },
+            profile: {
+                color: "#ffffff",
+                displayname: username,
+                verified: false,
+            },
+            servers: [],
+        };
+
+        await usersRef.set(data);
+        console.log(`${colours.FgGreen}✅ Successfully created user doc${colours.Reset}`);
+
+        console.log(`${colours.FgGreen}✅ Successfully created user${colours.Reset}`);
+        process.exit();
+    } catch (error) {
+        console.log(`${colours.FgRed}❌ Unsuccessfully created user${colours.Reset}`);
+        console.log(`${error.code}: ${error.message}`);
+    }
+}
+
+createUser();
