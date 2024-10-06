@@ -14,7 +14,6 @@
         "axios": "^1.7.7",
         "dotenv": "^16.4.5",
         "electron-squirrel-startup": "^1.0.0",
-        "electron-store": "^8.2.0",
         "firebase": "^10.11.0",
         "prompt-sync": "^4.2.0",
         "global-tunnel-ng": "^2.7.1"

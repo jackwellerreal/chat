@@ -1,8 +1,5 @@
 // Imports and packages
 
-const Store = require("electron-store");
-Store.initRenderer();
-
 const { app, BrowserWindow, shell, ipcMain } = require("electron");
 const fs = require("node:fs");
 const axios = require("axios");
@@ -35,15 +32,15 @@ let name;
 let proxy = false;
 let proxyAuth = [];
 
-async function isBehindProxy() {
-    try {
+try {
+    (async () => {
         await axios.get("https://api.ipify.org/?format=json", {
             timeout: 3000,
         });
-        return false;
-    } catch (error) {
-        return true;
-    }
+    })();
+    isBehindProxy = false;
+} catch (error) {
+    isBehindProxy = true;
 }
 
 // Load Windows
@@ -51,7 +48,7 @@ async function isBehindProxy() {
 app.whenReady().then(async () => {
     // Check if behind proxy.
 
-    if (await isBehindProxy()) {
+    if (isBehindProxy) {
         // Make window to prompt for password
 
         const authWindow = new BrowserWindow({
@@ -113,7 +110,7 @@ app.whenReady().then(async () => {
             );
 
             mainWindow.reload();
-            authWindow.close()
+            authWindow.close();
         });
     } else {
         // Make main window
@@ -143,35 +140,6 @@ app.whenReady().then(async () => {
             return { action: "deny" };
         });
     }
-});
-
-// Make user offline when app is quit
-
-app.on("window-all-closed", async () => {
-    if (mainWindow) {
-        if (await isBehindProxy()) {
-            globalTunnel.initialize({
-                host: process.env.PROXY.split(":")[0],
-                port: process.env.PROXY.split(":")[1],
-                proxyAuth: proxyAuth[0] + ":" + proxyAuth[1],
-            });
-        }
-
-        const onlineRef = db.collection("info").doc("online");
-        const onlineDoc = await onlineRef.get();
-        const onlineData = onlineDoc.exists ? onlineDoc.data() : {};
-
-        if (onlineData.people && onlineData.people.includes(name)) {
-            const index = onlineData.people.indexOf(name);
-            if (index > -1) {
-                onlineData.people.splice(index, 1);
-            }
-            await onlineRef.set({ people: onlineData.people });
-        }
-
-        globalTunnel.end();
-    }
-    app.quit();
 });
 
 // Get name form client
@@ -206,8 +174,23 @@ ipcMain.on("max", () => {
     }
 });
 
+// Make user offline when app is quit
+
 ipcMain.on("close", async () => {
+    const onlineRef = db.collection("info").doc("online");
+    const onlineData = (await onlineRef.get()).data().people;
+    console.log(onlineData);
+
+    const updatedData = onlineData.filter((user) => user.name !== name);
+    await onlineRef.update({ people: updatedData });
+
+    console.log("User offline");
+
     mainWindow.close();
+});
+
+app.on("window-all-closed", async () => {
+    app.quit();
 });
 
 // Set dock icon

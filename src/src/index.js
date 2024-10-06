@@ -36,8 +36,6 @@ const firebaseConfig = {
     appId: process.env.APPID,
 };
 
-const Store = require("electron-store");
-const store = new Store();
 const ipc = ipcRenderer;
 
 // Window Controls
