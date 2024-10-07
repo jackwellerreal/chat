@@ -80,7 +80,6 @@ const urlParams = new URLSearchParams(window.location.search);
 
 const overlayForm = document.querySelector("#overlay");
 const pageTitle = document.querySelector("#title");
-const favicon = document.querySelector("#favicon");
 
 const serverName = document.querySelector("#server-name");
 const serverDesc = document.querySelector("#server-description");
@@ -305,7 +304,6 @@ channelSidebar.addEventListener("scroll", function () {
 // Provide information on server
 
 pageTitle.innerHTML = `${server.name} - #${channel.name}`;
-favicon.href = server.icon;
 serverName.innerHTML = `${server.name} <div id="server-info" style="display: flex;align-items: center;height: 25px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="height: 16px;fill: #ffffff;"><path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg></div>`;
 serverDesc.innerHTML = server.description;
 serverBanner.style.background = `url(${server.banner})`;

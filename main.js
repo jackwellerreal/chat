@@ -54,7 +54,7 @@ app.whenReady().then(async () => {
             modal: true,
             parent: null,
             webPreferences: {
-                devTools: true,
+                devTools: false,
                 nodeIntegration: true,
                 contextIsolation: false,
             },
@@ -78,7 +78,7 @@ app.whenReady().then(async () => {
                 title: "Chat V2",
                 icon: "./assets/icon.png",
                 webPreferences: {
-                    devTools: true,
+                    devTools: false,
                     nodeIntegration: true,
                     contextIsolation: false,
                 },
@@ -118,7 +118,7 @@ app.whenReady().then(async () => {
             title: "Chat V2",
             icon: "./assets/icon.png",
             webPreferences: {
-                devTools: true,
+                devTools: false,
                 nodeIntegration: true,
                 contextIsolation: false,
             },
@@ -174,7 +174,7 @@ ipcMain.on("max", () => {
 ipcMain.on("close", async () => {
     const onlineRef = db.collection("info").doc("online");
     const onlineData = (await onlineRef.get()).data().people;
-    
+
     const updatedData = onlineData.filter((user) => user.name !== name);
     await onlineRef.update({ people: updatedData });
 
