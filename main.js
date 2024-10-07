@@ -3,7 +3,6 @@
 const { app, BrowserWindow, shell, ipcMain } = require("electron");
 const fs = require("node:fs");
 const axios = require("axios");
-const globalTunnel = require("global-tunnel-ng");
 
 require("dotenv").config();
 
@@ -28,9 +27,6 @@ let mainWindow;
 let name;
 
 // Check if behind proxy or no internet
-
-let proxy = false;
-let proxyAuth = [];
 
 try {
     (async () => {

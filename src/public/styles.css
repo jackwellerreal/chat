@@ -155,7 +155,8 @@ button:hover {
     letter-spacing: 0.02em;
 }
 
-.overlay-form-questions input[type="text"] {
+.overlay-form-questions input[type="text"],
+.overlay-form-questions input[type="password"] {
     padding: 10px;
     margin-bottom: 16px;
     font-size: 16px;
@@ -679,14 +680,13 @@ button:hover {
     grid-template-columns: repeat(2, 1fr);
     gap: 1em;
     padding: 1em;
-    
 }
 
-@media screen and  (max-width: 1352px) {
+@media screen and (max-width: 1352px) {
     .video {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(2, 1fr);
-    }   
+    }
 }
 
 .video video {
