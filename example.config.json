@@ -1,0 +1,20 @@
+{
+    "firebase": {
+        "apiKey": "",
+        "authDomain": "",
+        "projectId": "",
+        "storageBucket": "",
+        "messagingSenderId": "",
+        "appId": ""
+    },
+    "tenorAPI": "",
+    "profilePicAPI": "",
+    "proxy": "",
+    "messageLength": 0,
+    "economyCurrency": "",
+    "ai": {
+        "enabled": false,
+        "url": "",
+        "token": ""
+    }
+}

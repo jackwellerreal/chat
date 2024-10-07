@@ -4,20 +4,19 @@ const { app, BrowserWindow, shell, ipcMain } = require("electron");
 const fs = require("node:fs");
 const axios = require("axios");
 
-require("dotenv").config();
-
 const firebase = require("firebase/compat/app");
 require("firebase/compat/firestore");
 
 // Firebase Config
 
+const config = require("./config.json");
 const firebaseConfig = {
-    apiKey: process.env.APIKEY,
-    authDomain: process.env.AUTHDOMAIN,
-    projectId: process.env.PROJECTID,
-    storageBucket: process.env.STORAGEBUCKET,
-    messagingSenderId: process.env.MESSAGESENDERID,
-    appId: process.env.APPID,
+    apiKey: config.firebase.apiKey,
+    authDomain: config.firebase.authDomain,
+    projectId: config.firebase.projectId,
+    storageBucket: config.firebase.storageBucket,
+    messagingSenderId: config.firebase.messagingSenderId,
+    appId: config.firebase.appId,
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -175,12 +174,9 @@ ipcMain.on("max", () => {
 ipcMain.on("close", async () => {
     const onlineRef = db.collection("info").doc("online");
     const onlineData = (await onlineRef.get()).data().people;
-    console.log(onlineData);
-
+    
     const updatedData = onlineData.filter((user) => user.name !== name);
     await onlineRef.update({ people: updatedData });
-
-    console.log("User offline");
 
     mainWindow.close();
 });
@@ -188,7 +184,3 @@ ipcMain.on("close", async () => {
 app.on("window-all-closed", async () => {
     app.quit();
 });
-
-// Set dock icon
-
-app.dock.setIcon("./assets/icon.png");

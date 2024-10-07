@@ -1,8 +1,8 @@
 /node_modules
 /dist
 /out
-.env
 .DS_Store
 package-lock.json
+config.json
 test.js
 final.html

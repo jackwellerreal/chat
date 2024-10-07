@@ -26,14 +26,15 @@ import {
 const { ipcRenderer } = require("electron");
 const os = require("os");
 
-require("dotenv").config();
+const config = require("../../config.json");
+
 const firebaseConfig = {
-    apiKey: process.env.APIKEY,
-    authDomain: process.env.AUTHDOMAIN,
-    projectId: process.env.PROJECTID,
-    storageBucket: process.env.STORAGEBUCKET,
-    messagingSenderId: process.env.MESSAGESENDERID,
-    appId: process.env.APPID,
+    apiKey: config.firebase.apiKey,
+    authDomain: config.firebase.authDomain,
+    projectId: config.firebase.projectId,
+    storageBucket: config.firebase.storageBucket,
+    messagingSenderId: config.firebase.messagingSenderId,
+    appId: config.firebase.appId,
 };
 
 const ipc = ipcRenderer;
@@ -315,13 +316,14 @@ document.getElementById("settings-profile-name").innerText =
     currentUser.profile.displayname == null
         ? "Unnamed_User"
         : currentUser.profile.displayname;
-document.getElementById("settings-profile-picture").src =
-    process.env.PROFILEPICAPI.replace(
+document.getElementById("settings-profile-picture").src = config.profilePicAPI
+    .replace(
         "{NAME}",
         currentUser.profile.displayname == null
             ? "Unnamed_User"
             : currentUser.profile.displayname
-    ).replace(
+    )
+    .replace(
         "{COLOR}",
         (currentUser.profile.color == null
             ? "#ffffff"
@@ -380,10 +382,12 @@ onSnapshot(onlineDocRef, async () => {
                 </mask>
                 <foreignObject x="0" y="0" width="32" height="32" mask="url(#:r4:)">
                     <div>
-                        <img src="${process.env.PROFILEPICAPI.replace(
-                            "{NAME}",
-                            user.name.trim()
-                        ).replace("{COLOR}", user.color.replace("#", ""))}" />
+                        <img src="${config.profilePicAPI
+                            .replace("{NAME}", user.name.trim())
+                            .replace(
+                                "{COLOR}",
+                                user.color.replace("#", "")
+                            )}" />
                     </div>
                 </foreignObject>
                 <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
@@ -670,13 +674,12 @@ async function displayPosts(posts) {
 
         messageElement.innerHTML = `
             <div style="height: 60px;display: flex;align-items: center;">
-                <img src="${process.env.PROFILEPICAPI.replace(
-                    "{NAME}",
-                    name.trim()
-                ).replace(
-                    "{COLOR}",
-                    color.replace("#", "")
-                )}" class="message-pfp">
+                <img src="${config.profilepicapi
+                    .replace("{NAME}", name.trim())
+                    .replace(
+                        "{COLOR}",
+                        color.replace("#", "")
+                    )}" class="message-pfp">
             </div>
             <div>
                 <div class="message-sender">
@@ -1027,7 +1030,7 @@ fileUpload.onchange = () => {
 
 gifIcon.addEventListener("click", async (e) => {
     fetch(
-        `https://tenor.googleapis.com/v2/search?q=${messageInput.value}&key=${process.env.TENORAPI}&client_key=my_test_app&limit=1`,
+        `https://tenor.googleapis.com/v2/search?q=${messageInput.value}&key=${config.tenorAPI}&client_key=my_test_app&limit=1`,
         { method: "GET" }
     )
         .then((response) => response.json())
@@ -1250,7 +1253,7 @@ form.addEventListener("submit", async (e) => {
         if (message === "" || color === "") {
             return;
         }
-        if (message.length > process.env.MESSAGELENGTH) {
+        if (message.length > config.messageLength) {
             return;
         }
         if (message.includes("<") || message.includes(">")) {
@@ -1262,7 +1265,7 @@ form.addEventListener("submit", async (e) => {
         if (message.startsWith("/")) {
             if (channel.name.includes("bot") || message.startsWith("/purge")) {
                 const helpCommand = `embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact<br><span class="message-raw-text">/wordle</span><br>Get today's wordle answer${
-                    process.env.AIBOT === "true"
+                    config.ai.enabled
                         ? '<br><span class="message-raw-text">/aichat &lt;prompt&gt;</span><br>This command allows you to talk to ai<br><span class="message-raw-text">/aipic &lt;prompt&gt;</span><br>This command allows you to make images using ai'
                         : ""
                 }
@@ -1351,15 +1354,15 @@ form.addEventListener("submit", async (e) => {
                             slots2 == slots3 &&
                             slots3 == slots1
                         ) {
-                            status = `You made ${process.env.ECONOMYCURRENCY}${parseInt(message.replace("/slots ", "")) * 10}`;
+                            status = `You made ${config.economyCurrency}${parseInt(message.replace("/slots ", "")) * 10}`;
                         } else if (
                             slots1 == slots2 ||
                             slots2 == slots3 ||
                             slots3 == slots1
                         ) {
-                            status = `You made ${process.env.ECONOMYCURRENCY}${parseInt(message.replace("/slots ", "")) * 3}`;
+                            status = `You made ${config.economyCurrency}${parseInt(message.replace("/slots ", "")) * 3}`;
                         } else {
-                            status = `You lost ${process.env.ECONOMYCURRENCY}${message.replace("/slots ", "")}`;
+                            status = `You lost ${config.economyCurrency}${message.replace("/slots ", "")}`;
                         }
                         await addDoc(messageRef, {
                             bot: true,
@@ -1487,17 +1490,17 @@ form.addEventListener("submit", async (e) => {
                     return;
                 }
                 if (message.startsWith("/aichat")) {
-                    if (process.env.AIBOT === "true") {
+                    if (config.ai.enabled) {
                         await removeTypingIndicator();
 
                         await fetch(
-                            process.env.AIURL.replace(
+                            config.ai.url.replace(
                                 "{MODEL}",
                                 "@cf/meta/llama-3-8b-instruct"
                             ),
                             {
                                 headers: {
-                                    Authorization: process.env.AITOKEN,
+                                    Authorization: config.ai.token,
                                 },
                                 method: "POST",
                                 body: JSON.stringify({
@@ -1558,16 +1561,16 @@ form.addEventListener("submit", async (e) => {
                     return;
                 }
                 if (message.startsWith("/aipic")) {
-                    if (process.env.AIBOT === "true") {
+                    if (config.ai.enabled) {
                         await removeTypingIndicator();
                         await fetch(
-                            process.env.AIURL.replace(
+                            config.ai.url.replace(
                                 "{MODEL}",
                                 "@cf/bytedance/stable-diffusion-xl-lightning"
                             ),
                             {
                                 headers: {
-                                    Authorization: process.env.AITOKEN,
+                                    Authorization: config.ai.token,
                                 },
                                 method: "POST",
                                 body: JSON.stringify({
