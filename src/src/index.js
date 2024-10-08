@@ -98,23 +98,6 @@ const fileUpload = document.querySelector("#fileUpload");
 const emojiPicker = document.querySelector("#emoji-picker-div");
 const form = document.querySelector("#create");
 
-// Get info on chat
-
-const info = (await getDoc(doc(db, "info", "info"))).data();
-
-// Get users from database
-
-async function getAllUsers() {
-    const users = {};
-    const querySnapshot = await getDocs(collection(db, `info/users/users`));
-    querySnapshot.forEach((doc) => {
-        users[doc.id] = doc.data();
-    });
-    return users;
-}
-
-const users = await getAllUsers();
-
 if (auth.currentUser == null) {
     overlayForm.style.display = "flex";
 
@@ -132,15 +115,14 @@ if (auth.currentUser == null) {
                             <input id="form-password" type="password" />
                         </div>
                         <div class="overlay-form-confirm">
-                            <button id="button-exit">Cancel</button>
+                            <button id="button-exit">Exit</button>
                             <button id="button-confirm">Sign-In</button>
                         </div>
                         `;
     overlayForm.appendChild(formElement);
 
     document.querySelector("#button-exit").addEventListener("click", () => {
-        formElement.remove();
-        overlayForm.style.display = "none";
+        ipc.send("close");
     });
 
     document.querySelector("#button-confirm").addEventListener("click", () => {
@@ -161,6 +143,23 @@ if (auth.currentUser == null) {
             });
     });
 }
+
+// Get info on chat
+
+const info = (await getDoc(doc(db, "info", "info"))).data();
+
+// Get users from database
+
+async function getAllUsers() {
+    const users = {};
+    const querySnapshot = await getDocs(collection(db, `info/users/users`));
+    querySnapshot.forEach((doc) => {
+        users[doc.id] = doc.data();
+    });
+    return users;
+}
+
+const users = await getAllUsers();
 
 const currentUserRef = doc(db, "info/users/users", auth.currentUser.uid);
 const currentUser = (await getDoc(currentUserRef)).data();
