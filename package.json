@@ -32,7 +32,7 @@
   },
   "scripts": {
     "start": "electron-forge start",
-    "pack": "cross-env NODE_ENV=production electron-forge package",
+    "build": "cross-env NODE_ENV=production electron-forge package",
     "initialize-firebase": "node ./commands/initializeFirebase.js",
     "create-user": "node ./commands/createUser.js",
     "create-server": "node ./commands/createServer.js"

@@ -57,9 +57,7 @@ document
 
 fetch("https://api.ipify.org/?format=json")
     .then((response) => {
-        if (response.status === 200) {
-            console.log("Proxy not detected");
-        } else {
+        if (response.status !== 200) {
             alert("You don't have internet access (or you are behind a proxy)");
             ipc.send("close");
         }
@@ -314,6 +312,7 @@ document.getElementById("settings-profile-name").innerText =
     currentUser.profile.displayname == null
         ? "Unnamed_User"
         : currentUser.profile.displayname;
+
 document.getElementById("settings-profile-picture").src = config.profilePicAPI
     .replace(
         "{NAME}",
@@ -672,7 +671,7 @@ async function displayPosts(posts) {
 
         messageElement.innerHTML = `
             <div style="height: 60px;display: flex;align-items: center;">
-                <img src="${config.profilepicapi
+                <img src="${config.profilePicAPI
                     .replace("{NAME}", name.trim())
                     .replace(
                         "{COLOR}",
@@ -1191,8 +1190,6 @@ async function removeTypingIndicator() {
             people: currentDocData.people,
         });
     }
-
-    console.log("removeTypingIndicator");
 }
 
 // Send Message
@@ -1300,6 +1297,16 @@ form.addEventListener("submit", async (e) => {
                         alert("Invalid Verification Code");
                     }
 
+                    return;
+                }
+                if (message.startsWith("/listcodes")) {
+                    await removeTypingIndicator();
+
+                    if (verified) {
+                        alert(info.codes.join("\n"));
+                    } else {
+                        alert("No permission");
+                    }
                     return;
                 }
                 if (message.startsWith("/random")) {
@@ -1635,9 +1642,9 @@ form.addEventListener("submit", async (e) => {
                     return;
                 }
                 if (message.startsWith("/purge")) {
-                    if (verified) {
-                        await removeTypingIndicator();
+                    await removeTypingIndicator();
 
+                    if (verified) {
                         const querySnapshot = await getDocs(messageRef);
 
                         const deletePromises = [];
@@ -1650,14 +1657,11 @@ form.addEventListener("submit", async (e) => {
 
                         // Execute all deletions
                         await Promise.all(deletePromises);
-
-                        return;
                     } else {
                         alert("No permission");
                     }
                     return;
                 } else {
-                    await removeTypingIndicator();
                     return;
                 }
             } else {

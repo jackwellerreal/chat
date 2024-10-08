@@ -27,15 +27,15 @@ let name;
 
 // Check if behind proxy or no internet
 
-try {
-    (async () => {
+async function isBehindProxy() {
+    try {
         await axios.get("https://api.ipify.org/?format=json", {
             timeout: 3000,
         });
-    })();
-    isBehindProxy = false;
-} catch (error) {
-    isBehindProxy = true;
+        return false;
+    } catch (error) {
+        return true;
+    }
 }
 
 // Load Windows
@@ -43,7 +43,7 @@ try {
 app.whenReady().then(async () => {
     // Check if behind proxy.
 
-    if (isBehindProxy) {
+    if (await isBehindProxy()) {
         // Make window to prompt for password
 
         const authWindow = new BrowserWindow({
@@ -54,7 +54,7 @@ app.whenReady().then(async () => {
             modal: true,
             parent: null,
             webPreferences: {
-                devTools: false,
+                devTools: true,
                 nodeIntegration: true,
                 contextIsolation: false,
             },
@@ -78,7 +78,7 @@ app.whenReady().then(async () => {
                 title: "Chat V2",
                 icon: "./assets/icon.png",
                 webPreferences: {
-                    devTools: false,
+                    devTools: true,
                     nodeIntegration: true,
                     contextIsolation: false,
                 },
@@ -118,7 +118,7 @@ app.whenReady().then(async () => {
             title: "Chat V2",
             icon: "./assets/icon.png",
             webPreferences: {
-                devTools: false,
+                devTools: true,
                 nodeIntegration: true,
                 contextIsolation: false,
             },
