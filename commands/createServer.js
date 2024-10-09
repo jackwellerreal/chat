@@ -1,11 +1,11 @@
-require("dotenv").config();
+const config = require("../config.json");
 const firebaseConfig = {
-    apiKey: process.env.APIKEY,
-    authDomain: process.env.AUTHDOMAIN,
-    projectId: process.env.PROJECTID,
-    storageBucket: process.env.STORAGEBUCKET,
-    messagingSenderId: process.env.MESSAGESENDERID,
-    appId: process.env.APPID,
+    apiKey: config.firebase.apiKey,
+    authDomain: config.firebase.authDomain,
+    projectId: config.firebase.projectId,
+    storageBucket: config.firebase.storageBucket,
+    messagingSenderId: config.firebase.messagingSenderId,
+    appId: config.firebase.appId,
 };
 
 const firebase = require("firebase/compat/app");
