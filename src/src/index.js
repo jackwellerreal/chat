@@ -165,6 +165,13 @@ if (auth.currentUser == null) {
 const currentUserRef = doc(db, "info/users/users", auth.currentUser.uid);
 const currentUser = (await getDoc(currentUserRef)).data();
 
+console.log(currentUser);
+
+if (currentUser.account.banned == true) {
+    alert("You have been banned");
+    ipc.send("close");
+}
+
 // Send name to main process
 
 ipc.send("name", currentUser.profile.displayname);
@@ -635,10 +642,14 @@ async function displayPosts(posts) {
             time = momentObj.format("DD/MM/YYYY HH:mm");
         }
 
-        const author = users[post.uid];
+        const uid = post.uid;
+
+        const author = users[uid];
         const name = author.profile.displayname;
         const verified = author.profile.verified;
         const color = author.profile.color;
+
+        const userAdmin = currentUser.account.admin;
 
         const message = twemoji
             .parse(checkMessage(post.message.content), {
@@ -700,6 +711,11 @@ async function displayPosts(posts) {
                     }
                     </span>
                     <span class="message-time">${time}</span>
+                    ${
+                        userAdmin
+                            ? '<span class="message-time">- ' + uid + "</span>"
+                            : ""
+                    }
                 </div>
                 <span class="message-content">${message}</span>
             </div>
@@ -1203,11 +1219,13 @@ form.addEventListener("submit", async (e) => {
     const name = currentUser.profile.displayname;
     const color = currentUser.profile.color;
     const verified = currentUser.profile.verified;
+    const admin = currentUser.account.admin;
+    const banned = currentUser.account.banned;
 
     const message = messageInput.value;
 
     messageInput.value = "";
-    if (auth.currentUser) {
+    if (auth.currentUser && !banned) {
         if (name === "") {
             name = "Unnamed_User";
         }
@@ -1265,8 +1283,8 @@ form.addEventListener("submit", async (e) => {
                         : ""
                 }
                 ${
-                    verified
-                        ? '<br><span class="message-raw-text">/purge</span><br>This command deletes all messages in a channel'
+                    admin
+                        ? '<br><span class="message-raw-text">/ban &lt;userID&gt;</span><br>This command bans a user<br><span class="message-raw-text">/unban &lt;userID&gt;</span><br>This command unbans a user<br><span class="message-raw-text">/purge</span><br>This command deletes all messages in a channel<br><span class="message-raw-text">/resettyping</span><br>This command reset typing indicator'
                         : ""
                 }
                 `;
@@ -1302,7 +1320,7 @@ form.addEventListener("submit", async (e) => {
                 if (message.startsWith("/listcodes")) {
                     await removeTypingIndicator();
 
-                    if (verified) {
+                    if (admin) {
                         alert(info.codes.join("\n"));
                     } else {
                         alert("No permission");
@@ -1344,9 +1362,12 @@ form.addEventListener("submit", async (e) => {
                     return;
                 }
                 if (message.startsWith("/slots")) {
-                    if (message.replace("/slots ", "") != "/slots") {
-                        await removeTypingIndicator();
+                    await removeTypingIndicator();
 
+                    if (
+                        message.replace("/slots ", "") != "/slots" &&
+                        message.replace("/slots ", "" != null)
+                    ) {
                         let slots1 =
                             slots[Math.floor(Math.random() * slots.length)];
                         let slots2 =
@@ -1458,10 +1479,13 @@ form.addEventListener("submit", async (e) => {
                 if (message.startsWith("/wordle")) {
                     await removeTypingIndicator();
 
-                    const today = new Date();
+                    const today = new Date()
+                        .toLocaleString()
+                        .split(",")[0]
+                        .split("/");
 
                     await fetch(
-                        `https://www.nytimes.com/svc/wordle/v2/${today.toISOString().split("T")[0]}.json`,
+                        `https://www.nytimes.com/svc/wordle/v2/${today[2]}-${today[1]}-${today[0]}.json`,
                         {
                             headers: {
                                 Accept: "application/json",
@@ -1473,7 +1497,7 @@ form.addEventListener("submit", async (e) => {
                             await addDoc(messageRef, {
                                 bot: true,
                                 message: {
-                                    content: `embed:Wordle answer today:\\n<b>${data.solution}</b>`,
+                                    content: `embed:Wordle answer for today:\\n<b>${data.solution}</b>`,
                                     command: message,
                                 },
                                 timestamp: new Date(),
@@ -1495,148 +1519,232 @@ form.addEventListener("submit", async (e) => {
                     return;
                 }
                 if (message.startsWith("/aichat")) {
-                    if (config.ai.enabled) {
-                        await removeTypingIndicator();
+                    await removeTypingIndicator();
 
-                        await fetch(
-                            config.ai.url.replace(
-                                "{MODEL}",
-                                "@cf/meta/llama-3-8b-instruct"
-                            ),
-                            {
-                                headers: {
-                                    Authorization: config.ai.token,
+                    if (
+                        message.replace("/aipic ", "") != "/aipic" &&
+                        message.replace("/aipic ", "" != null)
+                    ) {
+                        if (config.ai.enabled) {
+                            await fetch(
+                                config.ai.url.replace(
+                                    "{MODEL}",
+                                    "@cf/meta/llama-3-8b-instruct"
+                                ),
+                                {
+                                    headers: {
+                                        Authorization: config.ai.token,
+                                    },
+                                    method: "POST",
+                                    body: JSON.stringify({
+                                        messages: [
+                                            {
+                                                role: "system",
+                                                content:
+                                                    "You are a friendly assistant that messages in a chat room. Make sure to respond with short answers, don't write paragraphs.",
+                                            },
+                                            {
+                                                role: "user",
+                                                content: message.replace(
+                                                    "/ai ",
+                                                    ""
+                                                ),
+                                            },
+                                        ],
+                                    }),
+                                }
+                            )
+                                .then((response) => response.json())
+                                .then(async (data) => {
+                                    await addDoc(messageRef, {
+                                        bot: true,
+                                        message: {
+                                            content: data.result.response,
+                                            command: message,
+                                        },
+                                        timestamp: new Date(),
+                                        uid: auth.currentUser.uid,
+                                    });
+                                })
+                                .catch(async (error) => {
+                                    await addDoc(messageRef, {
+                                        bot: true,
+                                        message: {
+                                            content: `Unable to fetch API: ${error}`,
+                                            command: message,
+                                        },
+                                        timestamp: new Date(),
+                                        uid: auth.currentUser.uid,
+                                    });
+                                });
+                        } else {
+                            await removeTypingIndicator();
+
+                            await addDoc(messageRef, {
+                                bot: true,
+                                message: {
+                                    content: `AI is disabled`,
+                                    command: message,
                                 },
-                                method: "POST",
-                                body: JSON.stringify({
-                                    messages: [
-                                        {
-                                            role: "system",
-                                            content:
-                                                "You are a friendly assistant that messages in a chat room. Make sure to respond with short answers, don't write paragraphs.",
-                                        },
-                                        {
-                                            role: "user",
-                                            content: message.replace(
-                                                "/ai ",
-                                                ""
-                                            ),
-                                        },
-                                    ],
-                                }),
-                            }
-                        )
-                            .then((response) => response.json())
-                            .then(async (data) => {
-                                await addDoc(messageRef, {
-                                    bot: true,
-                                    message: {
-                                        content: data.result.response,
-                                        command: message,
-                                    },
-                                    timestamp: new Date(),
-                                    uid: auth.currentUser.uid,
-                                });
-                            })
-                            .catch(async (error) => {
-                                await addDoc(messageRef, {
-                                    bot: true,
-                                    message: {
-                                        content: `Unable to fetch API: ${error}`,
-                                        command: message,
-                                    },
-                                    timestamp: new Date(),
-                                    uid: auth.currentUser.uid,
-                                });
+                                timestamp: new Date(),
+                                uid: auth.currentUser.uid,
                             });
+                        }
                     } else {
-                        await removeTypingIndicator();
-
-                        await addDoc(messageRef, {
-                            bot: true,
-                            message: {
-                                content: `AI is disabled`,
-                                command: message,
-                            },
-                            timestamp: new Date(),
-                            uid: auth.currentUser.uid,
-                        });
+                        alert("Invalid Prompt");
                     }
 
                     return;
                 }
                 if (message.startsWith("/aipic")) {
-                    if (config.ai.enabled) {
-                        await removeTypingIndicator();
-                        await fetch(
-                            config.ai.url.replace(
-                                "{MODEL}",
-                                "@cf/bytedance/stable-diffusion-xl-lightning"
-                            ),
-                            {
-                                headers: {
-                                    Authorization: config.ai.token,
-                                },
-                                method: "POST",
-                                body: JSON.stringify({
-                                    prompt: message.replace("/ai ", ""),
-                                }),
-                            }
-                        )
-                            .then((response) => response.blob())
-                            .then(async (data) => {
-                                const fileName = `file_${Math.random()
-                                    .toString(36)
-                                    .replace("0.", "")}.jfif`;
+                    await removeTypingIndicator();
 
-                                const storageRef = ref(storage, fileName);
-
-                                uploadBytes(storageRef, data).then(
-                                    (snapshot) => {
-                                        getDownloadURL(storageRef)
-                                            .then(async (url) => {
-                                                await addDoc(messageRef, {
-                                                    bot: true,
-                                                    message: {
-                                                        content: `image:${url}`,
-                                                        command: message,
-                                                    },
-                                                    timestamp: new Date(),
-                                                    uid: auth.currentUser.uid,
-                                                });
-                                            })
-                                            .catch((error) => {
-                                                console.log(
-                                                    "Error getting image URL:",
-                                                    error
-                                                );
-                                            });
-                                    }
-                                );
-                            })
-                            .catch(async (error) => {
-                                await addDoc(messageRef, {
-                                    bot: true,
-                                    message: {
-                                        content: `Unable to fetch API: ${error}`,
-                                        command: message,
+                    if (
+                        message.replace("/aipic ", "") != "/aipic" &&
+                        message.replace("/aipic ", "" != null)
+                    ) {
+                        if (config.ai.enabled) {
+                            await fetch(
+                                config.ai.url.replace(
+                                    "{MODEL}",
+                                    "@cf/bytedance/stable-diffusion-xl-lightning"
+                                ),
+                                {
+                                    headers: {
+                                        Authorization: config.ai.token,
                                     },
-                                    timestamp: new Date(),
-                                    uid: auth.currentUser.uid,
-                                });
-                            });
-                    } else {
-                        await removeTypingIndicator();
+                                    method: "POST",
+                                    body: JSON.stringify({
+                                        prompt: message.replace("/ai ", ""),
+                                    }),
+                                }
+                            )
+                                .then((response) => response.blob())
+                                .then(async (data) => {
+                                    const fileName = `file_${Math.random()
+                                        .toString(36)
+                                        .replace("0.", "")}.jfif`;
 
-                        await addDoc(messageRef, {
-                            bot: true,
-                            message: {
-                                content: `AI is disabled`,
-                                command: message,
-                            },
-                            timestamp: new Date(),
-                            uid: auth.currentUser.uid,
-                        });
+                                    const storageRef = ref(storage, fileName);
+
+                                    uploadBytes(storageRef, data).then(
+                                        (snapshot) => {
+                                            getDownloadURL(storageRef)
+                                                .then(async (url) => {
+                                                    await addDoc(messageRef, {
+                                                        bot: true,
+                                                        message: {
+                                                            content: `image:${url}`,
+                                                            command: message,
+                                                        },
+                                                        timestamp: new Date(),
+                                                        uid: auth.currentUser
+                                                            .uid,
+                                                    });
+                                                })
+                                                .catch((error) => {
+                                                    console.log(
+                                                        "Error getting image URL:",
+                                                        error
+                                                    );
+                                                });
+                                        }
+                                    );
+                                })
+                                .catch(async (error) => {
+                                    await addDoc(messageRef, {
+                                        bot: true,
+                                        message: {
+                                            content: `Unable to fetch API: ${error}`,
+                                            command: message,
+                                        },
+                                        timestamp: new Date(),
+                                        uid: auth.currentUser.uid,
+                                    });
+                                });
+                        } else {
+                            await removeTypingIndicator();
+
+                            await addDoc(messageRef, {
+                                bot: true,
+                                message: {
+                                    content: `AI is disabled`,
+                                    command: message,
+                                },
+                                timestamp: new Date(),
+                                uid: auth.currentUser.uid,
+                            });
+                        }
+                    } else {
+                        alert("Invalid Prompt");
+                    }
+
+                    return;
+                }
+                if (message.startsWith("/ban")) {
+                    await removeTypingIndicator();
+
+                    if (admin) {
+                        if (
+                            message.replace("/ban ", "") != "/ban" &&
+                            message.replace("/ban ", "") != null
+                        ) {
+                            const user = message.replace("/ban ", "");
+
+                            const userRef = doc(
+                                db,
+                                `info/users/users/${user}`
+                            );
+                            const userDoc = await getDoc(userRef);
+
+                            if (userDoc.exists()) {
+                                const userData = userDoc.data();
+
+                                userData.account.banned = true;
+
+                                await setDoc(userRef, userData);
+                            } else {
+                                alert("User not found");
+                            }
+                        } else {
+                            alert("Invalid User");
+                        }
+                    } else {
+                        alert("No permission");
+                    }
+
+                    return;
+                }
+                if (message.startsWith("/unban")) {
+                    await removeTypingIndicator();
+
+                    if (admin) {
+                        if (
+                            message.replace("/unban ", "") != "/unban" &&
+                            message.replace("/unban ", "") != null
+                        ) {
+                            const user = message.replace("/unban ", "");
+
+                            const userRef = doc(
+                                db,
+                                `info/users/users/${user}`
+                            );
+                            const userDoc = await getDoc(userRef);
+
+                            if (userDoc.exists()) {
+                                const userData = userDoc.data();
+
+                                userData.account.banned = false;
+
+                                await setDoc(userRef, userData);
+                            } else {
+                                alert("User not found");
+                            }
+                        } else {
+                            alert("Invalid User");
+                        }
+                    } else {
+                        alert("No permission");
                     }
 
                     return;
@@ -1644,7 +1752,7 @@ form.addEventListener("submit", async (e) => {
                 if (message.startsWith("/purge")) {
                     await removeTypingIndicator();
 
-                    if (verified) {
+                    if (admin) {
                         const querySnapshot = await getDocs(messageRef);
 
                         const deletePromises = [];
@@ -1657,6 +1765,18 @@ form.addEventListener("submit", async (e) => {
 
                         // Execute all deletions
                         await Promise.all(deletePromises);
+                    } else {
+                        alert("No permission");
+                    }
+                    return;
+                }
+                if (message.startsWith("/resettyping")) {
+                    await removeTypingIndicator();
+
+                    if (admin) {
+                        await setDoc(typingDocRef, {
+                            people: [],
+                        });
                     } else {
                         alert("No permission");
                     }

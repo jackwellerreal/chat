@@ -30,6 +30,9 @@ const username = prompt(
 const password = prompt(
     `${colours.FgYellow}Please enter a ${colours.FgBlue}password${colours.FgYellow}: ${colours.Reset}`
 );
+const admin = prompt(
+    `${colours.FgYellow}Should this user have ${colours.FgBlue}admin${colours.FgYellow} privileges (y/n): ${colours.Reset}`
+) == "y" ? true : false;
 
 async function createUser() {
     try {
@@ -42,11 +45,13 @@ async function createUser() {
             account: {
                 uid: user.uid,
                 username: username,
+                admin: admin,
+                banned: false,
             },
             profile: {
                 color: "#ffffff",
                 displayname: username,
-                verified: false,
+                verified: false, 
             },
             servers: [],
         };
