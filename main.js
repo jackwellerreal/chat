@@ -54,7 +54,7 @@ app.whenReady().then(async () => {
             modal: true,
             parent: null,
             webPreferences: {
-                devTools: true,
+                devTools: false,
                 nodeIntegration: true,
                 contextIsolation: false,
             },
@@ -172,11 +172,15 @@ ipcMain.on("max", () => {
 // Make user offline when app is quit
 
 ipcMain.on("close", async () => {
-    const onlineRef = db.collection("info").doc("online");
-    const onlineData = (await onlineRef.get()).data().people;
+    try {
+        const onlineRef = db.collection("info").doc("online");
+        const onlineData = (await onlineRef.get()).data().people;
 
-    const updatedData = onlineData.filter((user) => user.name !== name);
-    await onlineRef.update({ people: updatedData });
+        const updatedData = onlineData.filter((user) => user.name !== name);
+        await onlineRef.update({ people: updatedData });
+    } catch (error) {
+        console.log(error)
+    }
 
     mainWindow.close();
 });

@@ -22,6 +22,7 @@ import {
 import {
     getAuth,
     signInWithEmailAndPassword,
+    signOut
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 const { ipcRenderer } = require("electron");
 const os = require("os");
@@ -98,12 +99,17 @@ const fileUpload = document.querySelector("#fileUpload");
 const emojiPicker = document.querySelector("#emoji-picker-div");
 const form = document.querySelector("#create");
 
-if (auth.currentUser == null) {
-    overlayForm.style.display = "flex";
+// Get info on chat
 
-    const formElement = document.createElement("div");
-    formElement.className = "overlay-form";
-    formElement.innerHTML = `
+try {
+    const info = (await getDoc(doc(db, "info", "info"))).data();
+} catch (error) {
+    if (!auth.currentUser) {
+        overlayForm.style.display = "flex";
+
+        const formElement = document.createElement("div");
+        formElement.className = "overlay-form";
+        formElement.innerHTML = `
                         <div class="overlay-form-content">
                             <h1>Sign In</h1>
                             <p>Please enter your username and password</p>
@@ -119,34 +125,37 @@ if (auth.currentUser == null) {
                             <button id="button-confirm">Sign-In</button>
                         </div>
                         `;
-    overlayForm.appendChild(formElement);
+        overlayForm.appendChild(formElement);
 
-    document.querySelector("#button-exit").addEventListener("click", () => {
-        ipc.send("close");
-    });
+        document.querySelector("#button-exit").addEventListener("click", () => {
+            ipc.send("close");
+        });
 
-    document.querySelector("#button-confirm").addEventListener("click", () => {
-        const username = document.querySelector("#form-username").value;
-        const password = document.querySelector("#form-password").value;
+        document
+            .querySelector("#button-confirm")
+            .addEventListener("click", () => {
+                const username = document.querySelector("#form-username").value;
+                const password = document.querySelector("#form-password").value;
 
-        formElement.remove();
-        overlayForm.style.display = "none";
+                formElement.remove();
+                overlayForm.style.display = "none";
 
-        signInWithEmailAndPassword(auth, username + "@chat.com", password)
-            .then((userCredential) => {
-                window.location.reload();
-            })
-            .catch((error) => {
-                alert(
-                    `An error occured, please send this to a developer:\n${error}`
-                );
+                signInWithEmailAndPassword(
+                    auth,
+                    username + "@chat.com",
+                    password
+                )
+                    .then((userCredential) => {
+                        window.location.reload()
+                    })
+                    .catch((error) => {
+                        alert(
+                            `An error occured, please send this to a developer:\n${error}`
+                        );
+                    });
             });
-    });
+    }
 }
-
-// Get info on chat
-
-const info = (await getDoc(doc(db, "info", "info"))).data();
 
 // Get users from database
 
@@ -163,8 +172,6 @@ const users = await getAllUsers();
 
 const currentUserRef = doc(db, "info/users/users", auth.currentUser.uid);
 const currentUser = (await getDoc(currentUserRef)).data();
-
-console.log(currentUser);
 
 if (currentUser.account.banned == true) {
     alert("You have been banned");
@@ -313,6 +320,7 @@ serverDesc.innerHTML = server.description;
 serverBanner.style.background = `url(${server.banner})`;
 serverBanner.style.backgroundPosition = `center center`;
 serverBanner.style.backgroundSize = `cover`;
+messageInput.setAttribute("maxlength",config.messageLength)
 
 document.getElementById("settings-profile-name").innerText =
     currentUser.profile.displayname == null
@@ -865,7 +873,6 @@ async function loadVoice() {
         pc.ontrack = (event) => {
             event.streams[0].getTracks().forEach((track) => {
                 remoteStream.addTrack(track);
-                console.log(track);
             });
         };
 
@@ -1252,7 +1259,7 @@ form.addEventListener("submit", async (e) => {
                         });
                     })
                     .catch((error) => {
-                        console.log("Error getting image URL:", error);
+                        console.error("Error getting image URL:", error);
                     });
             });
 
@@ -1266,7 +1273,7 @@ form.addEventListener("submit", async (e) => {
             return;
         }
         if (message.length > config.messageLength) {
-            return;
+            message = message.substring(0, config.messageLength)
         }
         if (message.includes("<") || message.includes(">")) {
             message.replace("<", "&lt;").replace(">", "&gt;");
@@ -1642,7 +1649,7 @@ form.addEventListener("submit", async (e) => {
                                                     });
                                                 })
                                                 .catch((error) => {
-                                                    console.log(
+                                                    console.error(
                                                         "Error getting image URL:",
                                                         error
                                                     );
@@ -1690,10 +1697,7 @@ form.addEventListener("submit", async (e) => {
                         ) {
                             const user = message.replace("/ban ", "");
 
-                            const userRef = doc(
-                                db,
-                                `info/users/users/${user}`
-                            );
+                            const userRef = doc(db, `info/users/users/${user}`);
                             const userDoc = await getDoc(userRef);
 
                             if (userDoc.exists()) {
@@ -1724,10 +1728,7 @@ form.addEventListener("submit", async (e) => {
                         ) {
                             const user = message.replace("/unban ", "");
 
-                            const userRef = doc(
-                                db,
-                                `info/users/users/${user}`
-                            );
+                            const userRef = doc(db, `info/users/users/${user}`);
                             const userDoc = await getDoc(userRef);
 
                             if (userDoc.exists()) {

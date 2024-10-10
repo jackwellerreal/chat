@@ -108,7 +108,7 @@
                     </label>
                     <input type="file" id="fileUpload" style="display: none;" accept="image/*" />
                 </div>
-                <input class="message-create" id="created-message" placeholder="" max="175" maxlength="175" autofocus>
+                <input class="message-create" id="created-message" placeholder="" autofocus>
                 <div class=" message-create-button" id="gif-picker">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" id="gif-picker-icon">
                         <path
@@ -130,15 +130,6 @@
         </div>
     </div>
     <script defer>
-        String.prototype.truncate = String.prototype.truncate ||
-            function (n, useWordBoundary) {
-                if (this.length <= n) { return this; }
-                const subString = this.slice(0, n - 1); // the original check
-                return (useWordBoundary
-                    ? subString.slice(0, subString.lastIndexOf(" "))
-                    : subString);
-            };
-            
         console.log("")
 
         console.log(
