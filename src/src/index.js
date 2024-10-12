@@ -744,27 +744,31 @@ async function displayPosts(posts) {
             const previousMessageName =
                 previousMessage.children[1].children[0].children[0].innerHTML.trim();
             if (
-                previousMessageName == name &&
-                !bot &&
-                previousMessage.getAttribute("bot") == "false"
+                !(
+                    previousMessageName == name &&
+                    !bot &&
+                    previousMessage.getAttribute("bot") == "false"
+                )
             ) {
-                previousMessage.children[1].children[0].remove();
-                previousMessage.children[0].remove();
-
-                previousMessage.setAttribute("og-name", previousMessageName);
-
-                const multiTime = document.createElement("span");
-                multiTime.className = "message-time-multi";
-                multiTime.innerHTML = `${moment.unix(post.timestamp.seconds).format("HH:mm")}`;
-
-                previousMessage.appendChild(multiTime);
-                previousMessage.appendChild(
-                    previousMessage.children[0].children[0]
-                );
-                previousMessage.children[0].parentNode.removeChild(
-                    previousMessage.children[0]
-                );
+                return;
             }
+
+            previousMessage.children[1].children[0].remove();
+            previousMessage.children[0].remove();
+
+            previousMessage.setAttribute("og-name", previousMessageName);
+
+            const multiTime = document.createElement("span");
+            multiTime.className = "message-time-multi";
+            multiTime.innerHTML = `${moment.unix(post.timestamp.seconds).format("HH:mm")}`;
+
+            previousMessage.appendChild(multiTime);
+            previousMessage.appendChild(
+                previousMessage.children[0].children[0]
+            );
+            previousMessage.children[0].parentNode.removeChild(
+                previousMessage.children[0]
+            );
         }
     });
 
@@ -1057,6 +1061,12 @@ fileUpload.onchange = () => {
 // GIF Picker
 
 gifIcon.addEventListener("click", async (e) => {
+    if (!messageInput.value) {
+        return;
+    }
+    if (messageInput.value.startsWith("image:")) {
+        return;
+    }
     fetch(
         `https://tenor.googleapis.com/v2/search?q=${messageInput.value}&key=${config.tenorAPI}&client_key=my_test_app&limit=1`,
         { method: "GET" }
@@ -1146,22 +1156,23 @@ editSettings.addEventListener("click", async (e) => {
 const typingDocRef = doc(db, `${server.id}/channels/${channel.name}`, "typing");
 
 onSnapshot(typingDocRef, (doc) => {
-    if (doc.data()) {
-        if (doc.data().people.length !== 0) {
-            document.querySelector(".typing-indicator").innerHTML =
-                `
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                    <path d="M256 116a52 52 0 1 1 0-104 52 52 0 1 1 0 104zm0 364a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM448 288a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM32 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm399.4-96.2A56 56 0 1 1 352.2 80.6a56 56 0 1 1 79.2 79.2zM97.6 414.4a32 32 0 1 1 45.3-45.3A32 32 0 1 1 97.6 414.4zm271.5 0a32 32 0 1 1 45.3-45.3 32 32 0 1 1 -45.3 45.3zM86.3 86.3a48 48 0 1 1 67.9 67.9A48 48 0 1 1 86.3 86.3z"/>
-                </svg>
-            </div>` +
-                `<div>
-                <span style="font-weight:bold">${doc.data().people}</span> is typing...
-            </div>`;
-        }
-        if (doc.data().people.length === 0) {
-            document.querySelector(".typing-indicator").innerHTML = ``;
-        }
+    if (!doc.data()) {
+        return;
+    }
+    if (doc.data().people.length !== 0) {
+        document.querySelector(".typing-indicator").innerHTML =
+            `
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path d="M256 116a52 52 0 1 1 0-104 52 52 0 1 1 0 104zm0 364a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM448 288a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM32 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm399.4-96.2A56 56 0 1 1 352.2 80.6a56 56 0 1 1 79.2 79.2zM97.6 414.4a32 32 0 1 1 45.3-45.3A32 32 0 1 1 97.6 414.4zm271.5 0a32 32 0 1 1 45.3-45.3 32 32 0 1 1 -45.3 45.3zM86.3 86.3a48 48 0 1 1 67.9 67.9A48 48 0 1 1 86.3 86.3z"/>
+            </svg>
+        </div>` +
+            `<div>
+            <span style="font-weight:bold">${doc.data().people}</span> is typing...
+        </div>`;
+    }
+    if (doc.data().people.length === 0) {
+        document.querySelector(".typing-indicator").innerHTML = ``;
     }
 });
 
@@ -1191,14 +1202,16 @@ messageInput.addEventListener("input", async (e) => {
             ? currentDocSnapshot.data()
             : {};
 
-        if (currentDocData.people && currentDocData.people.includes(name)) {
-            const index = currentDocData.people.indexOf(name);
-            if (index > -1) {
-                currentDocData.people.splice(index, 1);
-            }
-
-            await setDoc(typingDocRef, { people: currentDocData.people });
+        if (!(currentDocData.people && currentDocData.people.includes(name))) {
+            return;
         }
+
+        const index = currentDocData.people.indexOf(name);
+        if (index > -1) {
+            currentDocData.people.splice(index, 1);
+        }
+
+        await setDoc(typingDocRef, { people: currentDocData.people });
     }, 10000);
 });
 
@@ -1211,16 +1224,18 @@ async function removeTypingIndicator() {
         ? currentDocSnapshot.data()
         : {};
 
-    if (currentDocData.people && currentDocData.people.includes(name)) {
-        const index = currentDocData.people.indexOf(name);
-        if (index > -1) {
-            currentDocData.people.splice(index, 1);
-        }
-
-        await setDoc(typingDocRef, {
-            people: currentDocData.people,
-        });
+    if (!(currentDocData.people && currentDocData.people.includes(name))) {
+        return;
     }
+
+    const index = currentDocData.people.indexOf(name);
+    if (index > -1) {
+        currentDocData.people.splice(index, 1);
+    }
+
+    await setDoc(typingDocRef, {
+        people: currentDocData.people,
+    });
 }
 
 // Send Message
@@ -1291,7 +1306,13 @@ form.addEventListener("submit", async (e) => {
         // Bot Commands
 
         if (message.startsWith("/")) {
-            if (channel.name.includes("bot") || message.startsWith("/ban") || message.startsWith("/unban") || message.startsWith("/purge") || message.startsWith("/delete")) {
+            if (
+                channel.name.includes("bot") ||
+                message.startsWith("/ban") ||
+                message.startsWith("/unban") ||
+                message.startsWith("/purge") ||
+                message.startsWith("/delete")
+            ) {
                 const helpCommand = `embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact<br><span class="message-raw-text">/wordle</span><br>Get today's wordle answer${
                     config.ai.enabled
                         ? '<br><span class="message-raw-text">/aichat &lt;prompt&gt;</span><br>This command allows you to talk to ai<br><span class="message-raw-text">/aipic &lt;prompt&gt;</span><br>This command allows you to make images using ai'
@@ -1699,7 +1720,10 @@ form.addEventListener("submit", async (e) => {
                             message.split(" ").length == 2 &&
                             message.split(" ")[1] != ""
                         ) {
-                            const userRef = doc(db, `info/users/users/${message.split(" ")[1]}`);
+                            const userRef = doc(
+                                db,
+                                `info/users/users/${message.split(" ")[1]}`
+                            );
                             const userDoc = await getDoc(userRef);
 
                             if (userDoc.exists()) {
@@ -1732,7 +1756,10 @@ form.addEventListener("submit", async (e) => {
                             message.split(" ").length == 2 &&
                             message.split(" ")[1] != ""
                         ) {
-                            const userRef = doc(db, `info/users/users/${message.split(" ")[1]}`);
+                            const userRef = doc(
+                                db,
+                                `info/users/users/${message.split(" ")[1]}`
+                            );
                             const userDoc = await getDoc(userRef);
 
                             if (userDoc.exists()) {
@@ -1786,7 +1813,10 @@ form.addEventListener("submit", async (e) => {
                             message.split(" ").length == 2 &&
                             message.split(" ")[1] != ""
                         ) {
-                            const messageRef = doc(db, `${server.id}/channels/${channel.name}/${message.split(" ")[1]}`);
+                            const messageRef = doc(
+                                db,
+                                `${server.id}/channels/${channel.name}/${message.split(" ")[1]}`
+                            );
                             const messageDoc = await getDoc(messageRef);
 
                             if (messageDoc.exists()) {
