@@ -52,6 +52,7 @@ async function createUser() {
                 color: "#ffffff",
                 displayname: username,
                 verified: false, 
+                status: "",
             },
             servers: [],
         };

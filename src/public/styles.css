@@ -362,6 +362,7 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     padding: 8px;
     background-color: #232428;
 }
@@ -390,6 +391,11 @@ button:hover {
 
 .settings-profile:hover {
     background-color: #3d3e45;
+}
+
+#settings-profile-status {
+    font-size: 12px;
+    color: #b5bac1;
 }
 
 .settings-settings {
@@ -523,7 +529,7 @@ button:hover {
 }
 
 .message-admin-button:hover {
-    color: #f23f42
+    color: #f23f42;
 }
 
 .message-content {
@@ -760,7 +766,7 @@ button:hover {
     display: flex;
     align-items: center;
     margin: 0px 8px;
-    padding: 1px 8px;
+    padding: 4px 8px;
     width: calc(100% - 16px);
     height: 44px;
     border-radius: 4px;
@@ -781,17 +787,15 @@ button:hover {
 
 .online-user p {
     height: min-content;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: #949ba4;
 }
 
 .online-user-verified {
     fill: #ffffff;
-    height: 20px;
-    vertical-align: -0.25em;
-    margin-left: 6px;
-    margin-right: 0px;
+    height: 18px;
+    vertical-align: -0.2em;
 }
 
 /* Animations */

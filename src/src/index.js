@@ -323,14 +323,21 @@ serverBanner.style.backgroundSize = `cover`;
 messageInput.setAttribute("maxlength", config.messageLength);
 
 document.getElementById("settings-profile-name").innerText =
-    currentUser.profile.displayname == null
+    currentUser.profile.displayname == null ||
+    currentUser.profile.displayname == ""
         ? "Unnamed_User"
         : currentUser.profile.displayname;
+
+document.getElementById("settings-profile-status").innerText =
+    currentUser.profile.status == null || currentUser.profile.status == ""
+        ? "Online"
+        : currentUser.profile.status;
 
 document.getElementById("settings-profile-picture").src = config.profilePicAPI
     .replace(
         "{NAME}",
-        currentUser.profile.displayname == null
+        currentUser.profile.displayname == null ||
+            currentUser.profile.displayname == ""
             ? "Unnamed_User"
             : currentUser.profile.displayname
     )
@@ -369,6 +376,7 @@ async function setOnline() {
         name: name,
         verified: currentUser.profile.verified,
         color: currentUser.profile.color,
+        status: currentUser.profile.status,
     });
 
     await setDoc(onlineDocRef, { people: peopleList });
@@ -386,42 +394,43 @@ onSnapshot(onlineDocRef, async () => {
         const userElement = document.createElement("div");
         userElement.className = "online-user";
         userElement.innerHTML = `
-            <svg width="32" height="32" viewBox="0 0 32 32">
-                <mask id=":r4:" width="32" height="32">
-                    <circle cx="16" cy="16" r="16" fill="white"></circle>
-                    <rect color="black" x="19" y="19" width="16" height="16" rx="8" ry="8"></rect>
-                </mask>
-                <foreignObject x="0" y="0" width="32" height="32" mask="url(#:r4:)">
-                    <div>
+                    <svg width="32" height="32" viewBox="0 0 32 32">
+                        <mask id=":r4:" width="32" height="32">
+                            <circle cx="16" cy="16" r="16" fill="white"></circle>
+                            <rect color="black" x="19" y="19" width="16" height="16" rx="8" ry="8"></rect>
+                        </mask>
+                        <foreignObject x="0" y="0" width="32" height="32" mask="url(#:r4:)">
+                            <div>
                         <img src="${config.profilePicAPI
                             .replace("{NAME}", user.name.trim())
                             .replace(
                                 "{COLOR}",
                                 user.color.replace("#", "")
                             )}" />
+                            </div>
+                        </foreignObject>
+                        <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
+                            <mask id=":r5:">
+                                <rect x="7.5" y="5" width="10" height="10" rx="5" ry="5" fill="white"></rect>
+                                <rect x="12.5" y="10" width="0" height="0" rx="0" ry="0" fill="black"></rect>
+                                <polygon points="-2.16506,-2.5 2.16506,0 -2.16506,2.5" fill="black" transform="scale(0) translate(13.125 10)"></polygon>
+                                <circle fill="black" cx="12.5" cy="10" r="0"></circle>
+                            </mask>
+                            <rect fill="#23a55a" width="25" height="15" mask="url(#:r5:)"></rect>
+                        </svg>
+                    </svg>
+                    <div>
+                        <p style="color: ${user.color}">${user.name} ${
+                            user.verified
+                                ? '<svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
+                                user.color +
+                                ';" class="online-user-verified" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
+                                : ""
+                        }</p>
+                        <p style="font-size: 14px;font-weight: normal;">${user.status}</p>
                     </div>
-                </foreignObject>
-                <svg x="14.5" y="17" width="25" height="15" viewBox="0 0 25 15">
-                    <mask id=":r5:">
-                        <rect x="7.5" y="5" width="10" height="10" rx="5" ry="5" fill="white"></rect>
-                        <rect x="12.5" y="10" width="0" height="0" rx="0" ry="0" fill="black"></rect>
-                        <polygon points="-2.16506,-2.5 2.16506,0 -2.16506,2.5" fill="black"
-                            transform="scale(0) translate(13.125 10)"></polygon>
-                        <circle fill="black" cx="12.5" cy="10" r="0"></circle>
-                    </mask>
-                    <rect fill="#23a55a" width="25" height="15" mask="url(#:r5:)"></rect>
-                </svg>
-            </svg>
 
-            <p style="color: ${user.color}">${user.name}</p>
 
-            ${
-                user.verified
-                    ? '<svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
-                      user.color +
-                      ';" class="online-user-verified" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
-                    : ""
-            }
         `;
         onlineList.appendChild(userElement);
     });
@@ -1088,13 +1097,14 @@ editSettings.addEventListener("click", async (e) => {
     formElement.innerHTML = `
     <div class="overlay-form-content">
         <h1>Settings</h1>
-        <p>TIP: Leave the form blank to not change that field</p>
     </div>
     <div class="overlay-form-questions">
         <h2>Username</h2>
-        <input id="form-name" type="text" placeholder="${currentUser.profile.displayname}" />
+        <input id="form-name" type="text" value="${currentUser.profile.displayname}" placeholder="${currentUser.profile.displayname}" maxlength="20"/>
         <h2>Colour</h2>
         <input id="form-colour" type="color" value="${currentUser.profile.color}" />
+        <h2>Status</h2>
+        <input id="form-status" type="text" value="${currentUser.profile.status}" placeholder="${currentUser.profile.status ? currentUser.profile.status : "Watching YouTube"}" maxlength="20"/>
     </div>
     <div class="overlay-form-confirm">
         <button id="button-exit">Cancel</button>
@@ -1111,39 +1121,15 @@ editSettings.addEventListener("click", async (e) => {
     document
         .querySelector("#button-confirm")
         .addEventListener("click", async () => {
-            const name = document.querySelector("#form-name").value;
+            const name = document.querySelector("#form-name").value ? document.querySelector("#form-name").value : currentUser.profile.displayname;
             const colour = document.querySelector("#form-colour").value;
+            const status = document.querySelector("#form-status").value ? document.querySelector("#form-status").value : "";
 
-            if (name) {
-                const onlineDocSnapshot = await getDoc(onlineDocRef);
-                const onlineDocData = onlineDocSnapshot.exists()
-                    ? onlineDocSnapshot.data()
-                    : [];
+            currentUser.profile.displayname = name.substring(0,20);
+            currentUser.profile.color = colour;
+            currentUser.profile.status = status.substring(0,20);
 
-                if (
-                    onlineDocData.people &&
-                    onlineDocData.people.includes(
-                        currentUser.profile.displayname
-                    )
-                ) {
-                    const index = onlineDocData.people.indexOf(
-                        currentUser.profile.displayname
-                    );
-                    if (index > -1) {
-                        onlineDocData.people.splice(index, 1);
-                    }
-
-                    currentUser.profile.displayname = name;
-                    await setDoc(currentUserRef, currentUser);
-                }
-
-                currentUser.profile.displayname = name;
-                await setDoc(currentUserRef, currentUser);
-            }
-            if (colour) {
-                currentUser.profile.color = colour;
-                await setDoc(currentUserRef, currentUser);
-            }
+            await setDoc(currentUserRef, currentUser);
 
             formElement.remove();
             overlayForm.style.display = "none";
