@@ -462,6 +462,10 @@ button:hover {
     border-radius: 50%;
 }
 
+.message-sender {
+    display: flex;
+}
+
 .message-sender * {
     font-size: 20px;
     font-weight: 600;
@@ -500,6 +504,26 @@ button:hover {
 
 .message:not(.message-mention):not(.message-important):hover {
     background-color: #2e3035;
+}
+
+.message-admin {
+    margin-left: 8px;
+    font-size: 16px;
+    color: gray;
+}
+
+.message-admin-button {
+    margin-right: 4px;
+    font-size: 16px;
+    font-weight: normal;
+    color: gray;
+    padding: 2px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.message-admin-button:hover {
+    color: #f23f42
 }
 
 .message-content {

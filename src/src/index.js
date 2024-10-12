@@ -703,9 +703,9 @@ async function displayPosts(posts) {
                     </span>
                 ${
                     verified
-                        ? '<svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
+                        ? '<div style="display:flex;align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
                           color +
-                          ';" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
+                          ';" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg></div>'
                         : ""
                 }
                     ${
@@ -718,11 +718,20 @@ async function displayPosts(posts) {
                     }
                     </span>
                     <span class="message-time">${time}</span>
-                    ${
-                        userAdmin
-                            ? '<span class="message-time">- ' + uid + "</span>"
-                            : ""
-                    }
+                        ${
+                            userAdmin
+                                ? `
+                                    <div class='message-admin'>
+                                        <span class='message-admin-button' onclick="
+                                            document.getElementById('created-message').value = '/delete ${post.id}';
+                                        ">Delete MSG</span>
+                                        <span class='message-admin-button' onclick="
+                                            document.getElementById('created-message').value = '/ban ${uid}';
+                                        ">Ban User</span>
+                                    </div>
+                                `
+                                : ""
+                        }
                 </div>
                 <span class="message-content">${message}</span>
             </div>
@@ -1282,7 +1291,7 @@ form.addEventListener("submit", async (e) => {
         // Bot Commands
 
         if (message.startsWith("/")) {
-            if (channel.name.includes("bot") || message.startsWith("/purge")) {
+            if (channel.name.includes("bot") || message.startsWith("/ban") || message.startsWith("/unban") || message.startsWith("/purge") || message.startsWith("/delete")) {
                 const helpCommand = `embed:<b>~~~ Help ~~~</b><br><span class="message-raw-text">/verify &lt;password&gt;</span><br>Use this command to add a verification badge next to your name<br><span class="message-raw-text">/random</span><br>Generate a random number<br><span class="message-raw-text">/coinflip</span><br>Flip a coin<br><span class="message-raw-text">/slots &lt;number&gt;</span><br>Play the slots<br><span class="message-raw-text">/joke</span><br>Generate a joke<br><span class="message-raw-text">/fact</span><br>Generate a fact<br><span class="message-raw-text">/wordle</span><br>Get today's wordle answer${
                     config.ai.enabled
                         ? '<br><span class="message-raw-text">/aichat &lt;prompt&gt;</span><br>This command allows you to talk to ai<br><span class="message-raw-text">/aipic &lt;prompt&gt;</span><br>This command allows you to make images using ai'
@@ -1371,8 +1380,9 @@ form.addEventListener("submit", async (e) => {
                     await removeTypingIndicator();
 
                     if (
-                        message.replace("/slots ", "") != "/slots" &&
-                        message.replace("/slots ", "" != null)
+                        message.split(" ").length == 2 &&
+                        message.split(" ")[1] != "" &&
+                        !isNaN(message.split(" ")[1])
                     ) {
                         let slots1 =
                             slots[Math.floor(Math.random() * slots.length)];
@@ -1528,8 +1538,8 @@ form.addEventListener("submit", async (e) => {
                     await removeTypingIndicator();
 
                     if (
-                        message.replace("/aipic ", "") != "/aipic" &&
-                        message.replace("/aipic ", "" != null)
+                        message.split(" ").length == 2 &&
+                        message.split(" ")[1] != ""
                     ) {
                         if (config.ai.enabled) {
                             await fetch(
@@ -1551,10 +1561,7 @@ form.addEventListener("submit", async (e) => {
                                             },
                                             {
                                                 role: "user",
-                                                content: message.replace(
-                                                    "/ai ",
-                                                    ""
-                                                ),
+                                                content: message.split(" ")[1],
                                             },
                                         ],
                                     }),
@@ -1606,8 +1613,8 @@ form.addEventListener("submit", async (e) => {
                     await removeTypingIndicator();
 
                     if (
-                        message.replace("/aipic ", "") != "/aipic" &&
-                        message.replace("/aipic ", "" != null)
+                        message.split(" ").length == 2 &&
+                        message.split(" ")[1] != ""
                     ) {
                         if (config.ai.enabled) {
                             await fetch(
@@ -1621,7 +1628,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     method: "POST",
                                     body: JSON.stringify({
-                                        prompt: message.replace("/ai ", ""),
+                                        prompt: message.split(" ")[1],
                                     }),
                                 }
                             )
@@ -1689,12 +1696,10 @@ form.addEventListener("submit", async (e) => {
 
                     if (admin) {
                         if (
-                            message.replace("/ban ", "") != "/ban" &&
-                            message.replace("/ban ", "") != null
+                            message.split(" ").length == 2 &&
+                            message.split(" ")[1] != ""
                         ) {
-                            const user = message.replace("/ban ", "");
-
-                            const userRef = doc(db, `info/users/users/${user}`);
+                            const userRef = doc(db, `info/users/users/${message.split(" ")[1]}`);
                             const userDoc = await getDoc(userRef);
 
                             if (userDoc.exists()) {
@@ -1724,12 +1729,10 @@ form.addEventListener("submit", async (e) => {
 
                     if (admin) {
                         if (
-                            message.replace("/unban ", "") != "/unban" &&
-                            message.replace("/unban ", "") != null
+                            message.split(" ").length == 2 &&
+                            message.split(" ")[1] != ""
                         ) {
-                            const user = message.replace("/unban ", "");
-
-                            const userRef = doc(db, `info/users/users/${user}`);
+                            const userRef = doc(db, `info/users/users/${message.split(" ")[1]}`);
                             const userDoc = await getDoc(userRef);
 
                             if (userDoc.exists()) {
@@ -1773,6 +1776,31 @@ form.addEventListener("submit", async (e) => {
                     } else {
                         alert("No permission");
                     }
+                    return;
+                }
+                if (message.startsWith("/delete")) {
+                    await removeTypingIndicator();
+
+                    if (admin) {
+                        if (
+                            message.split(" ").length == 2 &&
+                            message.split(" ")[1] != ""
+                        ) {
+                            const messageRef = doc(db, `${server.id}/channels/${channel.name}/${message.split(" ")[1]}`);
+                            const messageDoc = await getDoc(messageRef);
+
+                            if (messageDoc.exists()) {
+                                await deleteDoc(messageRef);
+                            } else {
+                                alert("Message not found");
+                            }
+                        } else {
+                            alert("Invalid Message");
+                        }
+                    } else {
+                        alert("No permission");
+                    }
+
                     return;
                 }
                 if (message.startsWith("/resettyping")) {
