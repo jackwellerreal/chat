@@ -22,7 +22,7 @@ import {
 import {
     getAuth,
     signInWithEmailAndPassword,
-    signOut
+    signOut,
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 const { ipcRenderer } = require("electron");
 const os = require("os");
@@ -146,7 +146,7 @@ try {
                     password
                 )
                     .then((userCredential) => {
-                        window.location.reload()
+                        window.location.reload();
                     })
                     .catch((error) => {
                         alert(
@@ -320,7 +320,7 @@ serverDesc.innerHTML = server.description;
 serverBanner.style.background = `url(${server.banner})`;
 serverBanner.style.backgroundPosition = `center center`;
 serverBanner.style.backgroundSize = `cover`;
-messageInput.setAttribute("maxlength",config.messageLength)
+messageInput.setAttribute("maxlength", config.messageLength);
 
 document.getElementById("settings-profile-name").innerText =
     currentUser.profile.displayname == null
@@ -1273,7 +1273,7 @@ form.addEventListener("submit", async (e) => {
             return;
         }
         if (message.length > config.messageLength) {
-            message = message.substring(0, config.messageLength)
+            message = message.substring(0, config.messageLength);
         }
         if (message.includes("<") || message.includes(">")) {
             message.replace("<", "&lt;").replace(">", "&gt;");
@@ -1633,29 +1633,26 @@ form.addEventListener("submit", async (e) => {
 
                                     const storageRef = ref(storage, fileName);
 
-                                    uploadBytes(storageRef, data).then(
-                                        (snapshot) => {
-                                            getDownloadURL(storageRef)
-                                                .then(async (url) => {
-                                                    await addDoc(messageRef, {
-                                                        bot: true,
-                                                        message: {
-                                                            content: `image:${url}`,
-                                                            command: message,
-                                                        },
-                                                        timestamp: new Date(),
-                                                        uid: auth.currentUser
-                                                            .uid,
-                                                    });
-                                                })
-                                                .catch((error) => {
-                                                    console.error(
-                                                        "Error getting image URL:",
-                                                        error
-                                                    );
+                                    uploadBytes(storageRef, data).then(() => {
+                                        getDownloadURL(storageRef)
+                                            .then(async (url) => {
+                                                await addDoc(messageRef, {
+                                                    bot: true,
+                                                    message: {
+                                                        content: `image:${url}`,
+                                                        command: message,
+                                                    },
+                                                    timestamp: new Date(),
+                                                    uid: auth.currentUser.uid,
                                                 });
-                                        }
-                                    );
+                                            })
+                                            .catch((error) => {
+                                                console.error(
+                                                    "Error getting image URL:",
+                                                    error
+                                                );
+                                            });
+                                    });
                                 })
                                 .catch(async (error) => {
                                     await addDoc(messageRef, {
@@ -1701,11 +1698,15 @@ form.addEventListener("submit", async (e) => {
                             const userDoc = await getDoc(userRef);
 
                             if (userDoc.exists()) {
-                                const userData = userDoc.data();
+                                if (!userDoc.data().account.banned) {
+                                    const userData = userDoc.data();
 
-                                userData.account.banned = true;
+                                    userData.account.banned = true;
 
-                                await setDoc(userRef, userData);
+                                    await setDoc(userRef, userData);
+                                } else {
+                                    alert("User is already banned");
+                                }
                             } else {
                                 alert("User not found");
                             }
@@ -1732,11 +1733,15 @@ form.addEventListener("submit", async (e) => {
                             const userDoc = await getDoc(userRef);
 
                             if (userDoc.exists()) {
-                                const userData = userDoc.data();
+                                if (userDoc.data().account.banned) {
+                                    const userData = userDoc.data();
 
-                                userData.account.banned = false;
+                                    userData.account.banned = false;
 
-                                await setDoc(userRef, userData);
+                                    await setDoc(userRef, userData);
+                                } else {
+                                    alert("User is not banned");
+                                }
                             } else {
                                 alert("User not found");
                             }
