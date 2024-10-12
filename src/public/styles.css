@@ -788,6 +788,7 @@ button:hover {
 .online-user p {
     height: min-content;
     font-size: 16px;
+    line-height: 16px;
     font-weight: 600;
     color: #949ba4;
 }

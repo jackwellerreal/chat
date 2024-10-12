@@ -361,9 +361,6 @@ const onlineDocRef = doc(db, "info", "online");
 
 async function setOnline() {
     const name = currentUser.profile.displayname;
-    if (name == "Unnamed_User") {
-        return;
-    }
 
     const onlineDocSnapshot = await getDoc(onlineDocRef);
     const onlineDocData = onlineDocSnapshot.exists()
@@ -423,8 +420,8 @@ onSnapshot(onlineDocRef, async () => {
                         <p style="color: ${user.color}">${user.name} ${
                             user.verified
                                 ? '<svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
-                                user.color +
-                                ';" class="online-user-verified" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
+                                  user.color +
+                                  ';" class="online-user-verified" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg>'
                                 : ""
                         }</p>
                         <p style="font-size: 14px;font-weight: normal;">${user.status}</p>
@@ -1121,15 +1118,42 @@ editSettings.addEventListener("click", async (e) => {
     document
         .querySelector("#button-confirm")
         .addEventListener("click", async () => {
-            const name = document.querySelector("#form-name").value ? document.querySelector("#form-name").value : currentUser.profile.displayname;
-            const colour = document.querySelector("#form-colour").value;
-            const status = document.querySelector("#form-status").value ? document.querySelector("#form-status").value : "";
+            // Update database
 
-            currentUser.profile.displayname = name.substring(0,20);
+            const name = document.querySelector("#form-name").value
+                ? document.querySelector("#form-name").value
+                : currentUser.profile.displayname;
+            const colour = document.querySelector("#form-colour").value;
+            const status = document.querySelector("#form-status").value
+                ? document.querySelector("#form-status").value
+                : "";
+
+            currentUser.profile.displayname = name.substring(0, 20);
             currentUser.profile.color = colour;
-            currentUser.profile.status = status.substring(0,20);
+            currentUser.profile.status = status.substring(0, 20);
 
             await setDoc(currentUserRef, currentUser);
+
+            // Update online people list
+
+            const onlineDocSnapshot = await getDoc(onlineDocRef);
+            const onlineDocData = onlineDocSnapshot.exists()
+                ? onlineDocSnapshot.data()
+                : [];
+        
+            const peopleList = onlineDocData.people ? onlineDocData.people : [];
+            const updatedData = peopleList.filter((user) => user.name !== name);
+
+            updatedData.push({
+                name: currentUser.profile.displayname,
+                color: currentUser.profile.color,
+                verified: currentUser.profile.verified,
+                status: currentUser.profile.status,
+            });
+        
+            await setDoc(onlineDocRef, { people: updatedData });
+
+            // Remove the form
 
             formElement.remove();
             overlayForm.style.display = "none";
