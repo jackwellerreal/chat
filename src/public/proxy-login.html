@@ -73,16 +73,17 @@
 
 <body>
     <div class="container">
-        <h1>Proxy Authentication</h1>
-        <input type="text" id="username" placeholder="Username" autofocus>
-        <input type="password" id="password" placeholder="Password">
-        <button id="submit">Submit</button>
+        <form id="form">
+            <h1>Proxy Authentication</h1>
+            <input type="text" id="username" placeholder="Username" autofocus>
+            <input type="password" id="password" placeholder="Password">
+            <button type="submit">Submit</button>
+        </form>
     </div>
     <script>
         const { ipcRenderer } = require('electron');
-        const ipc = ipcRenderer;
 
-        document.getElementById('submit').addEventListener('click', () => {
+        document.getElementById('form').addEventListener('submit', () => {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             if (username && password) {

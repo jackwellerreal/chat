@@ -10,16 +10,15 @@ require("firebase/compat/firestore");
 // Firebase Config
 
 const config = require("./config.json");
-const firebaseConfig = {
+
+firebase.initializeApp({
     apiKey: config.firebase.apiKey,
     authDomain: config.firebase.authDomain,
     projectId: config.firebase.projectId,
     storageBucket: config.firebase.storageBucket,
     messagingSenderId: config.firebase.messagingSenderId,
     appId: config.firebase.appId,
-};
-
-firebase.initializeApp(firebaseConfig);
+});
 const db = firebase.firestore();
 
 let mainWindow;

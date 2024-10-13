@@ -29,15 +29,6 @@ const os = require("os");
 
 const config = require("../../config.json");
 
-const firebaseConfig = {
-    apiKey: config.firebase.apiKey,
-    authDomain: config.firebase.authDomain,
-    projectId: config.firebase.projectId,
-    storageBucket: config.firebase.storageBucket,
-    messagingSenderId: config.firebase.messagingSenderId,
-    appId: config.firebase.appId,
-};
-
 const ipc = ipcRenderer;
 
 // Window Controls
@@ -70,7 +61,14 @@ fetch("https://api.ipify.org/?format=json")
 const app = initializeApp(firebaseConfig);
 const slots = ["💯", "💀", "🧑‍🦼", "🍪", "😂"];
 
-const db = getFirestore(app);
+const db = getFirestore({
+    apiKey: config.firebase.apiKey,
+    authDomain: config.firebase.authDomain,
+    projectId: config.firebase.projectId,
+    storageBucket: config.firebase.storageBucket,
+    messagingSenderId: config.firebase.messagingSenderId,
+    appId: config.firebase.appId,
+});
 const storage = getStorage();
 const auth = getAuth();
 const urlParams = new URLSearchParams(window.location.search);

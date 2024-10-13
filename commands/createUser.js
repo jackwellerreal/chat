@@ -1,18 +1,17 @@
 const config = require("../config.json");
-const firebaseConfig = {
+
+const firebase = require("firebase/compat/app");
+require("firebase/compat/auth");
+require("firebase/compat/firestore");
+
+firebase.initializeApp({
     apiKey: config.firebase.apiKey,
     authDomain: config.firebase.authDomain,
     projectId: config.firebase.projectId,
     storageBucket: config.firebase.storageBucket,
     messagingSenderId: config.firebase.messagingSenderId,
     appId: config.firebase.appId,
-};
-
-const firebase = require("firebase/compat/app");
-require("firebase/compat/auth");
-require("firebase/compat/firestore");
-
-firebase.initializeApp(firebaseConfig);
+});
 const db = firebase.firestore();
 const auth = firebase.auth();
 
