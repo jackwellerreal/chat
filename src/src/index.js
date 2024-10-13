@@ -58,10 +58,7 @@ fetch("https://api.ipify.org/?format=json")
         console.error("Error:", error);
     });
 
-const app = initializeApp(firebaseConfig);
-const slots = ["💯", "💀", "🧑‍🦼", "🍪", "😂"];
-
-const db = getFirestore({
+const app = initializeApp({
     apiKey: config.firebase.apiKey,
     authDomain: config.firebase.authDomain,
     projectId: config.firebase.projectId,
@@ -69,6 +66,9 @@ const db = getFirestore({
     messagingSenderId: config.firebase.messagingSenderId,
     appId: config.firebase.appId,
 });
+const slots = ["💯", "💀", "🧑‍🦼", "🍪", "😂"];
+
+const db = getFirestore(app);
 const storage = getStorage();
 const auth = getAuth();
 const urlParams = new URLSearchParams(window.location.search);
@@ -726,12 +726,14 @@ async function displayPosts(posts) {
                             userAdmin
                                 ? `
                                     <div class='message-admin'>
-                                        <span class='message-admin-button' onclick="
-                                            document.getElementById('created-message').value = '/delete ${post.id}';
-                                        ">Delete MSG</span>
-                                        <span class='message-admin-button' onclick="
-                                            document.getElementById('created-message').value = '/ban ${uid}';
-                                        ">Ban User</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" onclick="document.getElementById('created-message').value = '/delete ${post.id}';">
+                                            <title>Delete Message</title>
+                                            <path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0L284.2 0c12.1 0 23.2 6.8 28.6 17.7L320 32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 96C14.3 96 0 81.7 0 64S14.3 32 32 32l96 0 7.2-14.3zM32 128l384 0 0 320c0 35.3-28.7 64-64 64L96 512c-35.3 0-64-28.7-64-64l0-320zm96 64c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16l0 224c0 8.8 7.2 16 16 16s16-7.2 16-16l0-224c0-8.8-7.2-16-16-16z"/>
+                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" onclick="document.getElementById('created-message').value = '/ban ${uid}';">
+                                            <title>Ban User</title>
+                                            <path d="M318.6 9.4c-12.5-12.5-32.8-12.5-45.3 0l-120 120c-12.5 12.5-12.5 32.8 0 45.3l16 16c12.5 12.5 32.8 12.5 45.3 0l4-4L325.4 293.4l-4 4c-12.5 12.5-12.5 32.8 0 45.3l16 16c12.5 12.5 32.8 12.5 45.3 0l120-120c12.5-12.5 12.5-32.8 0-45.3l-16-16c-12.5-12.5-32.8-12.5-45.3 0l-4 4L330.6 74.6l4-4c12.5-12.5 12.5-32.8 0-45.3l-16-16zm-152 288c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l48 48c12.5 12.5 32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-1.4-1.4L272 285.3 226.7 240 168 298.7l-1.4-1.4z"/>
+                                        </svg>
                                     </div>
                                 `
                                 : ""
@@ -1245,6 +1247,8 @@ async function removeTypingIndicator() {
         people: currentDocData.people,
     });
 }
+
+removeTypingIndicator();
 
 // Send Message
 

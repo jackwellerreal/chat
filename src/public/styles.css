@@ -492,6 +492,7 @@ button:hover {
     font-size: 16px;
     color: gray;
     margin-left: 4px;
+    vertical-align: middle;
 }
 
 .message-time-multi {
@@ -518,18 +519,18 @@ button:hover {
     color: gray;
 }
 
-.message-admin-button {
+.message-admin svg {
+    height: 16px;
     margin-right: 4px;
     font-size: 16px;
     font-weight: normal;
-    color: gray;
-    padding: 2px;
+    fill: gray;
     text-decoration: none;
     cursor: pointer;
 }
 
-.message-admin-button:hover {
-    color: #f23f42;
+.message-admin svg:hover {
+    fill: #f23f42;
 }
 
 .message-content {
