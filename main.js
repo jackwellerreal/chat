@@ -173,17 +173,20 @@ ipcMain.on("max", () => {
 ipcMain.on("close", async () => {
     try {
         const onlineRef = db.collection("info").doc("online");
-        const onlineData = (await onlineRef.get()).data().people;
-
-        const updatedData = onlineData.filter((user) => user.name !== name);
-        await onlineRef.update({ people: updatedData });
+        await onlineRef.update({
+            people: (await onlineRef.get())
+                .data()
+                .people.filter((user) => user.name !== name),
+        });
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 
     mainWindow.close();
 });
 
 app.on("window-all-closed", async () => {
-    app.quit();
+    if (process.platform !== "darwin") {
+        app.quit();
+    }
 });
