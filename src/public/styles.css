@@ -477,7 +477,14 @@ button:hover {
     font-weight: 600;
 }
 
-.message-sender svg {
+.messgae-sender-verified {
+    display: flex;
+    align-items: center;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.messgae-sender-verified svg {
     fill: #ffffff;
     height: 24px;
     vertical-align: -0.25em;
@@ -493,6 +500,7 @@ button:hover {
     color: gray;
     margin-left: 4px;
     vertical-align: middle;
+    padding: 2px 0;
 }
 
 .message-time-multi {
@@ -515,7 +523,6 @@ button:hover {
 
 .message-admin {
     margin-left: 8px;
-    font-size: 16px;
     color: gray;
 }
 
@@ -541,8 +548,7 @@ button:hover {
 
 .message-highlight {
     background-color: #5865f24d;
-    padding: 2px;
-    margin-top: 2px;
+    margin: 0 4px;
     border-radius: 10px;
     text-decoration: none;
     cursor: pointer;

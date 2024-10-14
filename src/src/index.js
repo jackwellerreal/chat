@@ -99,15 +99,14 @@ const form = document.querySelector("#create");
 
 // Get info on chat
 
-try {
-    const info = (await getDoc(doc(db, "info", "info"))).data();
-} catch (error) {
-    if (!auth.currentUser) {
-        overlayForm.style.display = "flex";
+const info = (await getDoc(doc(db, "info", "info"))).data();
 
-        const formElement = document.createElement("div");
-        formElement.className = "overlay-form";
-        formElement.innerHTML = `
+if (!auth.currentUser) {
+    overlayForm.style.display = "flex";
+
+    const formElement = document.createElement("div");
+    formElement.className = "overlay-form";
+    formElement.innerHTML = `
                         <div class="overlay-form-content">
                             <h1>Sign In</h1>
                             <p>Please enter your username and password</p>
@@ -123,36 +122,29 @@ try {
                             <button id="button-confirm">Sign-In</button>
                         </div>
                         `;
-        overlayForm.appendChild(formElement);
+    overlayForm.appendChild(formElement);
 
-        document.querySelector("#button-exit").addEventListener("click", () => {
-            ipc.send("close");
-        });
+    document.querySelector("#button-exit").addEventListener("click", () => {
+        ipc.send("close");
+    });
 
-        document
-            .querySelector("#button-confirm")
-            .addEventListener("click", () => {
-                const username = document.querySelector("#form-username").value;
-                const password = document.querySelector("#form-password").value;
+    document.querySelector("#button-confirm").addEventListener("click", () => {
+        const username = document.querySelector("#form-username").value;
+        const password = document.querySelector("#form-password").value;
 
-                formElement.remove();
-                overlayForm.style.display = "none";
+        formElement.remove();
+        overlayForm.style.display = "none";
 
-                signInWithEmailAndPassword(
-                    auth,
-                    username + "@chat.com",
-                    password
-                )
-                    .then((userCredential) => {
-                        window.location.reload();
-                    })
-                    .catch((error) => {
-                        alert(
-                            `An error occured, please send this to a developer:\n${error}`
-                        );
-                    });
+        signInWithEmailAndPassword(auth, username + "@chat.com", password)
+            .then((userCredential) => {
+                window.location.reload();
+            })
+            .catch((error) => {
+                alert(
+                    `An error occured, please send this to a developer:\n${error}`
+                );
             });
-    }
+    });
 }
 
 // Get users from database
@@ -707,7 +699,7 @@ async function displayPosts(posts) {
                     </span>
                 ${
                     verified
-                        ? '<div style="display:flex;align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
+                        ? '<div class="messgae-sender-verified"><svg xmlns="http://www.w3.org/2000/svg" style="fill: ' +
                           color +
                           ';" viewBox="0 0 24 24" ><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg></div>'
                         : ""
@@ -1140,7 +1132,7 @@ editSettings.addEventListener("click", async (e) => {
             const onlineDocData = onlineDocSnapshot.exists()
                 ? onlineDocSnapshot.data()
                 : [];
-        
+
             const peopleList = onlineDocData.people ? onlineDocData.people : [];
             const updatedData = peopleList.filter((user) => user.name !== name);
 
@@ -1150,7 +1142,7 @@ editSettings.addEventListener("click", async (e) => {
                 verified: currentUser.profile.verified,
                 status: currentUser.profile.status,
             });
-        
+
             await setDoc(onlineDocRef, { people: updatedData });
 
             // Remove the form
@@ -1571,7 +1563,7 @@ form.addEventListener("submit", async (e) => {
                     await removeTypingIndicator();
 
                     if (
-                        message.split(" ").length == 2 &&
+                        message.split(" ").length >= 2 &&
                         message.split(" ")[1] != ""
                     ) {
                         if (config.ai.enabled) {
@@ -1594,7 +1586,7 @@ form.addEventListener("submit", async (e) => {
                                             },
                                             {
                                                 role: "user",
-                                                content: message.split(" ")[1],
+                                                content: message.replace("/aichat ",""),
                                             },
                                         ],
                                     }),
@@ -1646,7 +1638,7 @@ form.addEventListener("submit", async (e) => {
                     await removeTypingIndicator();
 
                     if (
-                        message.split(" ").length == 2 &&
+                        message.split(" ").length >= 2 &&
                         message.split(" ")[1] != ""
                     ) {
                         if (config.ai.enabled) {
@@ -1661,7 +1653,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     method: "POST",
                                     body: JSON.stringify({
-                                        prompt: message.split(" ")[1],
+                                        prompt: message.replace("/aipic ",""),
                                     }),
                                 }
                             )
@@ -1723,7 +1715,7 @@ form.addEventListener("submit", async (e) => {
                     }
 
                     return;
-                }
+                }               
                 if (message.startsWith("/ban")) {
                     await removeTypingIndicator();
 
