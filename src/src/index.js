@@ -981,7 +981,6 @@ async function loadVoice() {
             startButton.disabled = false;
             joinButton.disabled = false;
         } catch (error) {
-            alert("An error occured, please report this to " + server.manager);
             console.error(error);
         }
     };
@@ -991,7 +990,6 @@ async function loadVoice() {
             await createCall();
             leaveButton.disabled = false;
         } catch (error) {
-            alert("An error occured, please report this to " + server.manager);
             console.error(error);
         }
     };
@@ -1001,7 +999,6 @@ async function loadVoice() {
             await joinCall();
             leaveButton.disabled = false;
         } catch (error) {
-            alert("An error occured, please report this to " + server.manager);
             console.error(error);
         }
     };
@@ -1010,7 +1007,6 @@ async function loadVoice() {
         try {
             location.reload();
         } catch (error) {
-            alert("An error occured, please report this to " + server.manager);
             console.error(error);
         }
     };
