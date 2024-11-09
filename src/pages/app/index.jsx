@@ -1,20 +1,21 @@
 import styles from "./app.module.css";
+import { useNavigate } from "react-router-dom";
 
-import { MenuBar } from "./components/menubar";
-import { ServerList } from "./components/serverlist";
-import { ChannelList } from "./components/channellist";
-import { Settings } from "./components/settings";
-import { Messages } from "./components/messages";
-import { NewMessage } from "./components/newmessage";
-import { Online } from "./components/online";
-import { SignIn } from "./components/signin";
+import { MenuBar } from "../../components/menubar/index.jsx";
+import { ServerList } from "../../components/serverlist/index.jsx";
+import { ChannelList } from "../../components/channellist/index.jsx";
+import { Settings } from "../../components/settings/index.jsx";
+import { Messages } from "../../components/messages/index.jsx";
+import { NewMessage } from "../../components/newmessage/index.jsx";
+import { Online } from "../../components/online/index.jsx";
+import { SignIn } from "../signin/index.jsx";
 
-import firebaseConfig from "./firebaseconf.jsx";
+import firebaseConfig from "../../firebaseconf.jsx";
 import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { ChatProvider } from "./chatcontext.jsx";
+import { ChatProvider } from "../../chatcontext.jsx";
 
-import loadingImage from "./assets/icon.png"
+import loadingImage from "../../assets/icon.png";
 
 const auth = getAuth(firebaseConfig);
 
@@ -33,12 +34,8 @@ export function App() {
     }
 
     if (!user) {
-        return (
-            <>
-                <MenuBar />
-                <SignIn />
-            </>
-        );
+        const navigate = useNavigate();
+        navigate("/signin");
     } else {
         return (
             <ChatProvider>
