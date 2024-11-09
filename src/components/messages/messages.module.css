@@ -1,0 +1,136 @@
+.messages {
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: scroll;
+    background-color: #313338;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    margin-bottom: 100px;
+}
+
+.channel-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.greating {
+    text-align: center;
+    margin: 16px;
+}
+
+.greeting-title {
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.greeting-desc {
+    color: #b5bac1;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.message {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    padding: 4px 12px;
+    --webkit-user-select: text;
+}
+
+.message-pfp {
+    display: flex;
+    align-items: center;
+    width: 50px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.message-pfp img {
+    width: 50px;
+    border-radius: 50%;
+}
+
+.message-sender {
+    display: flex;
+    gap: 4px;
+}
+
+.message-sender * {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.message-sender-verified {
+    display: flex;
+    align-items: center;
+}
+
+.message-sender-verified svg {
+    fill: #ffffff;
+    width: 24px;
+    height: 24px;
+    vertical-align: -0.25em;
+}
+
+.message-sender span {
+    vertical-align: initial;
+}
+
+.message-time {
+    height: 30px;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 30px;
+    text-align: center;
+    color: gray;
+}
+
+.message-time-multi {
+    min-width: 50px !important;
+    margin-right: 12px;
+    font-weight: normal;
+    font-size: 16px;
+    color: gray;
+    text-align: right;
+    opacity: 0;
+}
+
+.message:hover .message-time-multi {
+    opacity: 1;
+}
+
+.message:not(.message-mention):not(.message-important):hover {
+    background-color: #2e3035;
+}
+
+.message-admin {
+    margin-left: 8px;
+    color: gray;
+}
+
+.message-admin svg {
+    height: 16px;
+    margin-right: 4px;
+    font-size: 16px;
+    font-weight: normal;
+    fill: gray;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.message-admin svg:hover {
+    fill: #f23f42;
+}
+
+.message-content {
+    width: calc(100% - 62px);
+    overflow-wrap: break-word;
+    font-size: 20px;
+    user-select: text;
+}
+
+.emoji {
+    height: 36px !important;
+    border-radius: 0 !important;
+    vertical-align: middle;
+}

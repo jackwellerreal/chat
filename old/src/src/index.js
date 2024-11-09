@@ -174,14 +174,26 @@ ipc.send("name", currentUser.profile.displayname);
 
 // Get info on server
 
-const servers = (await getDoc(doc(db, "info", "servers"))).data().list;
+const serverCollectionRef = collection(db, `info/servers/servers`);
+const serverDocs = await getDocs(serverCollectionRef);
+const servers = serverDocs.docs.map((doc) => doc.data());
 
 const server =
     urlParams.get("server-id") == null
-        ? servers.find((obj) => obj.id === "40a2eee5") // you can change the id to any server id
+        ? servers.find((obj) => obj.id === "40a2eee5")
         : servers.find((obj) => obj.id === urlParams.get("server-id"));
 
+        console.log(servers)
+
 // List all servers
+
+const dmsurl = new URL(window.location.href);
+dmsurl.searchParams.set("server-id", "dms");
+const serverElement = document.createElement("a");
+serverElement.className = "server-sidebar-icon";
+serverElement.innerHTML = `<img src="${info.appIcon}">`;
+serverElement.href = dmsurl;
+document.getElementById("server-list").appendChild(serverElement);
 
 servers.forEach((serverList) => {
     let localServerList =
@@ -194,7 +206,7 @@ servers.forEach((serverList) => {
         url.searchParams.set("server-id", serverList.id);
         const serverElement = document.createElement("a");
         serverElement.className = "server-sidebar-icon";
-        serverElement.innerHTML = `<img src="${serverList.icon}">`;
+        serverElement.innerHTML = `<img src="${serverList.info.icon}">`;
         serverElement.href = url;
         document.getElementById("server-list").appendChild(serverElement);
     }
@@ -266,11 +278,15 @@ document.querySelector("#findServer").addEventListener("click", () => {
 
 // List channels for selected server
 
-const channels = server.channels;
+console.log(server)
 
-const channel = urlParams.get("channel")
-    ? channels.find((obj) => obj.name === urlParams.get("channel"))
-    : channels.find((obj) => obj.name === server.mainChannel);
+const channels = server ? server.channels : null;
+
+const channel = server
+    ? urlParams.get("channel")
+        ? channels.find((obj) => obj.name === urlParams.get("channel"))
+        : channels.find((obj) => obj.name === server.mainChannel)
+    : null;
 
 channels.forEach((channelList) => {
     const url = new URL(window.location.href);
@@ -304,7 +320,6 @@ channelSidebar.addEventListener("scroll", function () {
 
 // Provide information on server
 
-pageTitle.innerHTML = `${server.name} - #${channel.name}`;
 serverName.innerHTML = `${server.name} <div id="server-info" style="display: flex;align-items: center;height: 25px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="height: 16px;fill: #ffffff;"><path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg></div>`;
 serverDesc.innerHTML = server.description;
 serverBanner.style.background = `url(${server.banner})`;
@@ -648,6 +663,7 @@ async function displayPosts(posts) {
         const uid = post.uid;
 
         const author = users[uid];
+        const username = author.account.username;
         const name = author.profile.displayname;
         const verified = author.profile.verified;
         const color = author.profile.color;
@@ -694,7 +710,7 @@ async function displayPosts(posts) {
             </div>
             <div>
                 <div class="message-sender">
-                    <span style="color: ${color};">
+                    <span style="color: ${color};" title="@${username}">
                         ${name}
                     </span>
                 ${
@@ -780,15 +796,17 @@ async function displayPosts(posts) {
 
 function loadData() {
     onSnapshot(q, (querySnapshot) => {
-        const posts = [];
-        querySnapshot.forEach((doc) => {
-            posts.push({ ...doc.data(), id: doc.id });
-        });
-        displayPosts(posts).then(() => {
-            messagesDiv.scroll({
-                top: messagesDiv.scrollHeight,
+        if (!currentUser.account.banned) {
+            const posts = [];
+            querySnapshot.forEach((doc) => {
+                posts.push({ ...doc.data(), id: doc.id });
             });
-        });
+            displayPosts(posts).then(() => {
+                messagesDiv.scroll({
+                    top: messagesDiv.scrollHeight,
+                });
+            });
+        }
     });
 }
 
@@ -1582,7 +1600,10 @@ form.addEventListener("submit", async (e) => {
                                             },
                                             {
                                                 role: "user",
-                                                content: message.replace("/aichat ",""),
+                                                content: message.replace(
+                                                    "/aichat ",
+                                                    ""
+                                                ),
                                             },
                                         ],
                                     }),
@@ -1649,7 +1670,7 @@ form.addEventListener("submit", async (e) => {
                                     },
                                     method: "POST",
                                     body: JSON.stringify({
-                                        prompt: message.replace("/aipic ",""),
+                                        prompt: message.replace("/aipic ", ""),
                                     }),
                                 }
                             )
@@ -1711,7 +1732,7 @@ form.addEventListener("submit", async (e) => {
                     }
 
                     return;
-                }               
+                }
                 if (message.startsWith("/ban")) {
                     await removeTypingIndicator();
 

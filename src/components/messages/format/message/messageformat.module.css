@@ -1,0 +1,62 @@
+.message-highlight {
+    background-color: #5865f24d;
+    padding: 0 4px;
+    border-radius: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background-color 50ms ease-out,
+        color 50ms ease-out;
+}
+
+.message-highlight:hover {
+    background-color: #5865f2;
+}
+
+.message-mention {
+    background-color: hsl(40 86% 57% / 0.1);
+    border-left: 2px solid hsl(40 86% 57%);
+}
+
+.message-important {
+    background-color: hsl(0 86% 57% / 0.1);
+    border-left: 2px solid hsl(0 86% 57%);
+}
+
+.message-spoiler {
+    width: fit-content;
+    background-color: #1e1f22;
+    padding: 2px;
+    margin-top: 2px;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.message-spoiler:hover {
+    background-color: hsl(0 0% 100% / 0.1);
+}
+
+.message-spoiler-text {
+    opacity: 0;
+}
+
+.message-spoiler:hover .message-spoiler-text {
+    opacity: 1;
+}
+
+.message-raw-text {
+    width: fit-content;
+    background-color: hsl(0 0% 100% / 0.1);
+    padding: 2px;
+    margin-top: 2px;
+    border-radius: 5px;
+    text-decoration: none;
+    white-space: pre-wrap;
+    font-family: consolas, monospace;
+}
+
+.message-content img {
+    max-width: 400px;
+    border-radius: 10px;
+}

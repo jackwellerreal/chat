@@ -1,0 +1,58 @@
+.create {
+    display: flex;
+    position: fixed;
+    width: calc(100% - 584px);
+    height: 44px;
+    bottom: 0;
+    margin: 32px 16px 24px 16px;
+}
+
+.message-create {
+    flex-grow: 1;
+    height: 100%;
+    padding: 10px 0px;
+    outline: none;
+    border: none;
+    border-radius: 0px;
+    color: #ffffff;
+    background-color: #383a40;
+}
+
+.message-create-button {
+    width: 56px;
+    padding: 10px 16px;
+    outline: none;
+    border: none;
+    color: #ffffff;
+    background-color: #383a40;
+    cursor: pointer;
+}
+
+.message-create-button svg {
+    height: 100%;
+    cursor: pointer;
+    fill: #b5bac1;
+}
+
+.message-create-button svg:hover {
+    fill: #dbdee1;
+}
+
+.message-create-button:nth-of-type(2) {
+    border-radius: 10px 0px 0px 10px;
+}
+
+.message-create-button:nth-of-type(3) {
+    width: 59px;
+}
+
+.message-create-button:nth-of-type(4) {
+    border-radius: 0px 10px 10px 0px;
+}
+
+.emoji-picker-div {
+    position: absolute;
+    display: none;
+    right: 0;
+    bottom: 64px;
+}

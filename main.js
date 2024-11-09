@@ -60,7 +60,7 @@ app.whenReady().then(async () => {
             autoHideMenuBar: true,
         });
 
-        authWindow.loadFile("./src/public/proxy-login.html");
+        authWindow.loadFile("./public/proxy-login.html");
 
         // Wait for response
 
@@ -85,7 +85,7 @@ app.whenReady().then(async () => {
                 autoHideMenuBar: true,
             });
 
-            mainWindow.loadFile("./src/public/index.html");
+            mainWindow.loadURL('http://localhost:3000')
 
             // Open links in default browser
 
@@ -125,7 +125,7 @@ app.whenReady().then(async () => {
             autoHideMenuBar: true,
         });
 
-        mainWindow.loadFile("./src/public/index.html");
+        mainWindow.loadURL('http://localhost:3000')
 
         // Open links in default browser
 

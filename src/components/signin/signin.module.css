@@ -1,0 +1,122 @@
+button,
+input[type="submit"],
+input[type="button"] {
+    height: 32px;
+    padding: 2px 16px;
+    border-radius: 3px;
+    background-color: #5865f2;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    outline: none;
+    transition:
+        background-color 170ms ease,
+        color 170ms ease;
+    cursor: pointer;
+}
+
+.overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: calc(100vh - 24px);
+    position: absolutew;
+    background: url(../../assets/background.jpg);
+    box-shadow: inset 0 0 0 100˝˝0px #00000047;
+    z-index: 100;
+}
+
+.overlay-form {
+    width: 440px;
+    height: fit-content;
+    border-radius: 4px;
+    background-color: #313338;
+}
+
+.overlay-form-content {
+    padding: 16px;
+}
+
+.overlay-form-content h1 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.overlay-form-content p {
+    text-align: center;
+    color: #b5bac1;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.overlay-form-questions {
+    padding: 0 16px;
+}
+
+.overlay-form-questions h2 {
+    color: #b5bac1;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.overlay-form-questions input[type="text"],
+.overlay-form-questions input[type="password"] {
+    padding: 10px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    width: 100%;
+    border-radius: 3px;
+    background-color: #1e1f22;
+    border: 0;
+    outline: 0;
+    text-rendering: optimizeLegibility;
+}
+
+.overlay-form-questions input[type="color"] {
+    height: 44px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    width: 100%;
+    border-radius: 3px;
+    background-color: #1e1f22;
+    border: 0;
+    outline: 0;
+    text-rendering: optimizeLegibility;
+}
+
+.overlay-form-questions input[type="color"]::-moz-color-swatch {
+    border-radius: 3px;
+    border: none;
+}
+
+.overlay-form-questions input[type="color"]::-webkit-color-swatch-wrapper {
+    border-radius: 3px;
+    padding: 0;
+    border-radius: 0;
+}
+
+.overlay-form-questions input[type="color"]::-webkit-color-swatch {
+    border-radius: 3px;
+    border: none;
+}
+
+.overlay-form-confirm {
+    display: flex;
+    justify-content: space-between;
+    background-color: #2b2d31;
+    padding: 16px;
+    border-radius: 0px 0px 4px 4px;
+}
+
+.overlay-form-confirm button:nth-of-type(1) {
+    background-color: transparent !important;
+}
+
+.overlay-form-confirm button:nth-of-type(1):hover {
+    text-decoration: underline;
+}

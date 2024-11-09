@@ -5,6 +5,7 @@
     font-style: normal;
     box-sizing: border-box;
     color: #ffffff;
+    user-select: none;
 }
 
 body {
@@ -544,6 +545,7 @@ button:hover {
     width: calc(100% - 62px);
     overflow-wrap: break-word;
     font-size: 20px;
+    user-select: text;
 }
 
 .message-highlight {

@@ -1,0 +1,67 @@
+.settings {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 8px;
+    background-color: #232428;
+}
+
+.settings-profile {
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.settings-profile svg {
+    margin-right: 8px;
+}
+
+.settings-profile p {
+    min-width: 76px;
+    font-size: 14px;
+}
+
+.settings-profile img {
+    height: 32px;
+    border-radius: 10px;
+}
+
+.settings-profile:hover {
+    background-color: #3d3e45;
+}
+
+#settings-profile-status {
+    font-size: 12px;
+    color: #b5bac1;
+}
+
+.settings-settings {
+    width: 32px;
+    height: 32px;
+    position: relative;
+    aspect-ratio: 1/1;
+    padding: 6px;
+    border-radius: 4px;
+    fill: #b4b9c0;
+    cursor: pointer;
+}
+
+.settings-settings:hover {
+    background-color: #3d3e45;
+}
+
+.settings-settings:hover > svg {
+    animation: spin normal 1s;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

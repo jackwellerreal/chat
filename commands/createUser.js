@@ -29,42 +29,52 @@ const username = prompt(
 const password = prompt(
     `${colours.FgYellow}Please enter a ${colours.FgBlue}password${colours.FgYellow}: ${colours.Reset}`
 );
-const admin = prompt(
-    `${colours.FgYellow}Should this user have ${colours.FgBlue}admin${colours.FgYellow} privileges (y/n): ${colours.Reset}`
-) == "y" ? true : false;
+const admin =
+    prompt(
+        `${colours.FgYellow}Should this user have ${colours.FgBlue}admin${colours.FgYellow} privileges (y/n): ${colours.Reset}`
+    ) == "y"
+        ? true
+        : false;
 
-async function createUser() {
-    try {
-        const userCredential = await auth.createUserWithEmailAndPassword(username + "@chat.com", password);
-        const user = userCredential.user;
-        console.log(`${colours.FgGreen}✅ Successfully created user auth${colours.Reset}`);
+try {
+    const userCredential = await auth.createUserWithEmailAndPassword(
+        username + "@chat.com",
+        password
+    );
+    const user = userCredential.user;
+    console.log(
+        `${colours.FgGreen}✅ Successfully created user auth${colours.Reset}`
+    );
 
-        const usersRef = db.collection("info/users/users").doc(user.uid);
-        const data = {
-            account: {
-                uid: user.uid,
-                username: username,
-                admin: admin,
-                banned: false,
-            },
-            profile: {
-                color: "#ffffff",
-                displayname: username,
-                verified: false, 
-                status: "",
-            },
-            servers: [],
-        };
+    const usersRef = db.collection("info/users/users").doc(user.uid);
+    const data = {
+        account: {
+            uid: user.uid,
+            username: username,
+            admin: admin,
+            banned: false,
+        },
+        profile: {
+            color: "#ffffff",
+            displayname: username,
+            verified: false,
+            status: "",
+        },
+        servers: [],
+    };
 
-        await usersRef.set(data);
-        console.log(`${colours.FgGreen}✅ Successfully created user doc${colours.Reset}`);
+    await usersRef.set(data);
+    console.log(
+        `${colours.FgGreen}✅ Successfully created user doc${colours.Reset}`
+    );
 
-        console.log(`${colours.FgGreen}✅ Successfully created user${colours.Reset}`);
-        process.exit();
-    } catch (error) {
-        console.log(`${colours.FgRed}❌ Unsuccessfully created user${colours.Reset}`);
-        console.log(`${error.code}: ${error.message}`);
-    }
+    console.log(
+        `${colours.FgGreen}✅ Successfully created user${colours.Reset}`
+    );
+    process.exit();
+} catch (error) {
+    console.log(
+        `${colours.FgRed}❌ Unsuccessfully created user${colours.Reset}`
+    );
+    console.log(`${error.code}: ${error.message}`);
 }
-
-createUser();

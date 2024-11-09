@@ -18,6 +18,18 @@ const prompt = require("prompt-sync")({ sigint: true });
 const Colours = require("./colours");
 const colours = new Colours();
 
+async function createServer(serverJSON) {
+    const serversRef = db.collection("info").doc("servers");
+    const serversDoc = await serversRef.get();
+    const serversData = serversDoc.exists ? serversDoc.data() : {};
+
+    const serversList = serversData.list ? serversData.list : [];
+
+    serversList.push(serverJSON);
+
+    await serversRef.set({ list: serversList });
+}
+
 try {
     console.log(
         `${colours.FgYellow}Welcome to the ${colours.FgBlue}server creation${colours.FgYellow} wizard!${colours.Reset}`
@@ -100,8 +112,7 @@ try {
         channels: channels,
     };
 
-    const serversRef = db.collection("info/users/users").doc(user.uid);
-    await serversRef.set(serverJSON);
+    createServer(serverJSON);
 
     console.log(
         `${colours.FgGreen}✅ Successfully created a server${colours.Reset}`

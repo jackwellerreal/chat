@@ -1,0 +1,32 @@
+.message-embed {
+    width: fit-content;
+    max-width: 520px;
+    border-left-style: solid;
+    border-width: 4px;
+    padding: 12px 14px 12px 12px;
+    border-radius: 4px;
+    background-color: #2b2d31;
+}
+
+.message-embed-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.message-embed-description {
+    font-size: 20px;
+    color: #fff;
+}
+
+.message-embed-footer {
+    font-size: 12px;
+    color: #ccc;
+}
+
+.message-embed-image {
+    width: 100%;
+    max-height: 400px;
+    border-radius: 4px;
+    margin-top: 12px;
+}

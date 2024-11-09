@@ -1,0 +1,20 @@
+{
+    "firebase": {
+        "apiKey": "AIzaSyC3bVHFPlQlqFRVNpgACjEZnGoFlB5Dbjs",
+        "authDomain": "chat-v2-654bb.firebaseapp.com",
+        "projectId": "chat-v2-654bb",
+        "storageBucket": "chat-v2-654bb.appspot.com",
+        "messagingSenderId": "996020677176",
+        "appId": "1:996020677176:web:753898bbd6fb1acc7014cd"
+    },
+    "tenorAPI": "AIzaSyAKeacIfhHp98ghbHeR2ghpMcQlkirtgA4",
+    "profilePicAPI": "https://api.dicebear.com/9.x/fun-emoji/svg?seed={NAME}&backgroundColor={COLOR}",
+    "proxy": "proxy2.eq.edu.au:80",
+    "messageLength": 250,
+    "economyCurrency": "$",
+    "ai": {
+        "enabled": true,
+        "url": "https://api.cloudflare.com/client/v4/accounts/2b744ecf36254923d3ae17919ee95f29/ai/run/{MODEL}",
+        "token": "Bearer XtxjXDWvCjIRWNpoQ-dL7OTZBwayJnqP7ARJikcH"
+    }
+}
