@@ -1,0 +1,24 @@
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: calc(100vh - 24px);
+    position: absolute;
+    box-shadow: inset 0 0 0 1000px #00000047;
+    z-index: 100;
+}
+
+.loading img {
+    width: 128px;
+    animation: rotate 4000ms infinite linear;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg)
+    }
+    to {
+        transform: rotate(360deg)
+    }
+}

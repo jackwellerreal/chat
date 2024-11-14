@@ -8,7 +8,7 @@ import { SignIn } from "./pages/signin/index.jsx";
 
 const router = createBrowserRouter([
     {
-        path: "/",
+        path: "/app",
         element: <App />,
     },
     {

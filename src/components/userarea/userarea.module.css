@@ -1,4 +1,4 @@
-.settings {
+.userarea {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -7,7 +7,7 @@
     background-color: #232428;
 }
 
-.settings-profile {
+.userarea-profile {
     display: flex;
     align-items: center;
     border-radius: 4px;
@@ -15,30 +15,30 @@
     cursor: pointer;
 }
 
-.settings-profile svg {
+.userarea-profile svg {
     margin-right: 8px;
 }
 
-.settings-profile p {
+.userarea-profile p {
     min-width: 76px;
     font-size: 14px;
 }
 
-.settings-profile img {
+.userarea-profile img {
     height: 32px;
     border-radius: 10px;
 }
 
-.settings-profile:hover {
+.userarea-profile:hover {
     background-color: #3d3e45;
 }
 
-#settings-profile-status {
-    font-size: 12px;
+.userarea-profile-status {
+    font-size: 12px !important;
     color: #b5bac1;
 }
 
-.settings-settings {
+.userarea-settings {
     width: 32px;
     height: 32px;
     position: relative;
@@ -49,11 +49,11 @@
     cursor: pointer;
 }
 
-.settings-settings:hover {
+.userarea-settings:hover {
     background-color: #3d3e45;
 }
 
-.settings-settings:hover > svg {
+.userarea-settings:hover > svg {
     animation: spin normal 1s;
 }
 

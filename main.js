@@ -85,7 +85,7 @@ app.whenReady().then(async () => {
                 autoHideMenuBar: true,
             });
 
-            mainWindow.loadURL('http://localhost:3000')
+            mainWindow.loadURL('http://localhost:3000/app')
 
             // Open links in default browser
 
@@ -125,7 +125,7 @@ app.whenReady().then(async () => {
             autoHideMenuBar: true,
         });
 
-        mainWindow.loadURL('http://localhost:3000')
+        mainWindow.loadURL('http://localhost:3000/app')
 
         // Open links in default browser
 

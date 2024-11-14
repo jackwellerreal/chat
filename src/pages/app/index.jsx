@@ -4,11 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { MenuBar } from "../../components/menubar/index.jsx";
 import { ServerList } from "../../components/serverlist/index.jsx";
 import { ChannelList } from "../../components/channellist/index.jsx";
-import { Settings } from "../../components/settings/index.jsx";
+import { UserArea } from "../../components/userarea/index.jsx";
 import { Messages } from "../../components/messages/index.jsx";
 import { NewMessage } from "../../components/newmessage/index.jsx";
 import { Online } from "../../components/online/index.jsx";
-import { SignIn } from "../signin/index.jsx";
 
 import firebaseConfig from "../../firebaseconf.jsx";
 import { getAuth } from "firebase/auth";
@@ -20,6 +19,7 @@ import loadingImage from "../../assets/icon.png";
 const auth = getAuth(firebaseConfig);
 
 export function App() {
+    const navigate = useNavigate();
     const [user, loading, error] = useAuthState(auth);
 
     if (loading) {
@@ -34,7 +34,6 @@ export function App() {
     }
 
     if (!user) {
-        const navigate = useNavigate();
         navigate("/signin");
     } else {
         return (
@@ -45,7 +44,7 @@ export function App() {
                         <div className={styles["sidebar"]}>
                             <ServerList />
                             <ChannelList />
-                            <Settings />
+                            <UserArea />
                         </div>
                         <div className={styles["main"]}>
                             <Messages />

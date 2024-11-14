@@ -15,6 +15,7 @@
 .online-user {
     display: flex;
     align-items: center;
+    gap: 8px;
     margin: 0px 8px;
     padding: 4px 8px;
     width: calc(100% - 16px);
@@ -25,10 +26,6 @@
 
 .online-user:hover {
     background-color: #35373c;
-}
-
-.online-user svg {
-    margin-right: 12px;
 }
 
 .online-user p {
@@ -43,4 +40,5 @@
     fill: #ffffff;
     height: 18px;
     vertical-align: -0.2em;
+    margin-left: 4px;
 }

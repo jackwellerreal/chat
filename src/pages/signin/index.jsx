@@ -8,17 +8,18 @@ import firebaseConfig from "../../firebaseconf.jsx";
 const auth = getAuth(firebaseConfig);
 
 export function SignIn() {
+    const navigate = useNavigate();
+
     const FormComplete = async (e) => {
         e.preventDefault();
 
         signInWithEmailAndPassword(
             auth,
-            e.target[0].value + "@chat.com",
+            e.target[0].value + "@example.com",
             e.target[1].value
         )
             .then((userCredential) => {
-                const user = userCredential.user;
-                console.log(user);
+                navigate("/app");
             })
             .catch((error) => {
                 const errorCode = error.code;
@@ -26,7 +27,6 @@ export function SignIn() {
                 console.log(errorCode, errorMessage);
             });
 
-        window.location.reload();
     };
 
     return (

@@ -53,7 +53,7 @@ export function NewMessage() {
 
     useEffect(() => {
         getMoreChannelInfo();
-    }, [currentServer, currentChannel]);
+    }, [currentChannel, currentServer]);
 
     const sendMessage = async (e) => {
         e.preventDefault();
@@ -105,8 +105,6 @@ export function NewMessage() {
                 timestamp: new Date(),
                 uid: user.uid,
             });
-
-            console.log("sent");
         } else if (currentServer && currentChannel) {
             const channelCollection = collection(
                 database,
@@ -123,8 +121,6 @@ export function NewMessage() {
                 timestamp: new Date(),
                 uid: user.uid,
             });
-
-            console.log("sent");
         }
     };
 

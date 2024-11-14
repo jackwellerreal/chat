@@ -4,6 +4,7 @@
     padding: 12px;
     grid-row: span 2;
     background-color: #1e1f22;
+    height: calc(100vh - 24px);
 }
 
 .server-sidebar-icon {

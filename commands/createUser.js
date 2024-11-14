@@ -38,7 +38,7 @@ const admin =
 
 try {
     const userCredential = await auth.createUserWithEmailAndPassword(
-        username + "@chat.com",
+        username + "@example.com",
         password
     );
     const user = userCredential.user;
