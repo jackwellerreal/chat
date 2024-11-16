@@ -48,3 +48,36 @@
 .settings-main {
     padding: 60px 40px 80px;
 }
+
+.settings-main-card {
+    width: 660px;
+    padding: 16px;
+    border-radius: 8px;
+    background-color: #1e1f22;
+}
+
+.settings-main-card img {
+    width: 80px;
+    aspect-ratio: 1;
+}
+
+.settings-main-card-title {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.settings-main-card-title h1 {
+    height: fit-content;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+
+.settings-main-card-content {
+    width: 100%;
+    padding: 16px;
+    border-radius: 8px;
+    background-color: #2b2d31;
+    margin-top: 8px;
+}

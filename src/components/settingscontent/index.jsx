@@ -34,19 +34,43 @@ export function SettingsContent() {
     useEffect(() => {
         getUserInfo();
     }, []);
-    
+
     return (
         <div className={styles["settings"]}>
             <div className={styles["settings-sidebar"]}>
                 <div className={styles["settings-sidebar-items"]}>
-                <div className={styles["settings-sidebar-title"]}>User Settings</div>
-                <div className={styles["settings-sidebar-item"]}>My Account</div>
-                <div className={styles["settings-sidebar-item"]}>Security</div></div>
+                    <div className={styles["settings-sidebar-title"]}>
+                        User Settings
+                    </div>
+                    <div className={styles["settings-sidebar-item"]}>
+                        My Account
+                    </div>
+                    <div className={styles["settings-sidebar-item"]}>
+                        Security
+                    </div>
+                </div>
             </div>
             <div className={styles["settings-main"]}>
-                <h1>Settings</h1>
-                <p>Coming soon!</p>
-                <button>This is a button</button>
+                <div className={styles["settings-main-card"]}>
+                    <div className={styles["settings-main-card-title"]}>
+                        {currentUser ? (
+                            <ProfilePicture
+                                name={currentUser.profile.displayname}
+                                color={currentUser.profile.color}
+                            />
+                        ) : null}
+                        <h1>
+                            @{currentUser ? currentUser.account.username : null}
+                        </h1>
+                    </div>
+                    <div className={styles["settings-main-card-content"]}>
+                        <div className={styles["settings-main-card-item"]}>
+                            {currentUser
+                                ? currentUser.profile.displayname
+                                : null}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
